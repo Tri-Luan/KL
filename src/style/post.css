@@ -1,0 +1,67 @@
+/* Practice START */
+.practice-section{
+    padding: 3rem 15px;
+    background-color: #f1f1f1;
+}
+.practice-title h1{
+    color: #00adef;
+    font-weight: bold;
+    font-size: 40px;
+    letter-spacing: 0.5px;
+    margin-top: 80px;
+}
+.practice-title span{
+    font-size: 17px;
+    letter-spacing: 4px;
+    font-weight: 600;
+    color: black;
+}
+#channel .item__content::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    content: "";
+    width: 100%;
+    height: 0;
+    background-color: #4dc6f4;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+  }
+.practice-title hr{
+    width: 70px;
+    height: 1.5px;
+    background-color: black;
+    margin: auto;
+}
+.practice-img img{
+    border:solid #dedede;
+}
+.practice-section .news-text h2{
+    font-size: 1.4em;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: black;
+    transition: all 0.5s;
+}
+.practice-section .news-text span{
+    font-size: 1em;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #0088c6;
+}
+.practice-section .news-text p{
+    line-height: 2em;
+    color: #999;
+    font-size: 1em;
+}
+.practice-section .news-text , .news-img{
+    margin-bottom: 40px;
+}
+.practice-text h2:hover{
+    color: #0088c6;
+}
+.practice-row{
+    padding: 30px;
+}
+/* Practice END */

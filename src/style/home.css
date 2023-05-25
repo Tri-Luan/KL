@@ -1,0 +1,210 @@
+.udeCarousel {
+  background-image: url(../assets/images/img1.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  height: 500px;
+  position: relative;
+}
+
+.udeCarousel .carousel__content {
+  position: absolute;
+  width: 50%;
+  top: 15%;
+  left: 5%;
+}
+
+.udeCarousel .carousel__content h1 {
+  color: #fff;
+  font-size: 35px;
+  font-weight: bold;
+}
+
+.udeCarousel .carousel__content p {
+  color: #fff;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.udeCarousel .carousel__seach .form-control {
+  padding: 20px;
+  border-radius: 0;
+  border: none;
+}
+
+.udeCarousel .carousel__seach .form-control::placeholder {
+  color: #a1a7b3;
+  font-size: 20px;
+  font-weight: 15px;
+}
+
+.udeCarousel .carousel__seach .form-control:focus {
+  box-shadow: none;
+}
+
+.udeCarousel .carousel__seach .input-group-prepend .input-group-text {
+  background-color: #fff;
+  color: #ec5252;
+  border: none;
+}
+
+.udeCarousel .carousel__seach .input-group-prepend:hover .input-group-text {
+  color: #fff;
+  background-color: #ec5252;
+}
+
+.banner .line {
+  background: linear-gradient(to right, #6e1a52, #ec5252);
+  padding: 5px;
+}
+
+.banner .banner__content {
+  background-color: #29303b;
+}
+
+.banner .banner__content .banner__item {
+  margin: auto;
+  color: #fff;
+  font-size: 24px;
+  font-weight: normal;
+  padding: 20px;
+}
+
+.banner .banner__content .banner_title {
+  text-align: center;
+}
+
+.banner .banner__content .banner_title h3 {
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.banner .banner__content .banner_title p {
+  color: #fff;
+  font-size: 15px;
+  font-weight: normal;
+  padding: 10px;
+}
+
+.btnRed {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  background-color: #ec5252;
+  padding: 10px 20px;
+  border-radius: 2px;
+  border: 1px solid #ec5252;
+  transition: all 0.5s;
+}
+
+.btnRed:hover {
+  background-color: #992337;
+  border-color: #992337;
+  color: #fff;
+}
+
+.btnRed:focus {
+  outline: none;
+}
+
+.intro {
+  background: linear-gradient(to right, #6e1a52, #ec5252);
+}
+
+.intro .intro__content {
+  display: flex;
+  width: 80%;
+  margin: auto;
+  padding-top: 8px;
+}
+
+.intro .intro__item .item__icon {
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.intro .intro__item .item__text {
+  padding-top: 10px;
+}
+
+.intro .intro__item .item__text h3 {
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.intro .intro__item .item__text p {
+  color: #fff;
+  font-size: 13px;
+  font-weight: normal;
+}
+
+@media screen and (max-width: 768px) {
+  .intro {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .intro .item__text {
+    text-align: center;
+  }
+}
+
+/* OUR SERVICES */
+#services {
+  /* background-image: url(./../images/s1.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; */
+  text-align: center;
+}
+
+#services h1 {
+  font-size: 2.5rem;
+  padding: 40px;
+  font-weight: 600;
+}
+
+.services__content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.services__item h3 {
+  font-size: 1.5rem;
+  padding: 20px;
+  font-weight: 600;
+  transition: all 0.5s;
+}
+
+.services__item p {
+  padding: 10px;
+}
+
+.services__item i {
+  background-color: white;
+  color: #992d52;
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
+  border: 1px solid #992d52;
+  font-size: 2.5rem;
+  padding: 3px;
+  line-height: 100px;
+  transition: all 0.5s;
+}
+.services__item:hover i {
+  color: #ec5252;
+
+}
+.services__item h3:hover{
+  color: #0088c6;
+}
