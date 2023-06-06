@@ -71,16 +71,6 @@ const CreateCourse = () => {
     if (!formValid) {
       return;
     }
-    console.log({
-      courseName: courseName,
-      description: description,
-      objective: objective,
-      courseImage: courseAvatar,
-      courseLevelId: level,
-      authorId: authorId,
-      reward: reward,
-      time: time,
-    });
     try {
       const response = await addCourse({
         courseName: courseName,
@@ -157,7 +147,6 @@ const CreateCourse = () => {
                 visible={setAlertIsShowing}
               />
             ) : null}
-            <button onClick={() => setAlertIsShowing(true)}>Alert</button>
             {errMessage !== null ? (
               <div
                 className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"

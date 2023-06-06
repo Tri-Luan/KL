@@ -3,7 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useLoginMutation } from "../../redux/authApiSlice";
 import { setUser, setToken } from "../../redux/authSlice";
-import { useLazyGetUserQuery } from "../../redux/usersApiSlice";
+import usePersist from "../../hooks/usePersist";
+import Cookies from "universal-cookie";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,17 +15,9 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errMessage, setErrMessage] = useState(null);
   const [formValid, setFormValid] = useState(false);
+  // const [persist, setPersist] = usePersist();
   const [login, { isLoading }] = useLoginMutation();
-
-  const [getUser, results] = useLazyGetUserQuery();
-
-  useEffect(() => {
-    if (results && results.data) {
-      dispatch(setUser(results.data));
-      navigate(from, { replace: true });
-    }
-  }, [results]);
-
+  const cookies = new Cookies();
   useEffect(() => {
     if (userName !== "" && password !== "") {
       setFormValid(true);
@@ -39,7 +32,11 @@ const Login = () => {
     try {
       const authData = await login({ userName, password }).unwrap();
       dispatch(setToken(authData.token));
-      await getUser(authData.userId);
+      dispatch(setUser({ id: authData.userId }));
+      cookies.set("jwt_refresh", authData.token.refreshToken, { path: "/" });
+      cookies.set("jwt_access", authData.token.accessToken, { path: "/" });
+      cookies.set("user_id", authData.userId, { path: "/" });
+      navigate(from, { replace: true });
     } catch (err) {
       if (!err?.originalStatus) {
         // isLoading: true until timeout occurs

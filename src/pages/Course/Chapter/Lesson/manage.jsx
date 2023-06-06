@@ -1,62 +1,38 @@
 import { Button } from "flowbite-react";
-import React, { useState } from "react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-import ModalComponent from "../../../components/ui/ModalComponent";
-import useModal from "../../../hooks/useModal";
+import ModalComponent from "../../../../components/ui/ModalComponent";
+import useModal from "../../../../hooks/useModal";
+import { selectCurrentUser } from "../../../../redux/authSlice";
 import {
-  useAddChapterMutation,
-  useDeleteChapterMutation,
-  useGetChaptersByCourseIdQuery,
-  useSetHideChapterMutation,
-  useUpdateChapterMutation,
-} from "../../../redux/courseApiSlice";
+  useDeleteLessonMutation,
+  useGetLessonsByChapterIdQuery,
+  useSetHideLessonMutation,
+} from "../../../../redux/courseApiSlice";
 
-const ChapterManagement = () => {
+const LessonManagement = () => {
   const { id } = useParams();
+  const user = useSelector(selectCurrentUser);
   const {
     data,
-    isLoading: isLoadingGetChapters,
+    isLoading: isLoadingGetLessons,
     isSuccess,
     isError,
     error,
     refetch,
-  } = useGetChaptersByCourseIdQuery({ courseId: id });
+  } = useGetLessonsByChapterIdQuery({ chapterId: id });
   console.log(data);
-  const [deleteChapter, { isLoading: isLoading1 }] = useDeleteChapterMutation();
-  const [addChapter, { isLoading: isLoading2 }] = useAddChapterMutation();
-  const [setHideChapter, { isLoading: isLoading3 }] =
-    useSetHideChapterMutation();
-  const [updateChapter, { isLoading: isLoading4 }] = useUpdateChapterMutation();
-
-  const {
-    arg: arg1,
-    isShowing: isShowing1,
-    content: content1,
-    toggle: toggle1,
-    setArg: setArg1,
-    setContent: setContent1,
-  } = useModal();
-  const {
-    arg: arg2,
-    isShowing: isShowing2,
-    content: content2,
-    toggle: toggle2,
-    setArg: setArg2,
-    setContent: setContent2,
-  } = useModal();
-  const {
-    arg: arg3,
-    isShowing: isShowing3,
-    toggle: toggle3,
-    content: content3,
-    setArg: setArg3,
-    setContent: setContent3,
-  } = useModal();
+  const [deleteLesson, { isLoading: isLoadingDeleteLesson }] =
+    useDeleteLessonMutation();
+  const [setHideLesson, { isLoading: isLoadingHideLesso }] =
+    useSetHideLessonMutation();
+  const { arg, isShowing, toggle, setArg } = useModal();
   const [success, setSuccess] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
-  const handleDeleteChapter = async (chapterId) => {
+  const handleDeleteLesson = async (chapterId) => {
     try {
-      const response = await deleteChapter(chapterId)
+      const response = await deleteLesson(chapterId)
         .unwrap()
         .then(() => {
           refetch();
@@ -75,55 +51,9 @@ const ChapterManagement = () => {
       }
     }
   };
-  const handleSetHideChapter = async (chapterId) => {
+  const handleSetHideLesson = async (chapterId) => {
     try {
-      const response = await setHideChapter(chapterId)
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
-      } else {
-        setErrMessage(response.data.errorMessages);
-      }
-    } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
-      } else if (err.originalStatus === 401) {
-        setErrMessage("Unauthorized");
-      }
-    }
-  };
-  const handleAddChapter = async (chapterName) => {
-    try {
-      const response = await addChapter({ courseId: id, chapterName })
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
-      } else {
-        setErrMessage(response.data.errorMessages);
-      }
-    } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
-      } else if (err.originalStatus === 401) {
-        setErrMessage("Unauthorized");
-      }
-    }
-  };
-  const handleUpdateChapter = async (chapterId, chapterName) => {
-    // console.log(chapterId, chapterName);
-    try {
-      const response = await updateChapter({
-        chapterId: chapterId,
-        chapterName: chapterName,
-      })
+      const response = await setHideLesson(chapterId)
         .unwrap()
         .then(() => {
           refetch();
@@ -144,7 +74,7 @@ const ChapterManagement = () => {
   };
   return (
     <div className="my-10 mx-auto">
-      {isLoadingGetChapters || isLoading1 ? (
+      {isLoadingGetLessons || isLoadingDeleteLesson ? (
         <div>
           <li className="flex items-center">
             <div role="status">
@@ -172,12 +102,11 @@ const ChapterManagement = () => {
       ) : isSuccess ? (
         <div>
           <h2 className="text-3xl font-bold mb-6 pb-4 text-center">
-            Chapter Manage
+            Lesson Manage
           </h2>
-
-          <section class="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
-            <div class="px-4 mx-auto max-w-screen-2xl lg:px-12">
-              <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
+          <section class="bg-gray-50 dark:bg-gray-900 py-7 sm:py-5">
+            <div class="px-2 mx-auto max-w-screen-2xl lg:px-12">
+              <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 rounded-lg">
                 <div class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                   <div class="flex items-center flex-1 space-x-4">
                     <div>
@@ -195,9 +124,9 @@ const ChapterManagement = () => {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            fill-rule="evenodd"
+                            fillRule="evenodd"
                             d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                            clip-rule="evenodd"
+                            clipRule="evenodd"
                           ></path>
                         </svg>
                         Last 30 days
@@ -210,15 +139,15 @@ const ChapterManagement = () => {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
                             d="M19 9l-7 7-7-7"
                           ></path>
                         </svg>
                       </button>
                     </div>
-                    <label for="table-search" class="sr-only">
+                    <label htmlFor="table-search" class="sr-only">
                       Search
                     </label>
                     <div class="relative">
@@ -231,9 +160,9 @@ const ChapterManagement = () => {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            fill-rule="evenodd"
+                            fillRule="evenodd"
                             d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                            clip-rule="evenodd"
+                            clipRule="evenodd"
                           ></path>
                         </svg>
                       </div>
@@ -246,39 +175,25 @@ const ChapterManagement = () => {
                     </div>
                   </div>
                   <div class="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-                    <Button
-                      gradientDuoTone="cyanToBlue"
-                      onClick={() => {
-                        toggle1();
-                      }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 4.5v15m7.5-7.5h-15"
-                        />
-                      </svg>
-                      Add chapter
-                    </Button>
-                    <ModalComponent
-                      isShowing={isShowing1}
-                      arg={arg1}
-                      content={content1}
-                      type="addchapterform"
-                      title="Add new chapter"
-                      buttonContent="Add chapter"
-                      func={handleAddChapter}
-                      hide={toggle1}
-                      setContent={setContent1}
-                    />
+                    <Link to={`/coursemanagement/lesson/create/${id}`}>
+                      <Button gradientDuoTone="cyanToBlue">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 4.5v15m7.5-7.5h-15"
+                          />
+                        </svg>
+                        Create lesson
+                      </Button>
+                    </Link>
                   </div>
                 </div>
                 <div class="overflow-x-auto">
@@ -292,17 +207,16 @@ const ChapterManagement = () => {
                               type="checkbox"
                               class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                             />
-                            <label for="checkbox-all" class="sr-only">
+                            <label htmlFor="checkbox-all" class="sr-only">
                               checkbox
                             </label>
                           </div>
                         </th>
                         <th scope="col" class="px-4 py-3">
-                          Chapter name
+                          Lesson name
                         </th>
-
                         <th scope="col" class="px-4 py-3">
-                          Lesson
+                          Score
                         </th>
                         <th scope="col" class="px-4 py-3">
                           Show
@@ -313,8 +227,8 @@ const ChapterManagement = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.chapters !== null
-                        ? data.chapters.map((chapter, i) => {
+                      {data.lessons !== null
+                        ? data.lessons.map((lesson, i) => {
                             return (
                               <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <td class="w-4 px-4 py-3">
@@ -326,7 +240,7 @@ const ChapterManagement = () => {
                                       class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                     />
                                     <label
-                                      for="checkbox-table-search-1"
+                                      htmlFor="checkbox-table-search-1"
                                       class="sr-only"
                                     >
                                       checkbox
@@ -342,22 +256,16 @@ const ChapterManagement = () => {
                                 src={"data:image/jpeg;base64," + course.image}
                                 alt="course img"
                               /> */}
-                                  {chapter.chapterName}
+                                  {lesson.lessonName}
                                 </th>
-                                <td class="px-4 py-2">
-                                  <Link
-                                    to={`/coursemanagement/lesson/${chapter.chapterId}`}
-                                    className="font-medium text-blue-600 dark:text-blue-500 hover:text-blue-700"
-                                  >
-                                    Manage
-                                  </Link>
+                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                  {lesson.score}
                                 </td>
-
                                 <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                   <div class="flex items-center">
                                     <div
                                       className={`inline-block w-4 h-4 mr-2 ${
-                                        chapter.isHidden
+                                        lesson.isHidden
                                           ? `bg-red-500`
                                           : `bg-green-500`
                                       }  rounded-full`}
@@ -368,7 +276,7 @@ const ChapterManagement = () => {
                                       outline
                                       pill
                                       onClick={() => {
-                                        handleSetHideChapter(chapter.chapterId);
+                                        handleSetHideLesson(lesson.lessonId);
                                       }}
                                     >
                                       switch
@@ -377,12 +285,8 @@ const ChapterManagement = () => {
                                 </td>
                                 <td>
                                   <div class="flex items-center px-5">
-                                    <button
-                                      onClick={() => {
-                                        setArg2(chapter.chapterId);
-                                        toggle2();
-                                        setContent2(chapter.chapterName);
-                                      }}
+                                    <Link
+                                      to={`/coursemanagement/lesson/update/${lesson.lessonId}`}
                                     >
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -398,18 +302,7 @@ const ChapterManagement = () => {
                                           d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
                                         />
                                       </svg>
-                                    </button>
-                                    <ModalComponent
-                                      isShowing={isShowing2}
-                                      arg={arg2}
-                                      hide={toggle2}
-                                      type="editchapterform"
-                                      func={handleUpdateChapter}
-                                      title="Update chapter"
-                                      buttonContent="Update chapter"
-                                      content={content2}
-                                      setContent={setContent2}
-                                    />
+                                    </Link>
                                     <button
                                       className="ml-1"
                                       data-modal-target="popup-modal"
@@ -423,8 +316,8 @@ const ChapterManagement = () => {
                                         stroke="currentColor"
                                         className="w-8 h-8 text-red-700"
                                         onClick={() => {
-                                          setArg3(chapter.chapterId);
-                                          toggle3();
+                                          setArg(lesson.lessonId);
+                                          toggle();
                                         }}
                                       >
                                         <path
@@ -435,11 +328,11 @@ const ChapterManagement = () => {
                                       </svg>
                                     </button>
                                     <ModalComponent
-                                      isShowing={isShowing3}
-                                      arg={arg3}
-                                      title="chapter"
-                                      hide={toggle3}
-                                      func={handleDeleteChapter}
+                                      isShowing={isShowing}
+                                      arg={arg}
+                                      hide={toggle}
+                                      func={handleDeleteLesson}
+                                      title="lesson"
                                     />
                                   </div>
                                 </td>
@@ -479,9 +372,9 @@ const ChapterManagement = () => {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            fill-rule="evenodd"
+                            fillRule="evenodd"
                             d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                            clip-rule="evenodd"
+                            clipRule="evenodd"
                           />
                         </svg>
                       </a>
@@ -541,9 +434,9 @@ const ChapterManagement = () => {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            fill-rule="evenodd"
+                            fillRule="evenodd"
                             d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd"
+                            clipRule="evenodd"
                           />
                         </svg>
                       </a>
@@ -559,4 +452,4 @@ const ChapterManagement = () => {
   );
 };
 
-export default ChapterManagement;
+export default LessonManagement;

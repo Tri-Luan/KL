@@ -8,6 +8,7 @@ import { selectCurrentUser } from "../../redux/authSlice";
 import {
   useDeleteCourseMutation,
   useGetCoursesByUserIdQuery,
+  useSetHideCourseMutation,
 } from "../../redux/courseApiSlice";
 const CourseManagement = () => {
   const user = useSelector(selectCurrentUser);
@@ -20,7 +21,11 @@ const CourseManagement = () => {
     refetch,
   } = useGetCoursesByUserIdQuery({ userId: user.id });
   console.log(data);
-  const [deleteCourse, { isLoading }] = useDeleteCourseMutation();
+  console.log(user);
+  const [deleteCourse, { isLoading: isLoadingDeleteCourse }] =
+    useDeleteCourseMutation();
+  const [setHideCourse, { isLoading: isLoadingHideCourse }] =
+    useSetHideCourseMutation();
   const { arg, isShowing, toggle, setArg } = useModal();
   const [success, setSuccess] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
@@ -45,9 +50,30 @@ const CourseManagement = () => {
       }
     }
   };
+  const handleSetHideCourse = async (courseId) => {
+    try {
+      const response = await setHideCourse(courseId)
+        .unwrap()
+        .then(() => {
+          refetch();
+        });
+      if (response.data.isSuccessful) {
+        setSuccess(true);
+        setErrMessage(["Register successful"]);
+      } else {
+        setErrMessage(response.data.errorMessages);
+      }
+    } catch (err) {
+      if (err.originalStatus === 200) {
+        setErrMessage("Create successful");
+      } else if (err.originalStatus === 401) {
+        setErrMessage("Unauthorized");
+      }
+    }
+  };
   return (
     <div className="my-10 mx-auto">
-      {isLoadingGetCourses || isLoading ? (
+      {isLoadingGetCourses || isLoadingDeleteCourse ? (
         <div>
           <li className="flex items-center">
             <div role="status">
@@ -315,8 +341,24 @@ const CourseManagement = () => {
                                   </td>
                                   <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     <div class="flex items-center">
-                                      <div class="inline-block w-4 h-4 mr-2 bg-green-400 rounded-full"></div>
-                                      TRUE
+                                      <div
+                                        className={`inline-block w-4 h-4 mr-2 ${
+                                          course.isHidden
+                                            ? `bg-red-500`
+                                            : `bg-green-500`
+                                        }  rounded-full`}
+                                      ></div>
+                                      <Button
+                                        size="xs"
+                                        gradientDuoTone="cyanToBlue"
+                                        outline
+                                        pill
+                                        onClick={() => {
+                                          handleSetHideCourse(course.id);
+                                        }}
+                                      >
+                                        switch
+                                      </Button>
                                     </div>
                                   </td>
                                   <td>

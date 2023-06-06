@@ -1,9 +1,13 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { selectCurrentUser } from "../../redux/authSlice";
-import { useSelector } from "react-redux";
+import { selectCurrentUser, setUser } from "../../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useGetUserMutation } from "../../redux/usersApiSlice";
+import Cookies from "universal-cookie";
+import { Button } from "flowbite-react";
+import { useSendLogoutMutation } from "../../redux/authApiSlice";
 
 // import { FingerPrintIcon } from "@heroicons/react/solid";
 function classNames(...classes) {
@@ -14,16 +18,36 @@ const Header = () => {
   // let activeStyle = {
   //   textDecoration: "underline",
   // };
-  const user = useSelector(selectCurrentUser);
   let normalStyle =
     "nav-link hover:text-[#2e72e7] text-gray-800 px-3 py-2 rounded-md text-base font-medium ";
   let activeClassName =
     "nav-link hover:normal-case border-b-2 border-[#2e72e7] text-[#2e72e7] px-3 py-2 text-base font-medium";
-  const [isOpen, setIsOpen] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const user = useSelector(selectCurrentUser);
+  const cookies = new Cookies();
+  const dispatch = useDispatch();
+  const [sendLogout] = useSendLogoutMutation();
+
+  // useEffect(() => {
+  //   if (user !== null) {
+  //     // setPersist((prev) => !prev);
+  //     try {
+  //       const response = await getUser(user.id);
+  //     } catch (error) {
+
+  //     }D
+  //     dispatch(setUser(response));
+  //   }
+  // }, []);
   const navigate = useNavigate();
   const handleLogout = () => {
+    cookies.remove("user_id", { path: "/" });
+    cookies.remove("jwt_accessToken", { path: "/" });
+    cookies.remove("jwt_refreshToken", { path: "/" });
+    sendLogout();
     navigate("/");
+    window.location.reload();
   };
   return (
     <div>
@@ -197,15 +221,18 @@ const Header = () => {
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <Link
-                            to="/coursemanagement"
+                          <Button
+                            onClick={() => {
+                              handleLogout();
+                            }}
+                            pill
                             className={classNames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
                           >
                             Log out
-                          </Link>
+                          </Button>
                         )}
                       </Menu.Item>
                     </Menu.Items>

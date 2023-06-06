@@ -13,7 +13,6 @@ import {
 
 const UpdateCourse = () => {
   // const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [formValid, setFormValid] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
   const [courseName, setCourseName] = useState("");

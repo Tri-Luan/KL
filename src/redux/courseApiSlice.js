@@ -10,7 +10,6 @@ export const courseApiSlice = apiSlice.injectEndpoints({
     getCourseDetail: builder.query({
       query: (arg) => {
         const { userId, courseId } = arg;
-        console.log("arg: ", userId);
         return {
           url: `${ApiPaths.course.root + ApiPaths.course.detail}`,
           params: { userId, courseId },
@@ -29,7 +28,6 @@ export const courseApiSlice = apiSlice.injectEndpoints({
     getCoursesByUserId: builder.query({
       query: (arg) => {
         const { userId } = arg;
-        console.log("arg: ", userId);
         return {
           url: `${ApiPaths.course.root + ApiPaths.course.management.root}`,
           params: { userId },
@@ -41,12 +39,7 @@ export const courseApiSlice = apiSlice.injectEndpoints({
       query: (body) => ({
         url: ApiPaths.course.root,
         method: "PUT",
-        // headers: {
-        //   'content-type': credentials.courseImage.type,
-        //   // 'content-length': `${credentials.size}`, // 👈 Headers need to be a string
-        // },
         body,
-        // formData: true,
       }),
     }),
     updateCourse: builder.mutation({
@@ -62,6 +55,154 @@ export const courseApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    setHideCourse: builder.mutation({
+      query: (id) => ({
+        url: `${
+          ApiPaths.course.root +
+          ApiPaths.course.management.root +
+          ApiPaths.course.management.hidden +
+          "/" +
+          id
+        }`,
+        method: "POST",
+      }),
+    }),
+
+    //Chapter
+    getChaptersByCourseId: builder.query({
+      query: (arg) => {
+        const { courseId } = arg;
+        return {
+          url: `${
+            ApiPaths.course.root +
+            ApiPaths.course.chapter.root +
+            ApiPaths.course.chapter.management
+          }`,
+          params: { courseId },
+        };
+      },
+      keepUnusedDataFor: 5,
+    }),
+    addChapter: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.chapter.root,
+        method: "PUT",
+        body,
+      }),
+    }),
+    updateChapter: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.chapter.root,
+        method: "POST",
+        body,
+      }),
+    }),
+    deleteChapter: builder.mutation({
+      query: (id) => ({
+        url: `${
+          ApiPaths.course.root + ApiPaths.course.chapter.root + "/" + id
+        }`,
+        method: "DELETE",
+      }),
+    }),
+    setHideChapter: builder.mutation({
+      query: (id) => ({
+        url: `${
+          ApiPaths.course.root +
+          ApiPaths.course.chapter.root +
+          ApiPaths.course.chapter.hidden +
+          "/" +
+          id
+        }`,
+        method: "POST",
+      }),
+    }),
+
+    //Lesson
+    getLessonsByChapterId: builder.query({
+      query: (arg) => {
+        const { chapterId } = arg;
+        return {
+          url: `${
+            ApiPaths.course.root +
+            ApiPaths.course.lesson.root +
+            ApiPaths.course.lesson.management
+          }`,
+          params: { chapterId },
+        };
+      },
+      keepUnusedDataFor: 5,
+    }),
+    getLessonDetails: builder.query({
+      query: (arg) => {
+        const { userId, lessonId } = arg;
+        return {
+          url: `${
+            ApiPaths.course.root +
+            ApiPaths.course.lesson.root +
+            ApiPaths.course.lesson.detail
+          }`,
+          params: { userId, lessonId },
+        };
+      },
+    }),
+    getLessonDetailsUpdate: builder.query({
+      query: (arg) =>
+        `${
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.management +
+          ApiPaths.course.lesson.detail
+        }/${arg}`,
+    }),
+    addLesson: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.lesson.root,
+        method: "PUT",
+        body,
+      }),
+    }),
+    updateLesson: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.lesson.root,
+        method: "POST",
+        body,
+      }),
+    }),
+    deleteLesson: builder.mutation({
+      query: (id) => ({
+        url: `${ApiPaths.course.root + ApiPaths.course.lesson.root + "/" + id}`,
+        method: "DELETE",
+      }),
+    }),
+    setHideLesson: builder.mutation({
+      query: (id) => ({
+        url: `${
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.hidden +
+          "/" +
+          id
+        }`,
+        method: "POST",
+      }),
+    }),
+    runCodeLesson: builder.mutation({
+      query: (body) => ({
+        url: `${
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.run
+        }`,
+        method: "POST",
+        body,
+      }),
+    }),
+
+    getCodeLanguages: builder.query({
+      query: () => `${ApiPaths.course.root + ApiPaths.course.codeLanguages}`,
+      keepUnusedDataFor: 5,
+    }),
   }),
 });
 
@@ -69,8 +210,23 @@ export const {
   useAddCourseMutation,
   useUpdateCourseMutation,
   useDeleteCourseMutation,
+  useSetHideCourseMutation,
   useGetCoursesQuery,
   useGetCoursesByUserIdQuery,
   useGetCourseDetailQuery,
   useGetCourseDetailUpdateQuery,
+  useGetChaptersByCourseIdQuery,
+  useAddChapterMutation,
+  useUpdateChapterMutation,
+  useDeleteChapterMutation,
+  useSetHideChapterMutation,
+  useGetLessonsByChapterIdQuery,
+  useGetLessonDetailsQuery,
+  useGetLessonDetailsUpdateQuery,
+  useAddLessonMutation,
+  useRunCodeLessonMutation,
+  useUpdateLessonMutation,
+  useDeleteLessonMutation,
+  useSetHideLessonMutation,
+  useGetCodeLanguagesQuery,
 } = courseApiSlice;

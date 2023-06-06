@@ -3,14 +3,14 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  height: 500px;
+  height: 550px;
   position: relative;
 }
 
 .udeCarousel .carousel__content {
   position: absolute;
   width: 50%;
-  top: 15%;
+  top: 10%;
   left: 5%;
 }
 
@@ -203,8 +203,7 @@
 }
 .services__item:hover i {
   color: #ec5252;
-
 }
-.services__item h3:hover{
+.services__item h3:hover {
   color: #0088c6;
 }

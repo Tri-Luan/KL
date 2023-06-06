@@ -16,7 +16,7 @@ const CourseDetail = () => {
     isError,
     error,
   } = useGetCourseDetailQuery({ userId: user.id, courseId: id });
-  console.log(course);
+  console.log(user);
   useEffect(() => {
     if (isSuccess) {
       document.getElementById("objective").innerHTML = course.objective;
@@ -137,68 +137,36 @@ const CourseDetail = () => {
             <Tabs.Group aria-label="Tabs with underline" style="underline">
               <Tabs.Item active={true} title="Objective">
                 <div id="objective"></div>
-                {/* <div>{course.Objective}</div> */}
               </Tabs.Item>
               <Tabs.Item title="Tasks">
                 <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
-                  <div className="lesson mt-14">
-                    <center>
-                      <div className="title w-fit px-6 py-3 text-center rounded-full bg-indigo-500 text-white">
-                        <h3>Class and Object</h3>
+                  {course.chapters.map((chapter, i) => {
+                    return (
+                      <div className="lesson mt-14">
+                        <center>
+                          <div className="title w-fit px-6 py-3 text-center rounded-full bg-indigo-500 text-white">
+                            <h3>{chapter.name}</h3>
+                          </div>
+                          <div className="flex justify-center my-6">
+                            {chapter.lessons.map((lesson, i) => {
+                              return (
+                                <Link
+                                  to={`/codeeditor/${lesson.id}`}
+                                  className="mx-1.5 my-3"
+                                >
+                                  <div className="rounded-full hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10">
+                                    {lesson.lessonNumber}
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </center>
                       </div>
-                      <div className="flex justify-center my-6">
-                        <Link
-                          to="/course/:id/:lessonid"
-                          className="mx-1.5 my-3"
-                        >
-                          <div className="rounded-full hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10">
-                            1
-                          </div>
-                        </Link>
-                        <Link
-                          to="/course/:id/:lessonid"
-                          className="mx-1.5 my-3"
-                        >
-                          <div className="rounded-full hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10">
-                            2
-                          </div>
-                        </Link>
-                        <Link
-                          to="/course/:id/:lessonid"
-                          className="mx-1.5 my-3"
-                        >
-                          <div className="rounded-full hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10">
-                            3
-                          </div>
-                        </Link>
-                        <Link
-                          to="/course/:id/:lessonid"
-                          className="mx-1.5 my-3"
-                        >
-                          <div className="rounded-full hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10">
-                            4
-                          </div>
-                        </Link>
-                        <Link
-                          to="/course/:id/:lessonid"
-                          className="mx-1.5 my-3"
-                        >
-                          <div className="rounded-full hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10">
-                            5
-                          </div>
-                        </Link>
-                        <Link
-                          to="/course/:id/:lessonid"
-                          className="mx-1.5 my-3"
-                        >
-                          <div className="rounded-full hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10">
-                            6
-                          </div>
-                        </Link>
-                      </div>
-                    </center>
-                  </div>
-                  <div className="lesson mt-14">
+                    );
+                  })}
+
+                  {/* <div className="lesson mt-14">
                     <center>
                       <div className="title w-fit px-6 py-3 text-center rounded-full bg-indigo-500 text-white">
                         <h3>Static variables and methods</h3>
@@ -360,7 +328,7 @@ const CourseDetail = () => {
                         </Link>
                       </div>
                     </center>
-                  </div>
+                  </div> */}
                 </div>
               </Tabs.Item>
               <Tabs.Item title="Reviews">Reviews</Tabs.Item>

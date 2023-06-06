@@ -5,6 +5,8 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^37.1.0",
     "@ckeditor/ckeditor5-react": "^6.0.0",
+    "@codemirror/lang-javascript": "^6.1.8",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.17",
     "@reduxjs/toolkit": "^1.9.5",
@@ -21,12 +23,13 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-redux": "^8.0.5",
-    "react-redux-form": "^1.16.14",
     "react-router-dom": "^6.11.0",
     "react-scripts": "5.0.1",
+    "react-split": "^2.0.14",
     "redux": "^4.2.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.2",
+    "universal-cookie": "^4.0.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
