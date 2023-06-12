@@ -6,25 +6,36 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
 import AlertComponent from "../../components/ui/AlertComponent";
+import useCkEditor from "../../hooks/useCkEditor";
 import { selectCurrentUser } from "../../redux/authSlice";
-import { useAddCourseMutation } from "../../redux/courseApiSlice";
+import {
+  useAddCourseMutation,
+  useGetThemesQuery,
+} from "../../redux/courseApiSlice";
 
 const CreateCourse = () => {
   // const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const authorId = user.id;
+  const { CkEditorData, setCkEditorData } = useCkEditor();
   const [formValid, setFormValid] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
   const [courseName, setCourseName] = useState("");
   const [level, setLevel] = useState(1);
   const [description, setDescription] = useState("");
-  const [objective, setObjective] = useState("");
   const [courseAvatar, setCourseAvatar] = useState("");
   const [reward, setReward] = useState("");
+  const [theme, setTheme] = useState("");
   const [time, setTime] = useState(0);
   const [success, setSuccess] = useState(false);
-
   const [alertIsShowing, setAlertIsShowing] = useState(false);
+  const {
+    data,
+    isLoading: isLoadingGetThemes,
+    isSuccess,
+    isError,
+    error,
+  } = useGetThemesQuery();
   const [addCourse, { isLoading }] = useAddCourseMutation();
   // useEffect(() => {
   //   if (results && results.data) {
@@ -38,22 +49,23 @@ const CreateCourse = () => {
   //   }
   // }, [results]);
 
-  const callBackFunction = (childData) => {
-    setObjective(childData);
-  };
-
+  useEffect(() => {
+    if (!isLoadingGetThemes) {
+      setTheme(data.themes[0].themeImage);
+    }
+  }, [isLoadingGetThemes]);
   useEffect(() => {
     if (
       courseName !== "" &&
       description !== "" &&
-      objective !== "" &&
+      CkEditorData !== "" &&
       courseAvatar !== null &&
       reward !== "" &&
       time !== 0
     ) {
       setFormValid(true);
     }
-  }, [courseName, description, objective, courseAvatar, reward, time]);
+  }, [courseName, description, CkEditorData, courseAvatar, reward, time]);
 
   const convertToBase64 = (file) => {
     const reader = new FileReader();
@@ -75,23 +87,34 @@ const CreateCourse = () => {
       const response = await addCourse({
         courseName: courseName,
         description: description,
-        objective: objective,
+        objective: CkEditorData,
         courseImage: courseAvatar,
+        courseTheme: theme,
         courseLevelId: level,
         authorId: authorId,
         reward: reward,
         time: time,
       }).unwrap();
-      // if (response.data.isSuccessful) {
-      //   setErrMessage("Create successed");
-      // } else {
-      //   setErrMessage(response.data.errorMessages);
-      // }
-    } catch (err) {
-      if (!err?.originalStatus) {
+      if (response.isSuccessful) {
+        setCkEditorData();
+        setTime(0);
+        setDescription("");
+        setLevel(1);
+        setCourseAvatar("");
+        setReward("");
+        setCourseName("");
+        setErrMessage(null);
+        setFormValid(false);
         setAlertIsShowing(true);
-      } else if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
+        window.scrollTo(0, 0);
+      } else {
+        setErrMessage(response.errorMessages);
+        window.scrollTo(0, 0);
+      }
+    } catch (err) {
+      console.error(err);
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
       }
@@ -99,7 +122,7 @@ const CreateCourse = () => {
   };
   return (
     <div>
-      {isLoading ? (
+      {isLoadingGetThemes ? (
         <div>
           <li className="flex items-center">
             <div role="status">
@@ -121,7 +144,7 @@ const CreateCourse = () => {
               </svg>
               <span className="sr-only">Loading...</span>
             </div>
-            Processing...
+            Loading...
           </li>
         </div>
       ) : (
@@ -143,7 +166,7 @@ const CreateCourse = () => {
             </h2>
             {alertIsShowing ? (
               <AlertComponent
-                content={"Create new course successed"}
+                content={"Create new course success"}
                 visible={setAlertIsShowing}
               />
             ) : null}
@@ -215,6 +238,29 @@ const CreateCourse = () => {
                 </div>
                 <div>
                   <label
+                    for="theme"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Theme
+                  </label>
+                  <select
+                    id="theme"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    required
+                    onChange={(e) => setTheme(e.target.value)}
+                  >
+                    {data.themes.map((theme, i) => {
+                      return (
+                        <option value={theme.themeImage}>
+                          {theme.themeName}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                <div className={`mt-5 ${theme}`}></div>
+                <div>
+                  <label
                     for="reward"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
@@ -279,7 +325,10 @@ const CreateCourse = () => {
                   >
                     Objective
                   </label>
-                  <CkEditor callBack={callBackFunction} />
+                  <CkEditor
+                    CkEditorData={CkEditorData}
+                    setCkEditorData={setCkEditorData}
+                  />
                 </div>
               </div>
               <button

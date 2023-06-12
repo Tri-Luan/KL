@@ -6,6 +6,7 @@ import { useRefreshMutation } from "../../redux/authApiSlice";
 import { selectCurrentToken, setToken, setUser } from "../../redux/authSlice";
 import Cookies from "universal-cookie";
 import { useDispatch } from "react-redux";
+import { useGetUserMutation } from "../../redux/usersApiSlice";
 const PersistLogin = () => {
   const [persist] = usePersist();
   const dispatch = useDispatch();
@@ -13,6 +14,7 @@ const PersistLogin = () => {
   const token = useSelector(selectCurrentToken);
   const effectRan = useRef(false);
   const [trueSuccess, setTrueSuccess] = useState(false);
+  const [getUser] = useGetUserMutation();
   const [refresh, { isUninitialized, isLoading, isSuccess, isError, error }] =
     useRefreshMutation();
 
@@ -28,16 +30,17 @@ const PersistLogin = () => {
         console.log("verifying refresh token");
         try {
           const response = await refresh(body);
-
-          if (userId !== undefined) dispatch(setUser({ id: userId }));
-          //const { accessToken } = response.data
           if (response.isSuccessful) {
             dispatch(setToken(response.token));
           } else {
             dispatch(setToken({ accessToken: cookies.get("jwt_access") }));
           }
-          console.log(cookies.get("user_id"));
-          console.log(response);
+          if (userId !== undefined) {
+            const response = await getUser(userId);
+            console.log(response);
+            dispatch(setUser(response.data));
+          }
+
           setTrueSuccess(true);
         } catch (err) {
           console.error(err);
@@ -46,9 +49,7 @@ const PersistLogin = () => {
 
       if (!token && persist) verifyRefreshToken();
     }
-
     return () => (effectRan.current = true);
-
     // eslint-disable-next-line
   }, []);
 

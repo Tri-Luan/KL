@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import CkEditor from "../../../../components/CkEditor/ckeditor";
 import AlertComponent from "../../../../components/ui/AlertComponent";
+import useCkEditor from "../../../../hooks/useCkEditor";
 import { selectCurrentUser } from "../../../../redux/authSlice";
 import {
   useAddLessonMutation,
@@ -16,6 +17,7 @@ const CreateLesson = () => {
   const user = useSelector(selectCurrentUser);
   const authorId = user.id;
   const { id } = useParams();
+  const { CkEditorData, setCkEditorData } = useCkEditor();
   const [formValid, setFormValid] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
   const [lessonName, setLessonName] = useState("");
@@ -23,10 +25,7 @@ const CreateLesson = () => {
   const [numberTestCases, setNumberTestCases] = useState(0);
   const [numberHiddenTestCases, setNumberHiddenTestCases] = useState(0);
   const [codeSample, setCodeSample] = useState("");
-  const [content, setContent] = useState("");
-  const [success, setSuccess] = useState(false);
   const [codeSampleLanguage, setCodeSampleLanguage] = useState(1);
-
   const [alertIsShowing, setAlertIsShowing] = useState(false);
   const [addLesson, { isLoading }] = useAddLessonMutation();
   const {
@@ -36,27 +35,11 @@ const CreateLesson = () => {
     isError,
     error,
   } = useGetCodeLanguagesQuery();
-  // useEffect(() => {
-  //   if (results && results.data) {
-  //     // dispatch(setUser(results.data));
-  //     // navigate(from, { replace: true });
-  //     if (results.data.isSuccessful) {
-  //       setErrMessage(["Register successful"]);
-  //     } else {
-  //       setErrMessage(results.data.errorMessages);
-  //     }
-  //   }
-  // }, [results]);
-
-  const callBackFunction = (childData) => {
-    setContent(childData);
-  };
-
   useEffect(() => {
-    if (lessonName !== "" && codeSample !== "" && content !== "") {
+    if (lessonName !== "" && codeSample !== "" && CkEditorData !== "") {
       setFormValid(true);
     }
-  }, [lessonName, codeSample, content]);
+  }, [lessonName, codeSample, CkEditorData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,35 +54,34 @@ const CreateLesson = () => {
       };
       const response = await addLesson({
         lessonName: lessonName,
-        content: content,
+        content: CkEditorData,
         score: score,
         authorId: authorId,
         chapterId: id,
         testCases: testCases,
         codeSamples: [CodeSample],
       }).unwrap();
-      if (response.data.isSuccessful) {
-        setErrMessage("Create successed");
-        setAlertIsShowing(true);
-      } else {
-        setErrMessage(response.data.errorMessages);
-      }
 
-      console.log({
-        lessonName: lessonName,
-        content: content,
-        score: score,
-        authorId: authorId,
-        chapterId: id,
-        testCases: testCases,
-        codeSamples: [CodeSample],
-      });
+      if (response.isSuccessful) {
+        setCkEditorData();
+        setCodeSampleLanguage("");
+        setCodeSample("");
+        setNumberTestCases(0);
+        setNumberHiddenTestCases(0);
+        setScore(100);
+        setLessonName("");
+        setErrMessage(null);
+        setFormValid(false);
+        setAlertIsShowing(true);
+        window.scrollTo(0, 0);
+      } else {
+        setErrMessage(response.errorMessages);
+        window.scrollTo(0, 0);
+      }
     } catch (err) {
-      // if (!err?.originalStatus) {
-      //   setAlertIsShowing(true);
-      // } else
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
+      console.error(err);
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
       }
@@ -208,7 +190,7 @@ const CreateLesson = () => {
 
   return (
     <div>
-      {isLoading || isLoadingGetCodeLanguages ? (
+      {isLoadingGetCodeLanguages ? (
         <div>
           <li className="flex items-center">
             <div role="status">
@@ -303,7 +285,7 @@ const CreateLesson = () => {
                     // }}
                     onChange={(e) => setScore(e.target.value)}
                   >
-                    <option value={100} selected="">
+                    <option value={100} selected={score === 100}>
                       100
                     </option>
                     <option value={200}>200</option>
@@ -322,7 +304,7 @@ const CreateLesson = () => {
                     required
                     onChange={(e) => setNumberTestCases(e.target.value)}
                   >
-                    <option value={0} selected="">
+                    <option value={0} selected={numberTestCases === 0}>
                       0
                     </option>
                     <option value={1}>1</option>
@@ -346,7 +328,7 @@ const CreateLesson = () => {
                     required
                     onChange={(e) => setNumberHiddenTestCases(e.target.value)}
                   >
-                    <option value={0} selected="">
+                    <option value={0} selected={numberHiddenTestCases === 0}>
                       0
                     </option>
                     <option value={1}>1</option>
@@ -404,7 +386,10 @@ const CreateLesson = () => {
                   >
                     Content
                   </label>
-                  <CkEditor callBack={callBackFunction} />
+                  <CkEditor
+                    CkEditorData={CkEditorData}
+                    setCkEditorData={setCkEditorData}
+                  />
                 </div>
               </div>
               <button

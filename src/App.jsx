@@ -11,7 +11,8 @@ import CreateCourse from "./pages/Course/create";
 import CourseDetail from "./pages/Course/detail";
 import CourseManagement from "./pages/Course/manage";
 import UpdateCourse from "./pages/Course/update";
-import Home from "./pages/Home";
+import DefaultHome from "./pages/Home";
+import Home from "./pages/Home/home";
 import Login from "./pages/Login";
 import PersistLogin from "./pages/Login/PersistLogin";
 import RequireAuth from "./pages/Login/RequireAuth";
@@ -27,12 +28,11 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         {/* public routes */}
-
+        <Route index element={<DefaultHome />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="unauthorized" element={<Unauthorized />} />
-        <Route index element={<Home />} />
-
+        <Route path="home" element={<Home />} />
         {/* protect routes */}
         {/* allowedRoles={[ROLES.Student]}  */}
         <Route element={<PersistLogin />}>
@@ -44,6 +44,7 @@ function App() {
           </Route>
 
           <Route element={<RequireAuth />}>
+            {/* <Route path="/home" element={<Home />} /> */}
             <Route path="/coursemanagement">
               <Route index element={<CourseManagement />} />
               <Route path="create" element={<CreateCourse />} />
@@ -68,7 +69,7 @@ function App() {
             <Route path="/editor/:exerciseID" element={<EditorPage />}></Route> */}
 
         {/* catch all route */}
-        <Route path="*" element={<Home />}></Route>
+        <Route path="*" element={<DefaultHome />}></Route>
       </Route>
       <Route element={<PersistLogin />}>
         <Route path="codeeditor/:id" element={<CodeEditor />} />

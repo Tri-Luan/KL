@@ -67,6 +67,70 @@ export const courseApiSlice = apiSlice.injectEndpoints({
         method: "POST",
       }),
     }),
+    addCourseComment: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.comment,
+        method: "PUT",
+        body,
+      }),
+    }),
+    addCourseReplyComment: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.replyComment,
+        method: "PUT",
+        body,
+      }),
+    }),
+    getCourseComments: builder.query({
+      query: (arg) => {
+        const { userId, courseId } = arg;
+        return {
+          url: `${ApiPaths.course.root + ApiPaths.course.comments}`,
+          params: { userId, courseId },
+        };
+      },
+    }),
+    deleteCourseComment: builder.mutation({
+      query: (arg) => {
+        const { userId, commentId } = arg;
+        return {
+          url: `${ApiPaths.course.root + ApiPaths.course.comment}`,
+          method: "DELETE",
+          params: { userId, commentId },
+        };
+      },
+    }),
+    deleteCourseReplyComment: builder.mutation({
+      query: (arg) => {
+        const { userId, replyCommentId } = arg;
+        return {
+          url: `${ApiPaths.course.root + ApiPaths.course.replyComment}`,
+          method: "DELETE",
+          params: { userId, replyCommentId },
+        };
+      },
+    }),
+    commentCourseAction: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.commentAction,
+        method: "POST",
+        body,
+      }),
+    }),
+    replycommentCourseAction: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.replyCommentAction,
+        method: "POST",
+        body,
+      }),
+    }),
+    registerCourse: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.course.root + ApiPaths.course.register,
+        method: "PUT",
+        body,
+      }),
+    }),
 
     //Chapter
     getChaptersByCourseId: builder.query({
@@ -198,6 +262,129 @@ export const courseApiSlice = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    submitCodeLesson: builder.mutation({
+      query: (body) => ({
+        url: `${
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.submit
+        }`,
+        method: "PUT",
+        body,
+      }),
+    }),
+    getLessonHistory: builder.query({
+      query: (arg) => {
+        const { userId, lessonId } = arg;
+        return {
+          url: `${
+            ApiPaths.course.root +
+            ApiPaths.course.lesson.root +
+            ApiPaths.course.lesson.histories
+          }`,
+          params: { userId, lessonId },
+        };
+      },
+    }),
+    addLessonComment: builder.mutation({
+      query: (body) => ({
+        url:
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.comment,
+        method: "PUT",
+        body,
+      }),
+    }),
+    addLessonReplyComment: builder.mutation({
+      query: (body) => ({
+        url:
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.replyComment,
+        method: "PUT",
+        body,
+      }),
+    }),
+    getLessonComments: builder.query({
+      query: (arg) => {
+        const { userId, lessonId } = arg;
+        return {
+          url: `${
+            ApiPaths.course.root +
+            ApiPaths.course.lesson.root +
+            ApiPaths.course.lesson.comments
+          }`,
+          params: { userId, lessonId },
+        };
+      },
+    }),
+    deleteLessonComment: builder.mutation({
+      query: (arg) => {
+        const { userId, commentId } = arg;
+        return {
+          url: `${
+            ApiPaths.course.root +
+            ApiPaths.course.lesson.root +
+            ApiPaths.course.lesson.comment
+          }`,
+          method: "DELETE",
+          params: { userId, commentId },
+        };
+      },
+    }),
+    deleteLessonReplyComment: builder.mutation({
+      query: (arg) => {
+        const { userId, replyCommentId } = arg;
+        return {
+          url: `${
+            ApiPaths.course.root +
+            ApiPaths.course.lesson.root +
+            ApiPaths.course.lesson.replyComment
+          }`,
+          method: "DELETE",
+          params: { userId, replyCommentId },
+        };
+      },
+    }),
+    commentLessonAction: builder.mutation({
+      query: (body) => ({
+        url:
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.commentAction,
+        method: "POST",
+        body,
+      }),
+    }),
+    replycommentLessonAction: builder.mutation({
+      query: (body) => ({
+        url:
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.replyCommentAction,
+        method: "POST",
+        body,
+      }),
+    }),
+    getLessonLeaderboard: builder.query({
+      query: (arg) => {
+        const { pageSize, lessonId, pageNumber } = arg;
+        return {
+          url: `${
+            ApiPaths.course.root +
+            ApiPaths.course.lesson.root +
+            ApiPaths.course.lesson.leaderboard
+          }`,
+          params: { pageSize, lessonId, pageNumber },
+        };
+      },
+    }),
+
+    getThemes: builder.query({
+      query: () => `${ApiPaths.course.root + ApiPaths.course.themes}`,
+      keepUnusedDataFor: 5,
+    }),
 
     getCodeLanguages: builder.query({
       query: () => `${ApiPaths.course.root + ApiPaths.course.codeLanguages}`,
@@ -215,18 +402,40 @@ export const {
   useGetCoursesByUserIdQuery,
   useGetCourseDetailQuery,
   useGetCourseDetailUpdateQuery,
+  useAddCourseCommentMutation,
+  useAddCourseReplyCommentMutation,
+  useGetCourseCommentsQuery,
+  useCommentCourseActionMutation,
+  useReplycommentCourseActionMutation,
+  useRegisterCourseMutation,
+  useDeleteCourseCommentMutation,
+  useDeleteCourseReplyCommentMutation,
+
   useGetChaptersByCourseIdQuery,
   useAddChapterMutation,
   useUpdateChapterMutation,
   useDeleteChapterMutation,
   useSetHideChapterMutation,
+
   useGetLessonsByChapterIdQuery,
   useGetLessonDetailsQuery,
   useGetLessonDetailsUpdateQuery,
   useAddLessonMutation,
+  useAddLessonCommentMutation,
+  useAddLessonReplyCommentMutation,
+  useGetLessonCommentsQuery,
+  useDeleteLessonCommentMutation,
+  useDeleteLessonReplyCommentMutation,
+  useCommentLessonActionMutation,
+  useReplycommentLessonActionMutation,
   useRunCodeLessonMutation,
+  useSubmitCodeLessonMutation,
+  useGetLessonHistoryQuery,
   useUpdateLessonMutation,
   useDeleteLessonMutation,
   useSetHideLessonMutation,
+  useGetLessonLeaderboardQuery,
+
+  useGetThemesQuery,
   useGetCodeLanguagesQuery,
 } = courseApiSlice;

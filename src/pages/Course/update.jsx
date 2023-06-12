@@ -5,49 +5,62 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
+import AlertComponent from "../../components/ui/AlertComponent";
 import LoadingComponent from "../../components/ui/LoadingComponent";
+import useCkEditor from "../../hooks/useCkEditor";
 import {
   useGetCourseDetailUpdateQuery,
+  useGetThemesQuery,
   useUpdateCourseMutation,
 } from "../../redux/courseApiSlice";
 
 const UpdateCourse = () => {
   // const navigate = useNavigate();
+  const { id } = useParams();
   const [formValid, setFormValid] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
   const [courseName, setCourseName] = useState("");
   const [level, setLevel] = useState(1);
   const [description, setDescription] = useState("");
-  const [objective, setObjective] = useState("");
+  const { CkEditorData, setCkEditorData } = useCkEditor();
+
   const [courseAvatar, setCourseAvatar] = useState("");
   const [reward, setReward] = useState("");
   const [time, setTime] = useState(0);
   const [success, setSuccess] = useState(false);
+  const [theme, setTheme] = useState("");
+  const [alertIsShowing, setAlertIsShowing] = useState(false);
 
-  
   const [updateCourse, { isLoading }] = useUpdateCourseMutation();
-
-  const { id } = useParams();
+  const {
+    data: themes,
+    isLoading: isLoadingGetThemes,
+    isSuccess: isSuccessGetThemes,
+    isError: isErrorGetThemes,
+    error: errorGetThemes,
+  } = useGetThemesQuery();
 
   const {
     data: course,
     isLoading: isLoadingGetCourse,
-    isSuccess,
-    isError,
-    error,
+    isSuccess: isSuccessGetCourse,
+    isError: isErrorGetCourse,
+    error: errorGetCourse,
     refetch,
   } = useGetCourseDetailUpdateQuery(id);
+
   useEffect(() => {
-    if (isSuccess) {
-      console.log(course);
-      setObjective(course.objective);
+    if (isSuccessGetCourse) {
+      setCkEditorData(course.objective);
       setCourseName(course.courseName);
       setLevel(course.courseLevel);
       setDescription(course.description);
       setReward(course.reward);
       setTime(course.time);
+      setTheme(course.theme);
+      setCourseAvatar(course.image);
     }
-  }, [isSuccess]);
+  }, [isSuccessGetCourse]);
   // useEffect(() => {
   //   if (results && results.data) {
   //     // dispatch(setUser(results.data));
@@ -60,22 +73,18 @@ const UpdateCourse = () => {
   //   }
   // }, [results]);
 
-  const callBackFunction = (childData) => {
-    setObjective(childData);
-  };
-
   useEffect(() => {
     if (
       courseName !== "" &&
       description !== "" &&
-      objective !== "" &&
+      CkEditorData !== "" &&
       courseAvatar !== null &&
       reward !== "" &&
       time !== 0
     ) {
       setFormValid(true);
     }
-  }, [courseName, description, objective, courseAvatar, reward, time]);
+  }, [courseName, description, CkEditorData, courseAvatar, reward, time]);
 
   const convertToBase64 = (file) => {
     const reader = new FileReader();
@@ -96,8 +105,9 @@ const UpdateCourse = () => {
         courseId: id,
         courseName: courseName,
         description: description,
-        objective: objective,
+        objective: CkEditorData,
         courseImage: courseAvatar,
+        courseTheme: theme,
         courseLevelId: level,
         reward: reward,
         time: time,
@@ -106,11 +116,12 @@ const UpdateCourse = () => {
         .then(() => {
           refetch();
         });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
+      if (response.isSuccessful) {
+        setAlertIsShowing(true);
+        window.scrollTo(0, 0);
       } else {
-        setErrMessage(response.data.errorMessages);
+        setErrMessage(response.errorMessages);
+        window.scrollTo(0, 0);
       }
     } catch (err) {
       if (err.originalStatus === 200) {
@@ -122,9 +133,9 @@ const UpdateCourse = () => {
   };
   return (
     <div>
-      {isLoadingGetCourse || isLoading ? (
+      {isLoadingGetCourse || isLoadingGetThemes ? (
         <LoadingComponent />
-      ) : isSuccess ? (
+      ) : isSuccessGetCourse && isSuccessGetThemes ? (
         <section class="bg-white ">
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
@@ -141,6 +152,12 @@ const UpdateCourse = () => {
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Edit course
             </h2>
+            {alertIsShowing ? (
+              <AlertComponent
+                content={"Update course success"}
+                visible={setAlertIsShowing}
+              />
+            ) : null}
             {errMessage !== null ? (
               <div
                 className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
@@ -170,7 +187,7 @@ const UpdateCourse = () => {
                     onChange={(e) => setCourseName(e.target.value)}
                   />
                 </div>
-                <div>
+                <div className="sm:col-span-2 w-1/2">
                   <label
                     for="level"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -205,10 +222,47 @@ const UpdateCourse = () => {
                   <FileInput
                     id="file"
                     helperText="Course avatars are used to represent the course (.png)"
-                    required
                     onChange={(e) => {
                       convertToBase64(e.target.files[0]);
                     }}
+                  />
+                </div>
+                <div className={`mt-5`}>
+                  <img
+                    class="rounded-t-lg h-40 min-w-full"
+                    src={"data:image/jpeg;base64," + courseAvatar}
+                    alt=""
+                  />
+                </div>
+                <div>
+                  <label
+                    for="theme"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Theme
+                  </label>
+                  <select
+                    id="theme"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    required
+                    onChange={(e) => {
+                      setTheme(e.target.value);
+                    }}
+                  >
+                    {themes.themes.map((theme, i) => {
+                      return (
+                        <option value={theme.themeImage}>
+                          {theme.themeName}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                <div className={`mt-5 `}>
+                  <img
+                    class="rounded-t-lg h-40 min-w-full"
+                    src={"data:image/jpeg;base64," + theme}
+                    alt=""
                   />
                 </div>
                 <div>
@@ -280,8 +334,8 @@ const UpdateCourse = () => {
                     Objective
                   </label>
                   <CkEditor
-                    callBack={callBackFunction}
-                    objectiveCkData={course.objective}
+                    CkEditorData={CkEditorData}
+                    setCkEditorData={setCkEditorData}
                   />
                 </div>
               </div>

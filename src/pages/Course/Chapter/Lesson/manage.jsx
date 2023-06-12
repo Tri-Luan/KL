@@ -74,7 +74,7 @@ const LessonManagement = () => {
   };
   return (
     <div className="my-10 mx-auto">
-      {isLoadingGetLessons || isLoadingDeleteLesson ? (
+      {isLoadingGetLessons ? (
         <div>
           <li className="flex items-center">
             <div role="status">
@@ -333,6 +333,7 @@ const LessonManagement = () => {
                                       hide={toggle}
                                       func={handleDeleteLesson}
                                       title="lesson"
+                                      type="delete"
                                     />
                                   </div>
                                 </td>

@@ -1,4 +1,4 @@
-export const baseUrl = "http://128.199.205.167:80/api/v1.0";
+export const baseUrl = "http://209.97.172.240/api/v1.0";
 
 // export const serverUrl = 'http://128.199.172.148:4000/jobe/index.php/restapi/';
 export const ApiPaths = {
@@ -14,6 +14,12 @@ export const ApiPaths = {
     detail: "/details",
     register: "/register",
     comment: "/comment",
+    comments: "/comments",
+    commentAction: "/commentAction",
+    replyComment: "/replycomment",
+    replyCommentAction: "/replyCommentAction",
+    themes: "/themes",
+    codeLanguages: "/codeLanguages",
     management: { root: "/management", detail: "/details", hidden: "/hidden" },
     chapter: {
       root: "/chapters",
@@ -26,7 +32,14 @@ export const ApiPaths = {
       detail: "/details",
       hidden: "/hidden",
       run: "/run",
+      submit: "/submit",
+      histories: "/histories",
+      comment: "/comment",
+      comments: "/comments",
+      commentAction: "/commentAction",
+      replyComment: "/replycomment",
+      replyCommentAction: "/replyCommentAction",
+      leaderboard: "/leaderboard",
     },
-    codeLanguages: "/codeLanguages",
   },
 };

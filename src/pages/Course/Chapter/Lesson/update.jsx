@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import CkEditor from "../../../../components/CkEditor/ckeditor";
 import AlertComponent from "../../../../components/ui/AlertComponent";
+import useCkEditor from "../../../../hooks/useCkEditor";
 import { selectCurrentUser } from "../../../../redux/authSlice";
 import {
   useAddLessonMutation,
@@ -18,6 +19,7 @@ const UpdateLesson = () => {
   const user = useSelector(selectCurrentUser);
   const authorId = user.id;
   const { id } = useParams();
+  const { CkEditorData, setCkEditorData } = useCkEditor();
   const [formValid, setFormValid] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
   const [lessonName, setLessonName] = useState("");
@@ -25,7 +27,6 @@ const UpdateLesson = () => {
   const [numberTestCases, setNumberTestCases] = useState(0);
   const [numberHiddenTestCases, setNumberHiddenTestCases] = useState(0);
   const [codeSample, setCodeSample] = useState("");
-  const [content, setContent] = useState("");
   const [success, setSuccess] = useState(false);
   const [codeSampleLanguage, setCodeSampleLanguage] = useState(1);
 
@@ -49,25 +50,21 @@ const UpdateLesson = () => {
   useEffect(() => {
     if (isSuccess) {
       console.log(lesson);
+      setCkEditorData(lesson.content);
       setLessonName(lesson.lessonName);
       setScore(lesson.score);
       // numberTestCases(lesson.numberTestCases);
       // numberHiddenTestCases(lesson.description);
       setCodeSample(lesson.codeSamples[0].codeSample);
-      setContent(lesson.content);
       setCodeSampleLanguage(lesson.codeSamples[0].codeLanguageId);
     }
   }, [isSuccess]);
 
-  const callBackFunction = (childData) => {
-    setContent(childData);
-  };
-
   useEffect(() => {
-    if (lessonName !== "" && codeSample !== "" && content !== "") {
+    if (lessonName !== "" && codeSample !== "" && CkEditorData !== "") {
       setFormValid(true);
     }
-  }, [lessonName, codeSample, content]);
+  }, [lessonName, codeSample, CkEditorData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,29 +79,17 @@ const UpdateLesson = () => {
       };
       const response = await updateLesson({
         lessonName: lessonName,
-        content: content,
+        content: CkEditorData,
         score: score,
-        authorId: authorId,
-        chapterId: id,
+        lessonId: id,
         testCases: testCases,
         codeSamples: [CodeSample],
       }).unwrap();
       if (response.data.isSuccessful) {
-        setErrMessage("Create successed");
         setAlertIsShowing(true);
       } else {
         setErrMessage(response.data.errorMessages);
       }
-
-      console.log({
-        lessonName: lessonName,
-        content: content,
-        score: score,
-        authorId: authorId,
-        chapterId: id,
-        testCases: testCases,
-        codeSamples: [CodeSample],
-      });
     } catch (err) {
       // if (!err?.originalStatus) {
       //   setAlertIsShowing(true);
@@ -248,7 +233,7 @@ const UpdateLesson = () => {
         <section class="bg-white ">
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
-              to={`/coursemanagement/lesson/${id}`}
+              to={`/coursemanagement/lesson/${lesson.chapterId}`}
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Back to management
@@ -263,7 +248,7 @@ const UpdateLesson = () => {
             </h2>
             {alertIsShowing ? (
               <AlertComponent
-                content={"Create new course successed"}
+                content={"Create new lesson success"}
                 visible={setAlertIsShowing}
               />
             ) : null}
@@ -416,8 +401,8 @@ const UpdateLesson = () => {
                     Content
                   </label>
                   <CkEditor
-                    callBack={callBackFunction}
-                    objectiveCkData={lesson.content}
+                    CkEditorData={CkEditorData}
+                    setCkEditorData={setCkEditorData}
                   />
                 </div>
               </div>
@@ -445,7 +430,7 @@ const UpdateLesson = () => {
                     </svg>
                   </span>
                 ) : null}
-                Create
+                Update
               </button>
             </form>
           </div>

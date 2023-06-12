@@ -1,6 +1,7 @@
 import { Button } from "flowbite-react";
 import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import AlertComponent from "../../../components/ui/AlertComponent";
 import ModalComponent from "../../../components/ui/ModalComponent";
 import useModal from "../../../hooks/useModal";
 import {
@@ -54,6 +55,7 @@ const ChapterManagement = () => {
   } = useModal();
   const [success, setSuccess] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
+  const [alertIsShowing, setAlertIsShowing] = useState(false);
   const handleDeleteChapter = async (chapterId) => {
     try {
       const response = await deleteChapter(chapterId)
@@ -97,24 +99,15 @@ const ChapterManagement = () => {
     }
   };
   const handleAddChapter = async (chapterName) => {
-    try {
-      const response = await addChapter({ courseId: id, chapterName })
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
-      } else {
-        setErrMessage(response.data.errorMessages);
-      }
-    } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
-      } else if (err.originalStatus === 401) {
-        setErrMessage("Unauthorized");
-      }
+    const response = await addChapter({ courseId: id, chapterName })
+      .unwrap()
+      .then(() => {
+        refetch();
+      });
+    if (response.data.isSuccessful) {
+      setAlertIsShowing(true);
+    } else {
+      setErrMessage(response.data.errorMessages);
     }
   };
   const handleUpdateChapter = async (chapterId, chapterName) => {
@@ -174,7 +167,12 @@ const ChapterManagement = () => {
           <h2 className="text-3xl font-bold mb-6 pb-4 text-center">
             Chapter Manage
           </h2>
-
+          {alertIsShowing ? (
+            <AlertComponent
+              content={"Create new chapter successed"}
+              visible={setAlertIsShowing}
+            />
+          ) : null}
           <section class="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
             <div class="px-4 mx-auto max-w-screen-2xl lg:px-12">
               <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
@@ -440,6 +438,7 @@ const ChapterManagement = () => {
                                       title="chapter"
                                       hide={toggle3}
                                       func={handleDeleteChapter}
+                                      type="delete"
                                     />
                                   </div>
                                 </td>

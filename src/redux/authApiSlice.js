@@ -11,6 +11,13 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: { ...credentials },
       }),
     }),
+    register: builder.mutation({
+      query: (body) => ({
+        url: ApiPaths.auth.root,
+        method: "PUT",
+        body,
+      }),
+    }),
     sendLogout: builder.mutation({
       query: (body) => ({
         url: ApiPaths.auth.root + ApiPaths.auth.logout,
@@ -60,5 +67,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
 //           headers: { "Content-Type": "application/json" },
 //           // withCredentials: true,
 //         }
-export const { useLoginMutation, useRefreshMutation, useSendLogoutMutation } =
-  authApiSlice;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useRefreshMutation,
+  useSendLogoutMutation,
+} = authApiSlice;

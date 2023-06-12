@@ -2,7 +2,7 @@ import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { useEffect, useState } from "react";
 
-const CkEditor = (props) => {
+const CkEditor = ({ CkEditorData, setCkEditorData }) => {
   const configurations = {
     toolbar: {
       items: [
@@ -59,14 +59,11 @@ const CkEditor = (props) => {
       contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
     },
   };
-  const [objectiveCkData, setObjectiveCkData] = useState(props.objectiveCkData);
-  const sendData = () => {
-    props.callBack(objectiveCkData);
-  };
+  const [CkData, setCkData] = useState(CkEditorData);
   return (
     <CKEditor
       editor={Editor}
-      data={objectiveCkData}
+      data={CkData}
       config={configurations}
       onReady={(editor) => {
         editor.editing.view.change((writer) => {
@@ -81,12 +78,13 @@ const CkEditor = (props) => {
       }}
       onChange={(event, editor) => {
         const data = editor.getData();
-        // console.log(data.length);
-        setObjectiveCkData(data);
-        sendData();
+        setCkData(data);
+        console.log();
       }}
       onBlur={(event, editor) => {
-        console.log("Blur.", editor);
+        const data = editor.getData();
+        setCkEditorData(data);
+        console.log(CkEditorData);
       }}
       onFocus={(event, editor) => {
         console.log("Focus.", editor);

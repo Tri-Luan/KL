@@ -5,7 +5,6 @@ export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUser: builder.mutation({
       query: (arg) => `${ApiPaths.user}/${arg}`,
-      keepUnusedDataFor: 5,
     }),
   }),
 });

@@ -5,6 +5,7 @@ import { useLoginMutation } from "../../redux/authApiSlice";
 import { setUser, setToken } from "../../redux/authSlice";
 import usePersist from "../../hooks/usePersist";
 import Cookies from "universal-cookie";
+import { useGetUserMutation } from "../../redux/usersApiSlice";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Login = () => {
   const [formValid, setFormValid] = useState(false);
   // const [persist, setPersist] = usePersist();
   const [login, { isLoading }] = useLoginMutation();
+  const [getUser] = useGetUserMutation();
   const cookies = new Cookies();
   useEffect(() => {
     if (userName !== "" && password !== "") {
@@ -32,7 +34,8 @@ const Login = () => {
     try {
       const authData = await login({ userName, password }).unwrap();
       dispatch(setToken(authData.token));
-      dispatch(setUser({ id: authData.userId }));
+      const response = await getUser(authData.userId);
+      dispatch(setUser(response.data));
       cookies.set("jwt_refresh", authData.token.refreshToken, { path: "/" });
       cookies.set("jwt_access", authData.token.accessToken, { path: "/" });
       cookies.set("user_id", authData.userId, { path: "/" });

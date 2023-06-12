@@ -1,4 +1,4 @@
-const Home = () => {
+const DefaultHome = () => {
   return (
     <div>
       <section className="udeCarousel">
@@ -167,4 +167,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default DefaultHome;
