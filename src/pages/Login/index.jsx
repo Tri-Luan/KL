@@ -33,13 +33,17 @@ const Login = () => {
     }
     try {
       const authData = await login({ userName, password }).unwrap();
-      dispatch(setToken(authData.token));
-      const response = await getUser(authData.userId);
-      dispatch(setUser(response.data));
-      cookies.set("jwt_refresh", authData.token.refreshToken, { path: "/" });
-      cookies.set("jwt_access", authData.token.accessToken, { path: "/" });
-      cookies.set("user_id", authData.userId, { path: "/" });
-      navigate(from, { replace: true });
+      if (authData.isSuccessful) {
+        dispatch(setToken(authData.token));
+        const response = await getUser(authData.userId);
+        dispatch(setUser(response.data));
+        cookies.set("jwt_refresh", authData.token.refreshToken, { path: "/" });
+        cookies.set("jwt_access", authData.token.accessToken, { path: "/" });
+        cookies.set("user_id", authData.userId, { path: "/" });
+        navigate(from, { replace: true });
+      } else {
+        setErrMessage(authData.errorMessage);
+      }
     } catch (err) {
       if (!err?.originalStatus) {
         // isLoading: true until timeout occurs

@@ -41,13 +41,19 @@ const Header = () => {
   //   }
   // }, []);
   const navigate = useNavigate();
-  const handleLogout = () => {
-    cookies.remove("user_id", { path: "/" });
-    cookies.remove("jwt_accessToken", { path: "/" });
-    cookies.remove("jwt_refreshToken", { path: "/" });
-    sendLogout();
-    navigate("/");
-    window.location.reload();
+  const handleLogout = async () => {
+    const body = {
+      refreshToken: cookies.get("jwt_refresh"),
+      accessToken: cookies.get("jwt_access"),
+    };
+    const response = await sendLogout(body);
+    if (response.data.isSuccessful) {
+      cookies.remove("user_id", { path: "/" });
+      cookies.remove("jwt_accessToken", { path: "/" });
+      cookies.remove("jwt_refreshToken", { path: "/" });
+      navigate("/");
+      window.location.reload();
+    }
   };
   return (
     <div>

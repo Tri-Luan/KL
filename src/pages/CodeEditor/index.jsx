@@ -633,7 +633,7 @@ const CodeEditor = () => {
               <Tabs.Item active icon={BookOpenIcon} title="Lesson">
                 {
                   <div
-                    className="block p-0 max-h-[75vh] w-full overflow-auto "
+                    className="block p-0 max-h-[70vh] w-full overflow-auto "
                     id="content"
                     dangerouslySetInnerHTML={{
                       __html: lesson.content,
@@ -659,7 +659,17 @@ const CodeEditor = () => {
                                 {i + 1}
                               </Table.Cell>
                               <Table.Cell>
-                                {leaderBoard.submittedDate}
+                                {new Date(
+                                  leaderBoard.submittedDate
+                                ).toLocaleString("vi-VN", {
+                                  month: "numeric",
+                                  day: "numeric",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                  timeZoneName: "short",
+                                })}
                               </Table.Cell>
                               <Table.Cell>
                                 {leaderBoard.codeLanguageName}
@@ -674,36 +684,50 @@ const CodeEditor = () => {
                 </Table>
               </Tabs.Item>
               <Tabs.Item icon={ClockIcon} title="Submit History">
-                <Table hoverable>
-                  <Table.Head>
-                    <Table.HeadCell>No</Table.HeadCell>
-                    <Table.HeadCell>Submit Time</Table.HeadCell>
-                    <Table.HeadCell>Language</Table.HeadCell>
-                    <Table.HeadCell>Test Case</Table.HeadCell>
-                    <Table.HeadCell>Score</Table.HeadCell>
-                    <Table.HeadCell>Submitted By</Table.HeadCell>
-                  </Table.Head>
-                  <Table.Body className="divide-y">
-                    {histories !== null
-                      ? histories.lessonHistories.map((history, i) => {
-                          return (
-                            <Table.Row className="bg-white text-blue-500 text-base">
-                              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                {i + 1}
-                              </Table.Cell>
-                              <Table.Cell>{history.submittedDate}</Table.Cell>
-                              <Table.Cell>
-                                {history.codeLanguageName}
-                              </Table.Cell>
-                              <Table.Cell>{history.testCase}</Table.Cell>
-                              <Table.Cell>{history.score}</Table.Cell>
-                              <Table.Cell>{history.userSubmitted}</Table.Cell>
-                            </Table.Row>
-                          );
-                        })
-                      : null}
-                  </Table.Body>
-                </Table>
+                <div className="max-h-[70vh] w-full overflow-y-auto ">
+                  <Table hoverable>
+                    <Table.Head>
+                      <Table.HeadCell>No</Table.HeadCell>
+                      <Table.HeadCell>Submit Time</Table.HeadCell>
+                      <Table.HeadCell>Language</Table.HeadCell>
+                      <Table.HeadCell>Test Case</Table.HeadCell>
+                      <Table.HeadCell>Score</Table.HeadCell>
+                      <Table.HeadCell>Submitted By</Table.HeadCell>
+                    </Table.Head>
+                    <Table.Body className="divide-y">
+                      {histories !== null
+                        ? histories.lessonHistories.map((history, i) => {
+                            return (
+                              <Table.Row className="bg-white text-blue-500 text-base">
+                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                  {i + 1}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {new Date(
+                                    history.submittedDate
+                                  ).toLocaleString("vi-VN", {
+                                    month: "numeric",
+                                    day: "numeric",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit",
+                                    timeZoneName: "short",
+                                  })}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {history.codeLanguageName}
+                                </Table.Cell>
+                                <Table.Cell>{history.testCase}</Table.Cell>
+                                <Table.Cell>{history.score}</Table.Cell>
+                                <Table.Cell>{history.userSubmitted}</Table.Cell>
+                              </Table.Row>
+                            );
+                          })
+                        : null}
+                    </Table.Body>
+                  </Table>
+                </div>
               </Tabs.Item>
               <Tabs.Item icon={ChatBubbleBottomCenterTextIcon} title="Comment">
                 {isLoadingGetCourseComments ? (
@@ -711,7 +735,7 @@ const CodeEditor = () => {
                     <Spinner aria-label="Center-aligned spinner example" />
                   </div>
                 ) : (
-                  <section class="bg-white dark:bg-gray-900 py-2 lg:py-4">
+                  <section class="bg-white dark:bg-gray-900  lg:py-4 p-0 max-h-[70vh] w-full overflow-auto ">
                     <div class="max-w-2xl px-4">
                       <div class="flex justify-between items-center mb-6">
                         {/* <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">

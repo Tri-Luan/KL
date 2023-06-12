@@ -61,12 +61,12 @@ const PersistLogin = () => {
     //persist: yes, token: no
   } else if (isError) {
     //persist: yes, token: no
-    content = (
-      <p className="errmsg">
-        {error.data?.message}
-        <Link to="/login">Please login again</Link>.
-      </p>
-    );
+    // content = (
+    //   <p className="errmsg">
+    //     {error.data?.message}
+    //     <Link to="/login">Please login again</Link>.
+    //   </p>
+    // );
   } else if (isSuccess && trueSuccess) {
     //persist: yes, token: yes
     content = <Outlet />;

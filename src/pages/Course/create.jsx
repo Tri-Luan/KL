@@ -199,7 +199,7 @@ const CreateCourse = () => {
                     onChange={(e) => setCourseName(e.target.value)}
                   />
                 </div>
-                <div>
+                <div className="sm:col-span-2 w-1/2">
                   <label
                     for="level"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -236,6 +236,13 @@ const CreateCourse = () => {
                     }}
                   />
                 </div>
+                <div className={`mt-5`}>
+                  <img
+                    class="rounded-t-lg h-40 min-w-full"
+                    src={"data:image/jpeg;base64," + courseAvatar}
+                    alt=""
+                  />
+                </div>
                 <div>
                   <label
                     for="theme"
@@ -258,7 +265,13 @@ const CreateCourse = () => {
                     })}
                   </select>
                 </div>
-                <div className={`mt-5 ${theme}`}></div>
+                <div className={`mt-5 `}>
+                  <img
+                    class="rounded-t-lg h-40 min-w-full"
+                    src={"data:image/jpeg;base64," + theme}
+                    alt=""
+                  />
+                </div>
                 <div>
                   <label
                     for="reward"

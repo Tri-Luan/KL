@@ -28,14 +28,15 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         {/* public routes */}
-        <Route index element={<DefaultHome />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
-        <Route path="home" element={<Home />} />
-        {/* protect routes */}
-        {/* allowedRoles={[ROLES.Student]}  */}
         <Route element={<PersistLogin />}>
+          <Route index element={<DefaultHome />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="unauthorized" element={<Unauthorized />} />
+          <Route path="home" element={<Home />} />
+          {/* protect routes */}
+          {/* allowedRoles={[ROLES.Student]}  */}
+
           <Route path="course">
             <Route index element={<Course />} />
             <Route element={<RequireAuth />}>
