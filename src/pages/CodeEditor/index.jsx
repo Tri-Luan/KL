@@ -1,7 +1,7 @@
 //Import CSS
 import "../../style/IDE.css";
 
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Split from "react-split";
 import { Listbox, Transition, Switch, Tab } from "@headlessui/react";
@@ -32,7 +32,7 @@ import {
   useDeleteLessonCommentMutation,
   useDeleteLessonReplyCommentMutation,
   useGetCodeLanguagesQuery,
-  useGetLessonCommentsQuery,
+  useGetLessonCommentsMutation,
   useGetLessonDetailsQuery,
   useGetLessonHistoryQuery,
   useGetLessonLeaderboardQuery,
@@ -53,6 +53,8 @@ function classNames(...classes) {
 const CodeEditor = () => {
   // const window = new JSDOM("").window;
   // const DOMPurify = createDOMPurify(window);
+  const tabsRef = useRef(null);
+  const props = { tabsRef };
 
   const user = useSelector(selectCurrentUser);
   const { id } = useParams();
@@ -92,14 +94,8 @@ const CodeEditor = () => {
     error: errorGetCodeLanguages,
   } = useGetCodeLanguagesQuery();
 
-  const {
-    data: comments,
-    isLoading: isLoadingGetCourseComments,
-    isSuccess: isSuccessGetCourseComments,
-    isError: isErrorGetCourseComments,
-    error: errorGetCourseComments,
-    refetch: refetchGetLessonComments,
-  } = useGetLessonCommentsQuery({ userId: user.id, lessonId: id });
+  const [getLessonComments] = useGetLessonCommentsMutation();
+
   const [runCodeLesson, { isLoading: isLoadingRunCode }] =
     useRunCodeLessonMutation();
   const [submitCodeLesson, { isLoading: isLoadingSubmitCode }] =
@@ -107,6 +103,7 @@ const CodeEditor = () => {
 
   const [addLessonComment, { isLoading: isLoadingAddLessonComment }] =
     useAddLessonCommentMutation();
+
   const [addLessonReplyComment, { isLoading: isLoadingAddLessonReplyComment }] =
     useAddLessonReplyCommentMutation();
   const [commentAction] = useCommentLessonActionMutation();
@@ -116,6 +113,7 @@ const CodeEditor = () => {
   const [deleteReplyComment, { isLoading: isLoadingDeleteLessonReplyComment }] =
     useDeleteLessonReplyCommentMutation();
 
+  const [comments, setComments] = useState(null);
   const [code, setCode] = useState("");
   const [results, setResults] = useState(null);
   const [isError, setIsError] = useState(false);
@@ -132,11 +130,19 @@ const CodeEditor = () => {
     toggle: toggle1,
     setArg: setArg1,
   } = useModal();
+  const { arg: arg2, isShowing: isShowing2, toggle: toggle2 } = useModal();
   const {
-    arg: arg2,
-    isShowing: isShowing2,
-    toggle: toggle2,
-    setArg: setArg2,
+    arg: arg3,
+    isShowing: isShowing3,
+    toggle: toggle3,
+    setArg: setArg3,
+  } = useModal();
+  const { arg: arg4, isShowing: isShowing4, toggle: toggle4 } = useModal();
+  const {
+    arg: arg5,
+    isShowing: isShowing5,
+    toggle: toggle5,
+    setArg: setArg5,
   } = useModal();
   useEffect(() => {
     if (!isLoadingGetLessonDetails && isSuccessGetLessonDetails) {
@@ -148,11 +154,6 @@ const CodeEditor = () => {
       setCode(lesson.codeSamples[0].codeSample);
     }
   }, [isSuccessGetLessonDetails, isLoadingGetLessonDetails]);
-  // useEffect(() => {
-  //   if (isSuccessGetCodeLanguages && isSuccessGetLessonDetails) {
-
-  //   }
-  // }, [isSuccessGetCodeLanguages, isSuccessGetLessonDetails]);
 
   const renderConditionIcon = (cond) => {
     if (cond === true) {
@@ -160,61 +161,6 @@ const CodeEditor = () => {
     } else if (cond === false) {
       return <ExclamationCircleIcon className="text-red-600 inline h-5 w-5" />;
     }
-  };
-  const renderRefreshModal = () => {
-    return (
-      <div
-        className="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-        id="staticBackdrop"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
-        tabIndex="-1"
-        aria-labelledby="staticBackdropLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog relative w-auto pointer-events-none">
-          <div className="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-            <div className="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
-              <h5
-                className="text-xl font-medium leading-normal text-gray-800"
-                id="exampleModalLabel"
-              >
-                <ArrowPathIcon className="text-blue-500 inline h-8 w-8" />
-                Reset
-              </h5>
-              <button
-                type="button"
-                className="btn-close box-content w-4 h-4 p-1 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body relative p-4">
-              Bạn có muốn làm mới code không?
-            </div>
-            <div className="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
-              <button
-                type="button"
-                className="inline-block px-6 py-2 border-2 border-blue-400 text-blue-400 font-medium text-xs leading-tight uppercase rounded-full hover:text-blue-500 hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out"
-                data-bs-dismiss="modal"
-              >
-                Không Làm Mới Code
-              </button>
-              <button
-                type="button"
-                className="inline-block px-6 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase rounded-full shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0 transition duration-150 ease-in-out"
-                data-bs-dismiss="modal"
-                onClick={() => {
-                  setCode("");
-                }}
-              >
-                Làm Mới Code
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   };
   const SelectLanguage = () => {
     return (
@@ -247,7 +193,10 @@ const CodeEditor = () => {
             >
               <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {languages.codeLanguages.map((codeLanguage, i) => {
-                  return (
+                  return lesson.codeSamples.findIndex(
+                    (codeSample) =>
+                      codeSample.codeLanguageId === codeLanguage.codeLanguageId
+                  ) >= 0 ? (
                     <Listbox.Option
                       key={i}
                       className={({ active }) =>
@@ -282,7 +231,7 @@ const CodeEditor = () => {
                         </>
                       )}
                     </Listbox.Option>
-                  );
+                  ) : null;
                 })}
                 {/* {this.state.languages.map((language, languageIdx) => (
                   
@@ -419,11 +368,15 @@ const CodeEditor = () => {
           content: comment,
         })
           .unwrap()
-          .then(() => {
-            refetchGetLessonComments();
+          .then(async () => {
+            const comments = await getLessonComments({
+              userId: user.id,
+              lessonId: id,
+            });
+            setComments(comments.data);
           });
-        console.log(response);
       }
+
       setComment("");
       // setTitle("");
       // setUserId("");
@@ -441,8 +394,12 @@ const CodeEditor = () => {
           content: content,
         })
           .unwrap()
-          .then(() => {
-            refetchGetLessonComments();
+          .then(async () => {
+            const comments = await getLessonComments({
+              userId: user.id,
+              lessonId: id,
+            });
+            setComments(comments.data);
           });
         console.log(response);
       }
@@ -459,8 +416,12 @@ const CodeEditor = () => {
         actionId: 0,
       })
         .unwrap()
-        .then(() => {
-          refetchGetLessonComments();
+        .then(async () => {
+          const comments = await getLessonComments({
+            userId: user.id,
+            lessonId: id,
+          });
+          setComments(comments.data);
         });
     } catch (err) {
       console.error("Failed to like the comment", err);
@@ -474,8 +435,12 @@ const CodeEditor = () => {
         actionId: 1,
       })
         .unwrap()
-        .then(() => {
-          refetchGetLessonComments();
+        .then(async () => {
+          const comments = await getLessonComments({
+            userId: user.id,
+            lessonId: id,
+          });
+          setComments(comments.data);
         });
     } catch (err) {
       console.error("Failed to dislike the comment", err);
@@ -489,8 +454,12 @@ const CodeEditor = () => {
         actionId: 0,
       })
         .unwrap()
-        .then(() => {
-          refetchGetLessonComments();
+        .then(async () => {
+          const comments = await getLessonComments({
+            userId: user.id,
+            lessonId: id,
+          });
+          setComments(comments.data);
         });
     } catch (err) {
       console.error("Failed to like the reply comment", err);
@@ -504,8 +473,12 @@ const CodeEditor = () => {
         actionId: 1,
       })
         .unwrap()
-        .then(() => {
-          refetchGetLessonComments();
+        .then(async () => {
+          const comments = await getLessonComments({
+            userId: user.id,
+            lessonId: id,
+          });
+          setComments(comments.data);
         });
     } catch (err) {
       console.error("Failed to dislike the reply comment", err);
@@ -515,8 +488,12 @@ const CodeEditor = () => {
     try {
       await deleteComment({ userId: user.id, commentId: commentId })
         .unwrap()
-        .then(() => {
-          refetchGetLessonComments();
+        .then(async () => {
+          const comments = await getLessonComments({
+            userId: user.id,
+            lessonId: id,
+          });
+          setComments(comments.data);
         });
     } catch (err) {
       console.error("Failed to delete the comment", err);
@@ -526,8 +503,12 @@ const CodeEditor = () => {
     try {
       await deleteReplyComment({ userId: user.id, replyCommentId: commentId })
         .unwrap()
-        .then(() => {
-          refetchGetLessonComments();
+        .then(async () => {
+          const comments = await getLessonComments({
+            userId: user.id,
+            lessonId: id,
+          });
+          setComments(comments.data);
         });
     } catch (err) {
       console.error("Failed to delete the reply comment", err);
@@ -566,6 +547,33 @@ const CodeEditor = () => {
       ) : lesson !== null ? (
         <section>
           {/* Breadcrumb Start */}
+          <ModalComponent
+            isShowing={isShowing3}
+            arg={arg3}
+            hide={toggle3}
+            func={onDeleteCommentClicked}
+            title="Confirmation"
+            content="comment"
+            type="delete"
+          />
+          <ModalComponent
+            isShowing={isShowing4}
+            arg={arg4}
+            hide={toggle4}
+            func={() => setCode("")}
+            title="Confirmation"
+            content="Are you sure you want to refresh code?"
+            type="confirm"
+          />
+          <ModalComponent
+            isShowing={isShowing5}
+            arg={arg5}
+            hide={toggle5}
+            func={onDeleteReplyCommentClicked}
+            title="Confirmation"
+            content="reply comment"
+            type="delete"
+          />
           <nav
             className="flex h-[5vh] py-2 px-4 text-gray-700 bg-gray-50  border-2 border-gray-300 dark:bg-gray-800 dark:border-gray-700"
             aria-label="Breadcrumb"
@@ -626,9 +634,18 @@ const CodeEditor = () => {
           >
             {/* Tabs Start */}
             <Tabs.Group
-              className=" flex-col "
+              className="flex-col"
               aria-label="Tabs with icons"
-              // style="underline"
+              ref={props.tabsRef}
+              onActiveTabChange={async (tab) => {
+                if (tab === 3) {
+                  const comments = await getLessonComments({
+                    userId: user.id,
+                    lessonId: id,
+                  });
+                  setComments(comments.data);
+                }
+              }}
             >
               <Tabs.Item active icon={BookOpenIcon} title="Lesson">
                 {
@@ -730,344 +747,348 @@ const CodeEditor = () => {
                 </div>
               </Tabs.Item>
               <Tabs.Item icon={ChatBubbleBottomCenterTextIcon} title="Comment">
-                {isLoadingGetCourseComments ? (
-                  <div className="text-center">
-                    <Spinner aria-label="Center-aligned spinner example" />
-                  </div>
-                ) : (
-                  <section class="bg-white dark:bg-gray-900  lg:py-4 p-0 max-h-[70vh] w-full overflow-auto ">
-                    <div class="max-w-2xl px-4">
-                      <div class="flex justify-between items-center mb-6">
-                        {/* <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
+                <section class="bg-white dark:bg-gray-900  lg:py-4 p-0 max-h-[70vh] w-full overflow-auto ">
+                  <div class="max-w-2xl px-4">
+                    <div class="flex justify-between items-center mb-6">
+                      {/* <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                         Discussion (20)
                       </h2> */}
-                      </div>
-                      {isLoadingDeleteLessonComment ||
+                    </div>
+                    {
+                      // isLoadingGetLessonComments ||
+                      isLoadingDeleteLessonComment ||
                       isLoadingAddLessonReplyComment ||
                       isLoadingAddLessonComment ? (
                         <div className="text-center">
                           <Spinner aria-label="Center-aligned spinner example" />
                         </div>
-                      ) : null}
-                      <ModalComponent
-                        isShowing={isShowing1}
-                        arg={arg1}
-                        type="replycomment"
-                        title="Reply comment"
-                        func={handleReplyComment}
-                        hide={toggle1}
-                      />
-                      <div class="mb-6">
-                        <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                          <label for="comment" class="sr-only">
-                            Your comment
-                          </label>
-                          <textarea
-                            id="comment"
-                            rows="6"
-                            class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
-                            placeholder="Write a comment..."
-                            required
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                          ></textarea>
-                        </div>
-                        <button
-                          class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-500 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-blue-600"
-                          onClick={handleComment}
-                        >
-                          Post comment
-                        </button>
+                      ) : null
+                    }
+                    <ModalComponent
+                      isShowing={isShowing1}
+                      arg={arg1}
+                      type="replycomment"
+                      title="Reply comment"
+                      func={handleReplyComment}
+                      hide={toggle1}
+                    />
+                    <div class="mb-6">
+                      <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                        <label for="comment" class="sr-only">
+                          Your comment
+                        </label>
+                        <textarea
+                          id="comment"
+                          rows="6"
+                          class="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                          placeholder="Write a comment..."
+                          required
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                        ></textarea>
                       </div>
-                      {comments.lessonComments.map((comment, i) => {
-                        return (
-                          <>
-                            <article class="p-6 mb-6 text-base bg-white rounded-lg dark:bg-gray-900">
-                              <footer class="flex justify-between items-center mb-2">
-                                <div class="flex items-center">
-                                  <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
-                                    <img
-                                      class="mr-2 w-6 h-6 rounded-full"
-                                      src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
-                                      alt="Michael Gough"
-                                    />
-                                    {comment.authorName}
-                                  </p>
-                                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    <time pubdate>
-                                      {new Date(
-                                        comment.commentDate
-                                      ).toLocaleString("en-US", {
-                                        month: "long",
-                                        day: "numeric",
-                                        year: "numeric",
-                                      })}
-                                    </time>
-                                  </p>
-                                </div>
-
-                                <button
-                                  id={`dropdownComment${i}Button`}
-                                  data-dropdown-toggle={`dropdownComment${i}`}
-                                  class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                                  type="button"
-                                  onClick={() => {
-                                    onDeleteCommentClicked(comment.commentId);
-                                  }}
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="w-5 h-5 text-red-700"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                                    />
-                                  </svg>
-                                  <span class="sr-only">Comment settings</span>
-                                </button>
-                              </footer>
-                              <p class="text-gray-900 ">{comment.content}</p>
-                              <div class="flex items-center mt-4 space-x-4">
-                                <button
-                                  type="button"
-                                  class="relative inline-flex items-center pr-5 py-2.5 text-sm font-medium text-center "
-                                  onClick={() => {
-                                    onLikeCommentClicked(comment.commentId);
-                                  }}
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1}
-                                    stroke="currentColor"
-                                    className="w-6 h-6"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
-                                    />
-                                  </svg>
-
-                                  <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-green-500 border-2 border-white rounded-full -right-1 ">
-                                    {comment.numberOfLike}
-                                  </div>
-                                </button>
-                                <button
-                                  type="button"
-                                  class="relative inline-flex items-center pr-5 py-2.5 text-sm font-medium text-center "
-                                  onClick={() => {
-                                    onDisLikeCommentClicked(comment.commentId);
-                                  }}
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1"
-                                    stroke="currentColor"
-                                    class="w-6 h-6"
-                                  >
-                                    <path
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M7.5 15h2.25m8.024-9.75c.011.05.028.1.052.148.591 1.2.924 2.55.924 3.977a8.96 8.96 0 01-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398C20.613 14.547 19.833 15 19 15h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 00.303-.54m.023-8.25H16.48a4.5 4.5 0 01-1.423-.23l-3.114-1.04a4.5 4.5 0 00-1.423-.23H6.504c-.618 0-1.217.247-1.605.729A11.95 11.95 0 002.25 12c0 .434.023.863.068 1.285C2.427 14.306 3.346 15 4.372 15h3.126c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.5a2.25 2.25 0 002.25 2.25.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"
-                                    />
-                                  </svg>
-
-                                  <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-red-500 border-2 border-white rounded-full -right-1 ">
-                                    {comment.numberOfDislike}
-                                  </div>
-                                </button>
-                                <button
-                                  type="button"
-                                  class="flex items-center text-md text-gray-500 hover:underline dark:text-gray-400"
-                                  onClick={() => {
-                                    setArg1(comment.commentId);
-                                    toggle1();
-                                  }}
-                                >
-                                  <svg
-                                    aria-hidden="true"
-                                    class="mr-1 w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="2"
-                                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                                    ></path>
-                                  </svg>
-                                  Reply
-                                </button>
-                              </div>
-                            </article>
-                            {comment.replyComments.length !== 0
-                              ? comment.replyComments.map((replycomment, i) => {
-                                  return (
-                                    <article class="p-6 mb-6 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
-                                      <footer class="flex justify-between items-center mb-2">
-                                        <div class="flex items-center">
-                                          <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
-                                            <img
-                                              class="mr-2 w-6 h-6 rounded-full"
-                                              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                                              alt="Jese Leos"
-                                            />
-                                            {replycomment.authorName}
-                                          </p>
-                                          <p class="text-sm text-gray-600 dark:text-gray-400">
-                                            <time pubdate>
-                                              {new Date(
-                                                replycomment.commentDate
-                                              ).toLocaleString("en-US", {
-                                                month: "long",
-                                                day: "numeric",
-                                                year: "numeric",
-                                              })}
-                                            </time>
-                                          </p>
-                                        </div>
-                                        <button
-                                          id={`dropdownComment${i}Button`}
-                                          data-dropdown-toggle={`dropdownComment${i}`}
-                                          class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                                          type="button"
-                                          onClick={() => {
-                                            onDeleteReplyCommentClicked(
-                                              replycomment.commentId
-                                            );
-                                          }}
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={1.5}
-                                            stroke="currentColor"
-                                            className="w-5 h-5 text-red-700"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                                            />
-                                          </svg>
-                                          <span class="sr-only">
-                                            Comment settings
-                                          </span>
-                                        </button>
-                                      </footer>
-                                      <p class="text-gray-900">
-                                        {replycomment.content}
-                                      </p>
-                                      <div class="flex items-center mt-4 space-x-4">
-                                        <button
-                                          type="button"
-                                          class="relative inline-flex items-center pr-5 py-2.5 text-sm font-medium text-center "
-                                          onClick={() => {
-                                            onLikeReplyCommentClicked(
-                                              replycomment.commentId
-                                            );
-                                          }}
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={1}
-                                            stroke="currentColor"
-                                            className="w-6 h-6"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
-                                            />
-                                          </svg>
-
-                                          <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-green-500 border-2 border-white rounded-full -right-1 ">
-                                            {replycomment.numberOfLike}
-                                          </div>
-                                        </button>
-                                        <button
-                                          type="button"
-                                          class="relative inline-flex items-center pr-5 py-2.5 text-sm font-medium text-center "
-                                          onClick={() => {
-                                            onDisLikeReplyCommentClicked(
-                                              replycomment.commentId
-                                            );
-                                          }}
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1"
-                                            stroke="currentColor"
-                                            class="w-6 h-6"
-                                          >
-                                            <path
-                                              stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              d="M7.5 15h2.25m8.024-9.75c.011.05.028.1.052.148.591 1.2.924 2.55.924 3.977a8.96 8.96 0 01-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398C20.613 14.547 19.833 15 19 15h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 00.303-.54m.023-8.25H16.48a4.5 4.5 0 01-1.423-.23l-3.114-1.04a4.5 4.5 0 00-1.423-.23H6.504c-.618 0-1.217.247-1.605.729A11.95 11.95 0 002.25 12c0 .434.023.863.068 1.285C2.427 14.306 3.346 15 4.372 15h3.126c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.5a2.25 2.25 0 002.25 2.25.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"
-                                            />
-                                          </svg>
-
-                                          <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-red-500 border-2 border-white rounded-full -right-1 ">
-                                            {replycomment.numberOfDislike}
-                                          </div>
-                                        </button>
-                                        <button
-                                          type="button"
-                                          class="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400"
-                                        >
-                                          <svg
-                                            aria-hidden="true"
-                                            class="mr-1 w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              stroke-width="2"
-                                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                                            ></path>
-                                          </svg>
-                                          Reply
-                                        </button>
-                                      </div>
-                                    </article>
-                                  );
-                                })
-                              : null}
-                          </>
-                        );
-                      })}
+                      <button
+                        class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-500 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-blue-600"
+                        onClick={handleComment}
+                      >
+                        Post comment
+                      </button>
                     </div>
-                  </section>
-                )}
+                    {comments !== null
+                      ? comments.lessonComments.map((comment, i) => {
+                          return (
+                            <>
+                              <article class="p-6 mb-6 text-base bg-white rounded-lg dark:bg-gray-900">
+                                <footer class="flex justify-between items-center mb-2">
+                                  <div class="flex items-center">
+                                    <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
+                                      <img
+                                        class="mr-2 w-6 h-6 rounded-full"
+                                        src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                                        alt="Michael Gough"
+                                      />
+                                      {comment.authorName}
+                                    </p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                      <time pubdate>
+                                        {new Date(
+                                          comment.commentDate
+                                        ).toLocaleString("en-US", {
+                                          month: "long",
+                                          day: "numeric",
+                                          year: "numeric",
+                                        })}
+                                      </time>
+                                    </p>
+                                  </div>
+
+                                  <button
+                                    id={`dropdownComment${i}Button`}
+                                    data-dropdown-toggle={`dropdownComment${i}`}
+                                    class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                                    type="button"
+                                    onClick={() => {
+                                      setArg3(comment.commentId);
+                                      toggle3();
+                                    }}
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={1.5}
+                                      stroke="currentColor"
+                                      className="w-5 h-5 text-red-700"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                      />
+                                    </svg>
+                                    <span class="sr-only">
+                                      Comment settings
+                                    </span>
+                                  </button>
+                                </footer>
+                                <p class="text-gray-900 ">{comment.content}</p>
+                                <div class="flex items-center mt-4 space-x-4">
+                                  <button
+                                    type="button"
+                                    class="relative inline-flex items-center pr-5 py-2.5 text-sm font-medium text-center "
+                                    onClick={() => {
+                                      onLikeCommentClicked(comment.commentId);
+                                    }}
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={1}
+                                      stroke="currentColor"
+                                      className="w-6 h-6"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
+                                      />
+                                    </svg>
+
+                                    <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-green-500 border-2 border-white rounded-full -right-1 ">
+                                      {comment.numberOfLike}
+                                    </div>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    class="relative inline-flex items-center pr-5 py-2.5 text-sm font-medium text-center "
+                                    onClick={() => {
+                                      onDisLikeCommentClicked(
+                                        comment.commentId
+                                      );
+                                    }}
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke-width="1"
+                                      stroke="currentColor"
+                                      class="w-6 h-6"
+                                    >
+                                      <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M7.5 15h2.25m8.024-9.75c.011.05.028.1.052.148.591 1.2.924 2.55.924 3.977a8.96 8.96 0 01-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398C20.613 14.547 19.833 15 19 15h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 00.303-.54m.023-8.25H16.48a4.5 4.5 0 01-1.423-.23l-3.114-1.04a4.5 4.5 0 00-1.423-.23H6.504c-.618 0-1.217.247-1.605.729A11.95 11.95 0 002.25 12c0 .434.023.863.068 1.285C2.427 14.306 3.346 15 4.372 15h3.126c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.5a2.25 2.25 0 002.25 2.25.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"
+                                      />
+                                    </svg>
+
+                                    <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-red-500 border-2 border-white rounded-full -right-1 ">
+                                      {comment.numberOfDislike}
+                                    </div>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    class="flex items-center text-md text-gray-500 hover:underline dark:text-gray-400"
+                                    onClick={() => {
+                                      setArg1(comment.commentId);
+                                      toggle1();
+                                    }}
+                                  >
+                                    <svg
+                                      aria-hidden="true"
+                                      class="mr-1 w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                                      ></path>
+                                    </svg>
+                                    Reply
+                                  </button>
+                                </div>
+                              </article>
+                              {comment.replyComments.length !== 0
+                                ? comment.replyComments.map(
+                                    (replycomment, i) => {
+                                      return (
+                                        <article class="p-6 mb-6 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
+                                          <footer class="flex justify-between items-center mb-2">
+                                            <div class="flex items-center">
+                                              <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
+                                                <img
+                                                  class="mr-2 w-6 h-6 rounded-full"
+                                                  src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                                                  alt="Jese Leos"
+                                                />
+                                                {replycomment.authorName}
+                                              </p>
+                                              <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                <time pubdate>
+                                                  {new Date(
+                                                    replycomment.commentDate
+                                                  ).toLocaleString("en-US", {
+                                                    month: "long",
+                                                    day: "numeric",
+                                                    year: "numeric",
+                                                  })}
+                                                </time>
+                                              </p>
+                                            </div>
+                                            <button
+                                              id={`dropdownComment${i}Button`}
+                                              data-dropdown-toggle={`dropdownComment${i}`}
+                                              class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                                              type="button"
+                                              onClick={() => {
+                                                setArg5(replycomment.commentId);
+                                                toggle5();
+                                              }}
+                                            >
+                                              <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className="w-5 h-5 text-red-700"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                                />
+                                              </svg>
+                                              <span class="sr-only">
+                                                Comment settings
+                                              </span>
+                                            </button>
+                                          </footer>
+                                          <p class="text-gray-900">
+                                            {replycomment.content}
+                                          </p>
+                                          <div class="flex items-center mt-4 space-x-4">
+                                            <button
+                                              type="button"
+                                              class="relative inline-flex items-center pr-5 py-2.5 text-sm font-medium text-center "
+                                              onClick={() => {
+                                                onLikeReplyCommentClicked(
+                                                  replycomment.commentId
+                                                );
+                                              }}
+                                            >
+                                              <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1}
+                                                stroke="currentColor"
+                                                className="w-6 h-6"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
+                                                />
+                                              </svg>
+
+                                              <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-green-500 border-2 border-white rounded-full -right-1 ">
+                                                {replycomment.numberOfLike}
+                                              </div>
+                                            </button>
+                                            <button
+                                              type="button"
+                                              class="relative inline-flex items-center pr-5 py-2.5 text-sm font-medium text-center "
+                                              onClick={() => {
+                                                onDisLikeReplyCommentClicked(
+                                                  replycomment.commentId
+                                                );
+                                              }}
+                                            >
+                                              <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1"
+                                                stroke="currentColor"
+                                                class="w-6 h-6"
+                                              >
+                                                <path
+                                                  stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M7.5 15h2.25m8.024-9.75c.011.05.028.1.052.148.591 1.2.924 2.55.924 3.977a8.96 8.96 0 01-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398C20.613 14.547 19.833 15 19 15h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 00.303-.54m.023-8.25H16.48a4.5 4.5 0 01-1.423-.23l-3.114-1.04a4.5 4.5 0 00-1.423-.23H6.504c-.618 0-1.217.247-1.605.729A11.95 11.95 0 002.25 12c0 .434.023.863.068 1.285C2.427 14.306 3.346 15 4.372 15h3.126c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.5a2.25 2.25 0 002.25 2.25.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384"
+                                                />
+                                              </svg>
+
+                                              <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-red-500 border-2 border-white rounded-full -right-1 ">
+                                                {replycomment.numberOfDislike}
+                                              </div>
+                                            </button>
+                                            <button
+                                              type="button"
+                                              class="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400"
+                                            >
+                                              <svg
+                                                aria-hidden="true"
+                                                class="mr-1 w-4 h-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                              >
+                                                <path
+                                                  stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  stroke-width="2"
+                                                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                                                ></path>
+                                              </svg>
+                                              Reply
+                                            </button>
+                                          </div>
+                                        </article>
+                                      );
+                                    }
+                                  )
+                                : null}
+                            </>
+                          );
+                        })
+                      : null}
+                  </div>
+                </section>
               </Tabs.Item>
             </Tabs.Group>
             {/* Tabs End */}
 
             {/* Code Editor Start  */}
             <div className="relative z-1">
-              {renderRefreshModal()}
               <div className="bg-slate-800 flex h-14 selectLanguage">
                 {SelectLanguage()}
 
@@ -1082,8 +1103,7 @@ const CodeEditor = () => {
                     data-mdb-ripple="false"
                     data-mdb-ripple-color="light"
                     className="px-4 pt-2.5 pb-2 bg-blue-600 text-white font-medium text-xs leading-tight  uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-600 focus:shadow-lg focus:outline-none focus:ring-0  transition duration-150 ease-in-out flex align-center"
-                    data-bs-toggle="modal"
-                    data-bs-target="#staticBackdrop"
+                    onClick={() => toggle4()}
                   >
                     <ArrowPathIcon
                       className="h-4 w-4 mr-2 ml-0  text-white "

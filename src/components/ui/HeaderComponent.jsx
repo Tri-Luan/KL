@@ -49,10 +49,10 @@ const Header = () => {
     const response = await sendLogout(body);
     if (response.data.isSuccessful) {
       cookies.remove("user_id", { path: "/" });
-      cookies.remove("jwt_accessToken", { path: "/" });
-      cookies.remove("jwt_refreshToken", { path: "/" });
+      cookies.remove("jwt_access", { path: "/" });
+      cookies.remove("jwt_refresh", { path: "/" });
+      localStorage.setItem("persist", false);
       navigate("/");
-      window.location.reload();
     }
   };
   return (

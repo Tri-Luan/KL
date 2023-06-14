@@ -34,34 +34,50 @@ const Course = () => {
         </div>
       ) : isSuccess ? (
         <section>
-          <section className="udeCarousel">
+          <section className="courseCarousel">
             <div className="carousel__content">
-              <h1>Luyện tập theo lịch của bạn</h1>
-              <p>Luyện tập bất kỳ chủ đề, bất cứ lúc nào.</p>
-              <button
+              <h3>
+                Learning programming online. Let's start with your first course!
+              </h3>
+              {/* <button
                 class="btnRed mt-3 ml-20"
                 // onClick={() => {
                 //   handleButton();
                 // }}
               >
                 Bắt đầu ngay!
-              </button>
+              </button> */}
+              {/* <form class="carousel__seach">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="What do you want to learn?"
+                    aria-label="Username"
+                    aria-describedby="basic-addon1"
+                  />
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">
+                      <i class="fa fa-search"></i>
+                    </span>
+                  </div>
+                </div>
+              </form> */}
             </div>
           </section>
-
           {data.coursesLists.map((courseLists, i) => {
             return (
               <>
                 {courseLists.courses.length !== 0 ? (
                   <div className="container mx-auto my-5" key={i}>
-                    <h2 className="text-4xl my-5 font-semibold tracking-tight text-gray-900 dark:text-white">
+                    <h2 className="text-4xl my-5 font-semibold tracking-tight text-gray-700 ">
                       {courseLists.courseLevelName}
                     </h2>
-                    <div class="grid lg:grid-cols-4 lg:gap-3 gap-2 xl:gap-x-3">
+                    <div class="grid lg:grid-cols-4 lg:gap-5 gap-5 xl:gap-x-7">
                       {courseLists.courses.map((course, i) => {
                         return (
                           <div key={i}>
-                            <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
+                            <div class="max-w-sm h-[450px] bg-white border border-gray-200 rounded-lg shadow-md ">
                               <Link to={`/course/${course.id}`}>
                                 <img
                                   class="rounded-t-lg h-52 min-w-full"
@@ -69,29 +85,83 @@ const Course = () => {
                                   alt=""
                                 />
                               </Link>
-                              <div class="view-content px-4 py-4">
-                                <div class="view-content-header">
-                                  <Badge color="info" size="sm">
-                                    Online
-                                  </Badge>
+                              <div class="view-content h-[180px] px-4 py-4">
+                                <div class="view-content-header ">
+                                  <div className="my-0.5 flex items-center">
+                                    <svg
+                                      className="h-5 w-5 text-yellow-300"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg
+                                      className="h-5 w-5 text-yellow-300"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg
+                                      className="h-5 w-5 text-yellow-300"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg
+                                      className="h-5 w-5 text-yellow-300"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <svg
+                                      className="h-5 w-5 text-yellow-300"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <span className="mr-2 rounded  px-2.5 py-0.5 text-md font-semibold text-yellow-300 dark:text-yellow-300">
+                                      {course.voteScore}
+                                    </span>
+                                    <div>
+                                      <Badge
+                                        className="ml-16"
+                                        color="yellow"
+                                        size="sm"
+                                      >
+                                        Online
+                                      </Badge>
+                                    </div>
+                                  </div>
+
                                   <Link to={`/course/${course.id}`}>
-                                    <h5 className="hover:text-[#2e72e7] text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                                    <h5 className="hover:text-[#2e72e7] mb-1 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
                                       {course.courseName}
                                     </h5>
                                   </Link>
-
-                                  <span class="course-author">
+                                  <span class="course-author my-6 text-blue-600">
                                     {course.authorName}
                                   </span>
                                 </div>
-                                <p className="course-description line-clamp-2 font-normal text-gray-700 dark:text-gray-400">
+                                <p className="course-description mt-4 line-clamp-2 font-normal text-gray-700 dark:text-gray-400">
                                   {course.description}
                                 </p>
-                                <div class="course-footer-left">
-                                  <Badge color="info" size="6xl">
-                                    Free
-                                  </Badge>
-                                </div>
+                              </div>
+
+                              <div className="course-footer mt-4">
+                                <hr className="mb-2 w-[90%] mx-auto" />
+                                <span className="ml-5 font-medium text-blue-500">
+                                  {" "}
+                                  Free
+                                </span>
                               </div>
                             </div>
                           </div>

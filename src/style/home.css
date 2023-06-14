@@ -1,3 +1,58 @@
+.courseCarousel {
+  background-image: url(../assets/images/theme1.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  height: 250px;
+  position: relative;
+}
+
+.courseCarousel .carousel__content {
+  position: absolute;
+  width: 80%;
+  top: 10%;
+  left: 10%;
+}
+
+.courseCarousel .carousel__content h3 {
+  color: #fff;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.courseCarousel .carousel__content p {
+  color: #fff;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.courseCarousel .carousel__seach .form-control {
+  padding: 20px;
+  border-radius: 0;
+  border: none;
+}
+
+.courseCarousel .carousel__seach .form-control::placeholder {
+  color: #a1a7b3;
+  font-size: 20px;
+  font-weight: 15px;
+}
+
+.courseCarousel .carousel__seach .form-control:focus {
+  box-shadow: none;
+}
+
+.courseCarousel .carousel__seach .input-group-prepend .input-group-text {
+  background-color: #fff;
+  color: #ec5252;
+  border: none;
+}
+
+.courseCarousel .carousel__seach .input-group-prepend:hover .input-group-text {
+  color: #fff;
+  background-color: #ec5252;
+}
+
 .udeCarousel {
   background-image: url(../assets/images/img1.jpg);
   background-repeat: no-repeat;
@@ -26,32 +81,6 @@
   font-weight: normal;
 }
 
-.udeCarousel .carousel__seach .form-control {
-  padding: 20px;
-  border-radius: 0;
-  border: none;
-}
-
-.udeCarousel .carousel__seach .form-control::placeholder {
-  color: #a1a7b3;
-  font-size: 20px;
-  font-weight: 15px;
-}
-
-.udeCarousel .carousel__seach .form-control:focus {
-  box-shadow: none;
-}
-
-.udeCarousel .carousel__seach .input-group-prepend .input-group-text {
-  background-color: #fff;
-  color: #ec5252;
-  border: none;
-}
-
-.udeCarousel .carousel__seach .input-group-prepend:hover .input-group-text {
-  color: #fff;
-  background-color: #ec5252;
-}
 
 .banner .line {
   background: linear-gradient(to right, #6e1a52, #ec5252);

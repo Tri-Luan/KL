@@ -1,9 +1,7 @@
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-
-import { Button, FileInput, Label, Modal } from "flowbite-react";
+import { FileInput, Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+
+import { Link, useParams } from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
 import AlertComponent from "../../components/ui/AlertComponent";
 import LoadingComponent from "../../components/ui/LoadingComponent";
@@ -27,26 +25,20 @@ const UpdateCourse = () => {
   const [courseAvatar, setCourseAvatar] = useState("");
   const [reward, setReward] = useState("");
   const [time, setTime] = useState(0);
-  const [success, setSuccess] = useState(false);
   const [theme, setTheme] = useState("");
   const [alertIsShowing, setAlertIsShowing] = useState(false);
 
-  const [updateCourse, { isLoading }] = useUpdateCourseMutation();
+  const [updateCourse] = useUpdateCourseMutation();
   const {
     data: themes,
     isLoading: isLoadingGetThemes,
     isSuccess: isSuccessGetThemes,
-    isError: isErrorGetThemes,
-    error: errorGetThemes,
   } = useGetThemesQuery();
 
   const {
     data: course,
     isLoading: isLoadingGetCourse,
     isSuccess: isSuccessGetCourse,
-    isError: isErrorGetCourse,
-    error: errorGetCourse,
-    refetch,
   } = useGetCourseDetailUpdateQuery(id);
 
   useEffect(() => {
@@ -60,18 +52,18 @@ const UpdateCourse = () => {
       setTheme(course.theme);
       setCourseAvatar(course.image);
     }
-  }, [isSuccessGetCourse]);
-  // useEffect(() => {
-  //   if (results && results.data) {
-  //     // dispatch(setUser(results.data));
-  //     // navigate(from, { replace: true });
-  //     if (results.data.isSuccessful) {
-  //       setErrMessage(["Register successful"]);
-  //     } else {
-  //       setErrMessage(results.data.errorMessages);
-  //     }
-  //   }
-  // }, [results]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isSuccessGetCourse,
+    course?.objective,
+    course?.courseName,
+    course?.courseLevel,
+    course?.description,
+    course?.reward,
+    course?.time,
+    course?.theme,
+    course?.image,
+  ]);
 
   useEffect(() => {
     if (
@@ -111,11 +103,7 @@ const UpdateCourse = () => {
         courseLevelId: level,
         reward: reward,
         time: time,
-      })
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
+      }).unwrap();
       if (response.isSuccessful) {
         setAlertIsShowing(true);
         window.scrollTo(0, 0);
@@ -124,10 +112,12 @@ const UpdateCourse = () => {
         window.scrollTo(0, 0);
       }
     } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
+        window.scrollTo(0, 0);
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
+        window.scrollTo(0, 0);
       }
     }
   };
@@ -136,8 +126,8 @@ const UpdateCourse = () => {
       {isLoadingGetCourse || isLoadingGetThemes ? (
         <LoadingComponent />
       ) : isSuccessGetCourse && isSuccessGetThemes ? (
-        <section class="bg-white ">
-          <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
+        <section className="bg-white ">
+          <div className="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
               to="/coursemanagement"
               className="font-medium text-indigo-600 hover:text-indigo-500"
@@ -167,11 +157,11 @@ const UpdateCourse = () => {
               </div>
             ) : null}
             <form onSubmit={handleSubmit}>
-              <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                <div class="sm:col-span-2">
+              <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                <div className="sm:col-span-2">
                   <label
-                    for="name"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="name"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Course name
                   </label>
@@ -179,7 +169,7 @@ const UpdateCourse = () => {
                     type="text"
                     name="name"
                     id="name"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Type course name"
                     required
                     autoComplete="off"
@@ -189,14 +179,14 @@ const UpdateCourse = () => {
                 </div>
                 <div className="sm:col-span-2 w-1/2">
                   <label
-                    for="level"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="level"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Level
                   </label>
                   <select
                     id="level"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     required
                     onChange={(e) => {
                       if (e.target.value === "Basic") setLevel(1);
@@ -229,21 +219,21 @@ const UpdateCourse = () => {
                 </div>
                 <div className={`mt-5`}>
                   <img
-                    class="rounded-t-lg h-40 min-w-full"
+                    className="rounded-t-lg h-40 min-w-full"
                     src={"data:image/jpeg;base64," + courseAvatar}
                     alt=""
                   />
                 </div>
                 <div>
                   <label
-                    for="theme"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="theme"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Theme
                   </label>
                   <select
                     id="theme"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     required
                     onChange={(e) => {
                       setTheme(e.target.value);
@@ -260,21 +250,21 @@ const UpdateCourse = () => {
                 </div>
                 <div className={`mt-5 `}>
                   <img
-                    class="rounded-t-lg h-40 min-w-full"
+                    className="rounded-t-lg h-40 min-w-full"
                     src={"data:image/jpeg;base64," + theme}
                     alt=""
                   />
                 </div>
                 <div>
                   <label
-                    for="reward"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="reward"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Reward
                   </label>
                   <select
                     id="reward"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     required
                     onChange={(e) => setReward(e.target.value)}
                   >
@@ -291,8 +281,8 @@ const UpdateCourse = () => {
                 </div>
                 <div>
                   <label
-                    for="time"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="time"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Estimated learning time
                   </label>
@@ -301,7 +291,7 @@ const UpdateCourse = () => {
                     min="0"
                     name="time"
                     id="time"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Type course name"
                     required
                     autoComplete="off"
@@ -309,34 +299,36 @@ const UpdateCourse = () => {
                     onChange={(e) => setTime(Number(e.target.value))}
                   />
                 </div>
-                <div class="sm:col-span-2">
+                <div className="sm:col-span-2">
                   <label
-                    for="description"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="description"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Description
                   </label>
                   <textarea
                     id="description"
                     rows="8"
-                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Type description here"
                     required
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   ></textarea>
                 </div>
-                <div class="sm:col-span-2">
+                <div className="sm:col-span-2">
                   <label
-                    for="objective"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="objective"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Objective
                   </label>
-                  <CkEditor
-                    CkEditorData={CkEditorData}
-                    setCkEditorData={setCkEditorData}
-                  />
+                  {CkEditorData !== null ? (
+                    <CkEditor
+                      CkEditorData={CkEditorData}
+                      setCkEditorData={setCkEditorData}
+                    />
+                  ) : null}
                 </div>
               </div>
               <button

@@ -6,6 +6,7 @@ import { setUser, setToken } from "../../redux/authSlice";
 import usePersist from "../../hooks/usePersist";
 import Cookies from "universal-cookie";
 import { useGetUserMutation } from "../../redux/usersApiSlice";
+import { Checkbox, Label } from "flowbite-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errMessage, setErrMessage] = useState(null);
   const [formValid, setFormValid] = useState(false);
-  // const [persist, setPersist] = usePersist();
+  const [persist, setPersist] = usePersist();
   const [login, { isLoading }] = useLoginMutation();
   const [getUser] = useGetUserMutation();
   const cookies = new Cookies();
@@ -58,6 +59,7 @@ const Login = () => {
     }
   };
 
+  const handleToggle = () => setPersist((prev) => !prev);
   return (
     <div className="flex min-h-full items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
@@ -154,7 +156,14 @@ const Login = () => {
                   Password
                 </label>
               </div>
-
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="persist"
+                  onChange={handleToggle}
+                  checked={persist}
+                />
+                <Label htmlFor="persist">Trust This Device</Label>
+              </div>
               <button
                 type="submit"
                 className="group relative disabled:bg-indigo-500 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

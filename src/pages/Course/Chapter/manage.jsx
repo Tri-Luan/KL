@@ -111,7 +111,6 @@ const ChapterManagement = () => {
     }
   };
   const handleUpdateChapter = async (chapterId, chapterName) => {
-    // console.log(chapterId, chapterName);
     try {
       const response = await updateChapter({
         chapterId: chapterId,
@@ -128,8 +127,8 @@ const ChapterManagement = () => {
         setErrMessage(response.data.errorMessages);
       }
     } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
       }
@@ -398,6 +397,7 @@ const ChapterManagement = () => {
                                       </svg>
                                     </button>
                                     <ModalComponent
+                                      key="modalUpdateChapter"
                                       isShowing={isShowing2}
                                       arg={arg2}
                                       hide={toggle2}

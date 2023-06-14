@@ -132,6 +132,7 @@ const ModalComponent = ({
               </label>
               <input
                 type="text"
+                key="chapterNameEdit1"
                 name="chapterNameEditId"
                 id="chapterNameEditId"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -140,7 +141,6 @@ const ModalComponent = ({
                 autoComplete="off"
                 value={chapterName}
                 onChange={(e) => {
-                  e.preventDefault();
                   setChapterName(e.target.value);
                 }}
               />
@@ -161,7 +161,7 @@ const ModalComponent = ({
         ) : type === "delete" ? (
           <div className="text-center">
             <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete this {title}?
+              Are you sure you want to delete this {content}?
             </h3>
             <div className="flex justify-center gap-4">
               <Button

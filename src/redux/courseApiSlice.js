@@ -81,7 +81,7 @@ export const courseApiSlice = apiSlice.injectEndpoints({
         body,
       }),
     }),
-    getCourseComments: builder.query({
+    getCourseComments: builder.mutation({
       query: (arg) => {
         const { userId, courseId } = arg;
         return {
@@ -306,7 +306,7 @@ export const courseApiSlice = apiSlice.injectEndpoints({
         body,
       }),
     }),
-    getLessonComments: builder.query({
+    getLessonComments: builder.mutation({
       query: (arg) => {
         const { userId, lessonId } = arg;
         return {
@@ -404,7 +404,7 @@ export const {
   useGetCourseDetailUpdateQuery,
   useAddCourseCommentMutation,
   useAddCourseReplyCommentMutation,
-  useGetCourseCommentsQuery,
+  useGetCourseCommentsMutation,
   useCommentCourseActionMutation,
   useReplycommentCourseActionMutation,
   useRegisterCourseMutation,
@@ -423,7 +423,7 @@ export const {
   useAddLessonMutation,
   useAddLessonCommentMutation,
   useAddLessonReplyCommentMutation,
-  useGetLessonCommentsQuery,
+  useGetLessonCommentsMutation,
   useDeleteLessonCommentMutation,
   useDeleteLessonReplyCommentMutation,
   useCommentLessonActionMutation,

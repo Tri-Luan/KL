@@ -8,7 +8,6 @@ import AlertComponent from "../../../../components/ui/AlertComponent";
 import useCkEditor from "../../../../hooks/useCkEditor";
 import { selectCurrentUser } from "../../../../redux/authSlice";
 import {
-  useAddLessonMutation,
   useGetCodeLanguagesQuery,
   useGetLessonDetailsUpdateQuery,
   useUpdateLessonMutation,
@@ -16,8 +15,6 @@ import {
 
 const UpdateLesson = () => {
   // const navigate = useNavigate();
-  const user = useSelector(selectCurrentUser);
-  const authorId = user.id;
   const { id } = useParams();
   const { CkEditorData, setCkEditorData } = useCkEditor();
   const [formValid, setFormValid] = useState(false);
@@ -27,7 +24,6 @@ const UpdateLesson = () => {
   const [numberTestCases, setNumberTestCases] = useState(0);
   const [numberHiddenTestCases, setNumberHiddenTestCases] = useState(0);
   const [codeSample, setCodeSample] = useState("");
-  const [success, setSuccess] = useState(false);
   const [codeSampleLanguage, setCodeSampleLanguage] = useState(1);
 
   const [alertIsShowing, setAlertIsShowing] = useState(false);
@@ -87,17 +83,18 @@ const UpdateLesson = () => {
       }).unwrap();
       if (response.data.isSuccessful) {
         setAlertIsShowing(true);
+        window.scrollTo(0, 0);
       } else {
         setErrMessage(response.data.errorMessages);
+        window.scrollTo(0, 0);
       }
     } catch (err) {
-      // if (!err?.originalStatus) {
-      //   setAlertIsShowing(true);
-      // } else
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
+        window.scrollTo(0, 0);
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
+        window.scrollTo(0, 0);
       }
     }
   };

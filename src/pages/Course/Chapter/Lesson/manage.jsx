@@ -303,11 +303,7 @@ const LessonManagement = () => {
                                         />
                                       </svg>
                                     </Link>
-                                    <button
-                                      className="ml-1"
-                                      data-modal-target="popup-modal"
-                                      data-modal-toggle="popup-modal"
-                                    >
+                                    <button className="ml-1">
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"

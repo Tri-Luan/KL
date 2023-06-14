@@ -1,6 +1,6 @@
 import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const CkEditor = ({ CkEditorData, setCkEditorData }) => {
   const configurations = {
@@ -20,14 +20,7 @@ const CkEditor = ({ CkEditorData, setCkEditorData }) => {
         {
           label: "Basic styles",
           icon: "bold",
-          items: [
-            "bold",
-            "italic",
-            // "strikethrough",
-            // "subscript",
-            // "superscript",
-            "code",
-          ],
+          items: ["bold", "italic", "code"],
         },
         "|",
         "link",
@@ -39,7 +32,6 @@ const CkEditor = ({ CkEditorData, setCkEditorData }) => {
         "|",
         "bulletedList",
         "numberedList",
-        // "todoList",
         "outdent",
         "indent",
       ],
@@ -73,8 +65,6 @@ const CkEditor = ({ CkEditorData, setCkEditorData }) => {
             editor.editing.view.document.getRoot()
           );
         });
-        // You can store the "editor" and use when it is needed.
-        console.log("Editor is ready to use!", editor);
       }}
       onChange={(event, editor) => {
         const data = editor.getData();
@@ -84,10 +74,6 @@ const CkEditor = ({ CkEditorData, setCkEditorData }) => {
       onBlur={(event, editor) => {
         const data = editor.getData();
         setCkEditorData(data);
-        console.log(CkEditorData);
-      }}
-      onFocus={(event, editor) => {
-        console.log("Focus.", editor);
       }}
     />
   );
