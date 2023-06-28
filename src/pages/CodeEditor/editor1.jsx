@@ -42,9 +42,10 @@ import {
 } from "../../redux/courseApiSlice";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../redux/authSlice";
-import { Spinner, Table, Tabs } from "flowbite-react";
+import { Spinner, Table, Tabs, Pagination } from "flowbite-react";
 import useModal from "../../hooks/useModal";
 import ModalComponent from "../../components/ui/ModalComponent";
+import userAvatar from "../../assets/images/userAvatar.png";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -53,12 +54,13 @@ function classNames(...classes) {
 const CodeEditor1 = () => {
   // const window = new JSDOM("").window;
   // const DOMPurify = createDOMPurify(window);
+
   const tabsRef = useRef(null);
   const props = { tabsRef };
   const location = useLocation();
   const id = location.state.id;
   const user = useSelector(selectCurrentUser);
-
+  const [currentPage, setCurrentPage] = useState(1);
   const {
     data: languages,
     isLoading: isLoadingGetCodeLanguages,
@@ -90,8 +92,8 @@ const CodeEditor1 = () => {
     refetch: refetchGetLessonLeaderboard,
   } = useGetLessonLeaderboardQuery({
     lessonId: id,
-    pageSize: 4,
-    pageNumber: 1,
+    pageSize: 5,
+    pageNumber: currentPage,
   });
 
   const [getLessonComments] = useGetLessonCommentsMutation();
@@ -117,6 +119,7 @@ const CodeEditor1 = () => {
   const [code, setCode] = useState("");
   const [results, setResults] = useState(null);
   const [isError, setIsError] = useState(false);
+
   const [disableSubmitButton, setDisableSubmitButton] = useState(true);
   const [error, setError] = useState({
     errorType: String,
@@ -699,6 +702,20 @@ const CodeEditor1 = () => {
                       : null}
                   </Table.Body>
                 </Table>
+                {leaderBoards.leaderboards !== null ? (
+                  <center>
+                    <Pagination
+                      // aria-current={currentPage}
+                      // theme={customTheme}
+                      currentPage={currentPage}
+                      onPageChange={(page) => {
+                        setCurrentPage(page);
+                      }}
+                      showIcons
+                      totalPages={leaderBoards.totalPages}
+                    />
+                  </center>
+                ) : null}
               </Tabs.Item>
               <Tabs.Item icon={ClockIcon} title="Submit History">
                 <div className="max-h-[70vh] w-full overflow-y-auto ">
@@ -804,7 +821,7 @@ const CodeEditor1 = () => {
                                     <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
                                       <img
                                         class="mr-2 w-6 h-6 rounded-full"
-                                        src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                                        src={userAvatar}
                                         alt="Michael Gough"
                                       />
                                       {comment.authorName}
@@ -944,7 +961,7 @@ const CodeEditor1 = () => {
                                               <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
                                                 <img
                                                   class="mr-2 w-6 h-6 rounded-full"
-                                                  src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                                                  src={userAvatar}
                                                   alt="Jese Leos"
                                                 />
                                                 {replycomment.authorName}

@@ -175,7 +175,9 @@ const LessonManagement = () => {
                     </div>
                   </div>
                   <div class="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-                    <Link to={`/coursemanagement/lesson/create/${id}`}>
+                    <Link
+                      to={`/coursemanagement/chaptermanagement/lessonmanagement/create/${id}`}
+                    >
                       <Button gradientDuoTone="cyanToBlue">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -286,7 +288,7 @@ const LessonManagement = () => {
                                 <td>
                                   <div class="flex items-center px-5">
                                     <Link
-                                      to={`/coursemanagement/lesson/update/${lesson.lessonId}`}
+                                      to={`/coursemanagement/chaptermanagement/lessonmanagement/update/${lesson.lessonId}`}
                                     >
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"

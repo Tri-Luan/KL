@@ -343,7 +343,7 @@ const ChapterManagement = () => {
                                 </th>
                                 <td class="px-4 py-2">
                                   <Link
-                                    to={`/coursemanagement/lesson/${chapter.chapterId}`}
+                                    to={`/coursemanagement/chaptermanagement/lessonmanagement/${chapter.chapterId}`}
                                     className="font-medium text-blue-600 dark:text-blue-500 hover:text-blue-700"
                                   >
                                     Manage

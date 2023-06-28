@@ -7,6 +7,7 @@ import useModal from "../../hooks/useModal";
 import { selectCurrentUser } from "../../redux/authSlice";
 import { exportComponentAsPNG } from "react-component-export-image";
 import certificate from "../../assets/images/certificate.png";
+import userAvatar from "../../assets/images/userAvatar.png";
 import {
   useAddCourseCommentMutation,
   useAddCourseReplyCommentMutation,
@@ -314,11 +315,13 @@ const CourseDetail = () => {
               content="reply comment"
               type="delete"
             />
-            <div className=" w-3/5 px-14 py-10">
-              <h1 className="text-white font-bold text-3xl">
+            <div className="mx-auto w-full max-w-7xl px-14 py-10">
+              <h1 className="text-white font-bold  text-3xl">
                 {course.courseName}
               </h1>
-              <p className="text-white line-clamp-3">{course.description}</p>
+              <p className="text-white line-clamp-3 w-3/5">
+                {course.description}
+              </p>
               <div className="mt-2.5 mb-5 flex items-center">
                 <svg
                   className="h-5 w-5 text-yellow-300"
@@ -369,7 +372,7 @@ const CourseDetail = () => {
               </div>
               <div className="flex justify-start">
                 <Avatar
-                  img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                  img={userAvatar}
                   rounded={true}
                   className="mt-2.5 mb-5 ml-2 "
                 >
@@ -381,17 +384,27 @@ const CourseDetail = () => {
                 </Avatar>
               </div>
               {course.isRegistered ? (
-                <Progress
-                  class="w-1/2"
-                  color="blue"
-                  labelProgress
-                  labelText
-                  progress={course.completedPercent}
-                  progressLabelPosition="inside"
-                  size="lg"
-                  textLabel="Progress"
-                  textLabelPosition="outside"
-                />
+                <>
+                  <div class="flex justify-between mb-1">
+                    <span class="mb-1 text-lg font-medium text-white">
+                      Progress
+                    </span>
+                  </div>
+                  <div class="w-1/2 h-6 mb-6 bg-gray-200 rounded-full dark:bg-gray-700">
+                    {course.completedPercent === 0 ? (
+                      <div className="text-gray-700 h-6 text-md font-medium  text-center p-0.5 leading-none rounded-full">
+                        {course.completedPercent}%
+                      </div>
+                    ) : (
+                      <div
+                        className={`bg-green-500 text-white h-6 text-md font-medium  text-center p-0.5 leading-none rounded-full`}
+                        style={{ width: `${course.completedPercent}` }}
+                      >
+                        {course.completedPercent}%
+                      </div>
+                    )}
+                  </div>
+                </>
               ) : (
                 /* <div class="w-20 h-20 text-center justify-center items-center  border-4 rounded-full  dark:bg-gray-700">
                 <span
@@ -424,7 +437,7 @@ const CourseDetail = () => {
               )}
             </div>
           </section>
-          <div class="container mx-auto my-5">
+          <div class="mx-auto w-full max-w-7xl my-5">
             <Tabs.Group
               aria-label="Tabs with underline"
               style="underline"
@@ -556,7 +569,7 @@ const CourseDetail = () => {
                                     <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
                                       <img
                                         class="mr-2 w-6 h-6 rounded-full"
-                                        src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                                        src={userAvatar}
                                         alt="Michael Gough"
                                       />
                                       {comment.authorName}
@@ -695,7 +708,7 @@ const CourseDetail = () => {
                                               <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
                                                 <img
                                                   class="mr-2 w-6 h-6 rounded-full"
-                                                  src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                                                  src={userAvatar}
                                                   alt="Jese Leos"
                                                 />
                                                 {replycomment.authorName}

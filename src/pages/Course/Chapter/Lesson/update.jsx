@@ -230,16 +230,11 @@ const UpdateLesson = () => {
         <section class="bg-white ">
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
-              to={`/coursemanagement/lesson/${lesson.chapterId}`}
+              to={`/coursemanagement/chaptermanagement/lessonmanagement/${id}`}
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              Back to management
+              Back to lesson management
             </Link>
-            <img
-              className="mx-auto h-12 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-              alt="Your Company"
-            />
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Update lesson
             </h2>

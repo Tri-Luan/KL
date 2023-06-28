@@ -204,7 +204,7 @@ const DiscussionDetail = () => {
             content="reply comment"
             type="delete"
           />
-          <div className="mx-auto pt-4 lg:pt-10  w-full max-w-5xl">
+          <div className="mx-auto pt-4 lg:pt-10 w-full max-w-5xl">
             <Breadcrumbs />
           </div>
           <main class="pt-4 pb-16 lg:pt-10 lg:pb-24 lg:mx-10 bg-white">

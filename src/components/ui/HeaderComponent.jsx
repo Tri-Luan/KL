@@ -8,7 +8,7 @@ import { useGetUserMutation } from "../../redux/usersApiSlice";
 import Cookies from "universal-cookie";
 import { Button } from "flowbite-react";
 import { useSendLogoutMutation } from "../../redux/authApiSlice";
-
+import userAvatar from "../../assets/images/userAvatar.png";
 import { FireIcon } from "@heroicons/react/24/solid";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -105,16 +105,6 @@ const Header = () => {
                   >
                     Discussion
                   </NavLink>
-                  {user?.role === "Author" ? (
-                    <NavLink
-                      to="/post"
-                      className={({ isActive }) =>
-                        isActive ? activeClassName : normalStyle
-                      }
-                    >
-                      Đăng bài
-                    </NavLink>
-                  ) : null}
                 </div>
               </div>
             </div>
@@ -181,8 +171,8 @@ const Header = () => {
                     <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                       <span className="sr-only">Open user menu</span>
                       <img
-                        className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        className="h-8 w-8 rounded-full border-none"
+                        src={userAvatar}
                         alt=""
                       />
                     </Menu.Button>

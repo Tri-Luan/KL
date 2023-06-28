@@ -281,7 +281,7 @@ const CourseManagement = () => {
                                   </td>
                                   <td class="px-4 py-2">
                                     <Link
-                                      to={`/coursemanagement/chapter/${course.id}`}
+                                      to={`/coursemanagement/chaptermanagement/${course.id}`}
                                       className="font-medium text-blue-600 dark:text-blue-500 hover:text-blue-700"
                                     >
                                       Manage

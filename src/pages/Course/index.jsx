@@ -5,7 +5,7 @@ import { useGetCoursesQuery } from "../../redux/courseApiSlice";
 const Course = () => {
   const { data, isLoading, isSuccess, isError, error } = useGetCoursesQuery();
   console.log(data);
- 
+
   return (
     <div>
       {isLoading ? (
@@ -36,12 +36,11 @@ const Course = () => {
       ) : isSuccess ? (
         <section>
           <section className="courseCarousel">
-            <div className="carousel__content">
+            <div className="carousel__content container mx-auto w-full max-w-7xl">
               <h3>
                 Learning programming online. Let's start with your first course!
               </h3>
-
-              <form className="mt-6">
+              <form className="mt-6 ">
                 <div class="flex">
                   <div class="relative w-2/4">
                     <input
@@ -81,7 +80,7 @@ const Course = () => {
             return (
               <>
                 {courseLists.courses.length !== 0 ? (
-                  <div className="container mx-auto my-5" key={i}>
+                  <div className="mx-auto w-full max-w-7xl my-5" key={i}>
                     <h2 className="text-4xl my-5 font-semibold tracking-tight text-gray-700 ">
                       {courseLists.courseLevelName}
                     </h2>
