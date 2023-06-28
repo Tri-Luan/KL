@@ -234,12 +234,8 @@ const UpdatePractice = () => {
             >
               Back to management
             </Link>
-            <img
-              className="mx-auto h-12 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-              alt="Your Company"
-            />
-            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+
+            <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Update Practice
             </h2>
             {alertIsShowing ? (

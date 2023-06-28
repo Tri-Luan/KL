@@ -15,12 +15,13 @@ import {
 import {
   ArrowPathIcon,
   ArrowDownTrayIcon,
-  SaveAsIcon,
   ChevronDoubleRightIcon,
   BookOpenIcon,
   AcademicCapIcon,
   ChatBubbleBottomCenterTextIcon,
   ClockIcon,
+  UserIcon,
+  HeartIcon,
 } from "@heroicons/react/24/outline";
 import ReactCodeMirror from "@uiw/react-codemirror";
 import { oneDark } from "@codemirror/theme-one-dark";
@@ -28,7 +29,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { useGetCodeLanguagesQuery } from "../../redux/courseApiSlice";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../redux/authSlice";
-import { Spinner, Table, Tabs, Pagination } from "flowbite-react";
+import { Spinner, Table, Tabs, Pagination, Badge } from "flowbite-react";
 import useModal from "../../hooks/useModal";
 import ModalComponent from "../../components/ui/ModalComponent";
 import {
@@ -601,13 +602,39 @@ const CodeEditor2 = () => {
             >
               <Tabs.Item active icon={BookOpenIcon} title="Lesson">
                 {
-                  <div
-                    className="block p-0 max-h-[70vh] w-full overflow-auto "
-                    id="content"
-                    dangerouslySetInnerHTML={{
-                      __html: practice.content,
-                    }}
-                  />
+                  <div>
+                    <div className="flex mb-3">
+                      <UserIcon className="text-gray-800  mr-1 h-5 w-5" />
+                      <span class="course-author font-semibold  text-blue-600">
+                        {practice.author}
+                      </span>
+                      <Badge
+                        className="ml-4 mr-4"
+                        color={
+                          practice.level === "Easy"
+                            ? "success"
+                            : practice.level === "Medium"
+                            ? "warning"
+                            : "failure"
+                        }
+                        pill
+                        size="sm"
+                      >
+                        {practice.level}
+                      </Badge>
+                      <HeartIcon className="text-blue-600  mr-1 h-5 w-5" />
+                      <span class="course-author font-base  ">
+                        {practice.score} Points
+                      </span>
+                    </div>
+                    <div
+                      className="block p-0 max-h-[70vh] w-full overflow-auto "
+                      id="content"
+                      dangerouslySetInnerHTML={{
+                        __html: practice.content,
+                      }}
+                    />
+                  </div>
                 }
               </Tabs.Item>
               <Tabs.Item icon={AcademicCapIcon} title="Leaderboard">

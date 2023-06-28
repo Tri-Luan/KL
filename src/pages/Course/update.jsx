@@ -135,7 +135,7 @@ const UpdateCourse = () => {
               Back to course management
             </Link>
 
-            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+            <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Edit course
             </h2>
             {alertIsShowing ? (

@@ -21,6 +21,8 @@ import {
   AcademicCapIcon,
   ChatBubbleBottomCenterTextIcon,
   ClockIcon,
+  HeartIcon,
+  UserIcon,
 } from "@heroicons/react/24/outline";
 import ReactCodeMirror from "@uiw/react-codemirror";
 import { oneDark } from "@codemirror/theme-one-dark";
@@ -42,7 +44,7 @@ import {
 } from "../../redux/courseApiSlice";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../redux/authSlice";
-import { Spinner, Table, Tabs, Pagination } from "flowbite-react";
+import { Spinner, Table, Tabs, Pagination, Badge } from "flowbite-react";
 import useModal from "../../hooks/useModal";
 import ModalComponent from "../../components/ui/ModalComponent";
 import userAvatar from "../../assets/images/userAvatar.png";
@@ -75,6 +77,7 @@ const CodeEditor1 = () => {
     isError: isErrorGetLessonDetails,
     error: errorGetLessonDetails,
   } = useGetLessonDetailsQuery({ lessonId: id, userId: user.id });
+  console.log(lesson);
   const {
     data: histories,
     isLoading: isLoadingGetLessonHistory,
@@ -652,13 +655,25 @@ const CodeEditor1 = () => {
             >
               <Tabs.Item active icon={BookOpenIcon} title="Lesson">
                 {
-                  <div
-                    className="block p-0 max-h-[70vh] w-full overflow-auto "
-                    id="content"
-                    dangerouslySetInnerHTML={{
-                      __html: lesson.content,
-                    }}
-                  />
+                  <div>
+                    <div className="flex mb-3">
+                      <UserIcon className="text-gray-800  mr-1 h-5 w-5" />
+                      <span class="course-author font-semibold  text-blue-600">
+                        {lesson.authorName}
+                      </span>
+                      <HeartIcon className="text-blue-600 ml-4  mr-1 h-5 w-5" />
+                      <span class="course-author font-base  ">
+                        {lesson.score} Points
+                      </span>
+                    </div>
+                    <div
+                      className="block p-0 max-h-[70vh] w-full overflow-auto "
+                      id="content"
+                      dangerouslySetInnerHTML={{
+                        __html: lesson.content,
+                      }}
+                    />
+                  </div>
                 }
               </Tabs.Item>
               <Tabs.Item icon={AcademicCapIcon} title="Leaderboard">

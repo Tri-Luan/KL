@@ -224,7 +224,7 @@ const CreateLesson = () => {
             >
               Back to lesson management
             </Link>
-            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+            <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Create new lesson
             </h2>
             {alertIsShowing ? (
