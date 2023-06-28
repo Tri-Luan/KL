@@ -42,4 +42,23 @@ export const ApiPaths = {
       leaderboard: "/leaderboard",
     },
   },
+  practice: {
+    root: "/practices",
+    detail: "/details",
+    levels: "/levels",
+    management: { root: "/management", detail: "/details", hidden: "/hidden" },
+    run: "/run",
+    submit: "/submit",
+    histories: "/histories",
+    leaderboard: "/leaderboard",
+  },
+  discussion: {
+    root: "/discussions",
+    comment: "/comment",
+    comments: "/comments",
+    commentAction: "/commentAction",
+    replyComment: "/replycomment",
+    replyCommentAction: "/replyCommentAction",
+    detail: "/details",
+  },
 };

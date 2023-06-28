@@ -10,6 +10,7 @@ module.exports = {
         pinyon: ["Pinyon Script"],
         faustina: ["Faustina"],
       },
+      
     },
   },
   plugins: [require("flowbite/plugin")],

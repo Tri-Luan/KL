@@ -2,7 +2,7 @@
 import "../../style/IDE.css";
 
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import Split from "react-split";
 import { Listbox, Transition, Switch, Tab } from "@headlessui/react";
 import {
@@ -25,67 +25,37 @@ import {
 import ReactCodeMirror from "@uiw/react-codemirror";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { javascript } from "@codemirror/lang-javascript";
-import {
-  useAddLessonCommentMutation,
-  useAddLessonReplyCommentMutation,
-  useCommentLessonActionMutation,
-  useDeleteLessonCommentMutation,
-  useDeleteLessonReplyCommentMutation,
-  useGetCodeLanguagesQuery,
-  useGetLessonCommentsMutation,
-  useGetLessonDetailsQuery,
-  useGetLessonHistoryQuery,
-  useGetLessonLeaderboardQuery,
-  useReplycommentLessonActionMutation,
-  useRunCodeLessonMutation,
-  useSubmitCodeLessonMutation,
-} from "../../redux/courseApiSlice";
+import { useGetCodeLanguagesQuery } from "../../redux/courseApiSlice";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../redux/authSlice";
 import { Spinner, Table, Tabs } from "flowbite-react";
 import useModal from "../../hooks/useModal";
 import ModalComponent from "../../components/ui/ModalComponent";
+import {
+  useGetPracticeDetailsQuery,
+  useGetPracticeHistoryQuery,
+  useGetPracticeLeaderboardQuery,
+  useRunCodePracticeMutation,
+  useSubmitCodePracticeMutation,
+} from "../../redux/practiceApiSlice";
+import Breadcrumbs from "../../components/ui/Breadcrumbs";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const CodeEditor = () => {
+const CodeEditor2 = () => {
   // const window = new JSDOM("").window;
   // const DOMPurify = createDOMPurify(window);
   const tabsRef = useRef(null);
   const props = { tabsRef };
+  const location = useLocation();
 
+  console.log(location.state);
   const user = useSelector(selectCurrentUser);
-  const { id } = useParams();
-  const {
-    data: lesson,
-    isLoading: isLoadingGetLessonDetails,
-    isSuccess: isSuccessGetLessonDetails,
-    isError: isErrorGetLessonDetails,
-    error: errorGetLessonDetails,
-  } = useGetLessonDetailsQuery({ lessonId: id, userId: user.id });
-  const {
-    data: histories,
-    isLoading: isLoadingGetLessonHistory,
-    isSuccess: isSuccessGetLessonHistory,
-    isError: isErrorGetLessonHistory,
-    error: errorGetLessonHistory,
-    refetch: refetchGetLessonHistory,
-  } = useGetLessonHistoryQuery({ lessonId: id, userId: user.id });
-  const {
-    data: leaderBoards,
-    isLoading: isLoadingGetLeaderBoard,
-    isSuccess: isSuccessGetLeaderBoard,
-    isError: isErrorGetLeaderBoard,
-    error: errorGetLeaderBoard,
-    refetch: refetchGetLessonLeaderboard,
-  } = useGetLessonLeaderboardQuery({
-    lessonId: id,
-    pageSize: 4,
-    pageNumber: 1,
-  });
-  console.log(leaderBoards);
+  // const { id } = useParams();
+  const id = location.state.id;
+
   const {
     data: languages,
     isLoading: isLoadingGetCodeLanguages,
@@ -93,27 +63,58 @@ const CodeEditor = () => {
     isError: isErrorGetCodeLanguages,
     error: errorGetCodeLanguages,
   } = useGetCodeLanguagesQuery();
+  const {
+    data: practice,
+    isLoading: isLoadingGetPracticeDetails,
+    isSuccess: isSuccessGetPracticeDetails,
+    isError: isErrorGetPracticeDetails,
+    error: errorGetPracticeDetails,
+  } = useGetPracticeDetailsQuery({ practiceId: id, userId: user.id });
+  console.log(practice);
+  const {
+    data: histories,
+    isLoading: isLoadingGetPracticeHistory,
+    isSuccess: isSuccessGetPracticeHistory,
+    isError: isErrorGetPracticeHistory,
+    error: errorGetPracticeHistory,
+    refetch: refetchGetPracticeHistory,
+  } = useGetPracticeHistoryQuery({ practiceId: id, userId: user.id });
+  console.log(histories);
+  const {
+    data: leaderBoards,
+    isLoading: isLoadingGetLeaderBoard,
+    isSuccess: isSuccessGetLeaderBoard,
+    isError: isErrorGetLeaderBoard,
+    error: errorGetLeaderBoard,
+    refetch: refetchGetPracticeLeaderboard,
+  } = useGetPracticeLeaderboardQuery({
+    practiceId: id,
+    pageSize: 4,
+    pageNumber: 1,
+  });
+  console.log(leaderBoards);
+  const [runCodePractice, { isLoading: isLoadingRunCode }] =
+    useRunCodePracticeMutation();
+  const [submitCodePractice, { isLoading: isLoadingSubmitCode }] =
+    useSubmitCodePracticeMutation();
 
-  const [getLessonComments] = useGetLessonCommentsMutation();
+  // const [getLessonComments] = useGetLessonCommentsMutation();
+  // const [addPracticeComment, { isLoading: isLoadingAddLessonComment }] =
+  //   useAddLessonCommentMutation();
+  // const [
+  //   addPracticeReplyComment,
+  //   { isLoading: isLoadingAddLessonReplyComment },
+  // ] = useAddPracticeReplyCommentMutation();
+  // const [commentAction] = useCommentPracticeActionMutation();
+  // const [replyCommentAction] = useReplycommentPracticeActionMutation();
+  // const [deleteComment, { isLoading: isLoadingDeletePracticeComment }] =
+  //   useDeletePracticeCommentMutation();
+  // const [
+  //   deleteReplyComment,
+  //   { isLoading: isLoadingDeletePracticeReplyComment },
+  // ] = useDeletePracticeReplyCommentMutation();
+  // const [comments, setComments] = useState(null);
 
-  const [runCodeLesson, { isLoading: isLoadingRunCode }] =
-    useRunCodeLessonMutation();
-  const [submitCodeLesson, { isLoading: isLoadingSubmitCode }] =
-    useSubmitCodeLessonMutation();
-
-  const [addLessonComment, { isLoading: isLoadingAddLessonComment }] =
-    useAddLessonCommentMutation();
-
-  const [addLessonReplyComment, { isLoading: isLoadingAddLessonReplyComment }] =
-    useAddLessonReplyCommentMutation();
-  const [commentAction] = useCommentLessonActionMutation();
-  const [replyCommentAction] = useReplycommentLessonActionMutation();
-  const [deleteComment, { isLoading: isLoadingDeleteLessonComment }] =
-    useDeleteLessonCommentMutation();
-  const [deleteReplyComment, { isLoading: isLoadingDeleteLessonReplyComment }] =
-    useDeleteLessonReplyCommentMutation();
-
-  const [comments, setComments] = useState(null);
   const [code, setCode] = useState("");
   const [results, setResults] = useState(null);
   const [isError, setIsError] = useState(false);
@@ -144,16 +145,12 @@ const CodeEditor = () => {
     toggle: toggle5,
     setArg: setArg5,
   } = useModal();
+
   useEffect(() => {
-    if (!isLoadingGetLessonDetails && isSuccessGetLessonDetails) {
-      setSelectedLanguage({
-        codeLanguageId: lesson.codeSamples[0].codeLanguageId,
-        codeLanguageName: lesson.codeSamples[0].codeLanguageName,
-        codeLanguageVersion: lesson.codeSamples[0].codeLanguageVersion,
-      });
-      setCode(lesson.codeSamples[0].codeSample);
+    if (!isLoadingGetCodeLanguages) {
+      setSelectedLanguage(languages.codeLanguages[0]);
     }
-  }, [isSuccessGetLessonDetails, isLoadingGetLessonDetails]);
+  }, [isLoadingGetCodeLanguages]);
 
   const renderConditionIcon = (cond) => {
     if (cond === true) {
@@ -192,50 +189,38 @@ const CodeEditor = () => {
               leaveTo="opacity-0"
             >
               <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                {languages.codeLanguages.map((codeLanguage, i) => {
-                  return lesson.codeSamples.findIndex(
-                    (codeSample) =>
-                      codeSample.codeLanguageId === codeLanguage.codeLanguageId
-                  ) >= 0 ? (
-                    <Listbox.Option
-                      key={i}
-                      className={({ active }) =>
-                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                          active
-                            ? "bg-amber-100 text-amber-900"
-                            : "text-gray-900"
-                        }`
-                      }
-                      value={codeLanguage}
-                    >
-                      {({ selected }) => (
-                        <>
-                          <span
-                            className={`block truncate ${
-                              selected ? "font-medium" : "font-normal"
-                            }`}
-                          >
-                            {codeLanguage.codeLanguageName +
-                              " (" +
-                              codeLanguage.codeLanguageVersion +
-                              ")"}
+                {languages.codeLanguages.map((codeLanguage, i) => (
+                  <Listbox.Option
+                    key={i}
+                    className={({ active }) =>
+                      `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                        active ? "bg-amber-100 text-amber-900" : "text-gray-900"
+                      }`
+                    }
+                    value={codeLanguage}
+                    // selected={i === 1}
+                  >
+                    {({ selected }) => (
+                      <>
+                        <span
+                          className={`block truncate ${
+                            selected ? "font-medium" : "font-normal"
+                          }`}
+                        >
+                          {codeLanguage.codeLanguageName +
+                            " (" +
+                            codeLanguage.codeLanguageVersion +
+                            ")"}
+                        </span>
+                        {selected ? (
+                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
                           </span>
-                          {selected ? (
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
-                              <CheckIcon
-                                className="h-5 w-5"
-                                aria-hidden="true"
-                              />
-                            </span>
-                          ) : null}
-                        </>
-                      )}
-                    </Listbox.Option>
-                  ) : null;
-                })}
-                {/* {this.state.languages.map((language, languageIdx) => (
-                  
-                ))} */}
+                        ) : null}
+                      </>
+                    )}
+                  </Listbox.Option>
+                ))}
               </Listbox.Options>
             </Transition>
           </div>
@@ -246,94 +231,103 @@ const CodeEditor = () => {
   const renderTestCase = () => {
     return (
       <>
-        <h3 className="text-2xl text-white font-bold mb-1 text-center">
-          Test Cases
-        </h3>
-        <div className="w-full overflow-y-auto h-60 ml-6 mt-4  inline-flex sm:px-0">
-          <Tab.Group vertical>
-            <Tab.List className="flex w-50 max-w-md flex-col space-x-0 space-y-4 rounded-xl bg-slate-800 p-1">
-              {lesson.testCases.map((testCase, Idx) => (
-                <Tab
-                  key={testCase}
-                  className={({ selected }) =>
-                    classNames(
-                      "w-full flex ml-0 rounded-lg px-2.5 py-2.5 text-sm font-medium leading-5 text-white",
-                      selected
-                        ? "bg-slate-700 "
-                        : "text-blue-100 hover:bg-white/[0.12] hover:text-white"
+        {practice.testCases !== null ? (
+          <>
+            {" "}
+            <h3 className="text-2xl text-white font-bold mb-1 text-center">
+              Test Cases
+            </h3>
+            <div className="w-full overflow-y-auto h-60 ml-6 mt-4  inline-flex sm:px-0">
+              <Tab.Group vertical>
+                <Tab.List className="flex w-50 max-w-md flex-col space-x-0 space-y-4 rounded-xl bg-slate-800 p-1">
+                  {practice.testCases.map((testCase, Idx) => (
+                    <Tab
+                      key={testCase}
+                      className={({ selected }) =>
+                        classNames(
+                          "w-full flex ml-0 rounded-lg px-2.5 py-2.5 text-sm font-medium leading-5 text-white",
+                          selected
+                            ? "bg-slate-700 "
+                            : "text-blue-100 hover:bg-white/[0.12] hover:text-white"
+                        )
+                      }
+                    >
+                      Test Case {Idx + 1}
+                      {testCase.isHidden === true ? (
+                        <LockClosedIcon
+                          className="ml-2 h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      ) : results !== null ? (
+                        results.testCases.map((result, i) =>
+                          result.testCaseId === testCase.testCaseId
+                            ? renderConditionIcon(result.isPassed)
+                            : null
+                        )
+                      ) : null}
+                    </Tab>
+                  ))}
+                </Tab.List>
+                <Tab.Panels className="">
+                  {practice.testCases.map((testCase, Idx) =>
+                    !testCase.isHidden ? (
+                      <Tab.Panel
+                        key={Idx}
+                        className={classNames(
+                          "rounded-xl bg-slate-700 h-[200px] w-[600px] text-white  p-3"
+                        )}
+                      >
+                        <p>
+                          <span className="text-blue-400">Input:</span>
+                          {testCase.input}
+                        </p>
+                        <p>
+                          <span className="text-blue-400">
+                            Actual output:&nbsp;
+                          </span>
+                          {results !== null
+                            ? results.testCases.map((result, i) =>
+                                result.testCaseId === testCase.testCaseId
+                                  ? result.actualOutput
+                                  : null
+                              )
+                            : null}
+                        </p>
+                        <p>
+                          <span className="text-blue-400">
+                            Expected output:
+                          </span>{" "}
+                          {testCase.expectedOutput}
+                        </p>
+                      </Tab.Panel>
+                    ) : (
+                      <Tab.Panel
+                        key={Idx}
+                        className={classNames(
+                          "rounded-xl bg-slate-700 h-[200px] w-[600px] text-white  p-3"
+                        )}
+                      >
+                        <p>
+                          <span className="text-blue-400">
+                            Hidden test case
+                          </span>
+                        </p>
+                      </Tab.Panel>
                     )
-                  }
-                >
-                  Test Case {Idx + 1}
-                  {testCase.isHidden === true ? (
-                    <LockClosedIcon
-                      className="ml-2 h-5 w-5"
-                      aria-hidden="true"
-                    />
-                  ) : results !== null ? (
-                    results.testCases.map((result, i) =>
-                      result.testCaseId === testCase.testCaseId
-                        ? renderConditionIcon(result.isPassed)
-                        : null
-                    )
-                  ) : null}
-                </Tab>
-              ))}
-            </Tab.List>
-            <Tab.Panels className="">
-              {lesson.testCases.map((testCase, Idx) =>
-                !testCase.isHidden ? (
-                  <Tab.Panel
-                    key={Idx}
-                    className={classNames(
-                      "rounded-xl bg-slate-700 h-[200px] w-[600px] text-white  p-3"
-                    )}
-                  >
-                    <p>
-                      <span className="text-blue-400">Input:</span>
-                      {testCase.input}
-                    </p>
-                    <p>
-                      <span className="text-blue-400">
-                        Actual output:&nbsp;
-                      </span>
-                      {results !== null
-                        ? results.testCases.map((result, i) =>
-                            result.testCaseId === testCase.testCaseId
-                              ? result.actualOutput
-                              : null
-                          )
-                        : null}
-                    </p>
-                    <p>
-                      <span className="text-blue-400">Expected output:</span>{" "}
-                      {testCase.expectedOutput}
-                    </p>
-                  </Tab.Panel>
-                ) : (
-                  <Tab.Panel
-                    key={Idx}
-                    className={classNames(
-                      "rounded-xl bg-slate-700 h-[200px] w-[600px] text-white  p-3"
-                    )}
-                  >
-                    <p>
-                      <span className="text-blue-400">Hidden test case</span>
-                    </p>
-                  </Tab.Panel>
-                )
-              )}
-            </Tab.Panels>
-          </Tab.Group>
-        </div>
+                  )}
+                </Tab.Panels>
+              </Tab.Group>
+            </div>
+          </>
+        ) : null}
       </>
     );
   };
 
   const runCode = async () => {
-    const response = await runCodeLesson({
-      lessonId: lesson.lessonId,
-      lessonCode: code,
+    const response = await runCodePractice({
+      practiceId: practice.practiceId,
+      practiceCode: code,
       codeLanguageId: selectedLanguage.codeLanguageId,
     }).unwrap();
     if (response.errorType === null && response.errorMessage === null) {
@@ -348,177 +342,177 @@ const CodeEditor = () => {
     }
   };
   const submitCode = async () => {
-    const response = await submitCodeLesson({
-      lessonId: lesson.lessonId,
-      lessonCode: code,
+    const response = await submitCodePractice({
+      practiceId: practice.lessonId,
+      practiceCode: code,
       codeLanguageId: selectedLanguage.codeLanguageId,
       userId: user.id,
     }).unwrap();
     console.log(response);
-    refetchGetLessonHistory();
-    refetchGetLessonLeaderboard();
+    refetchGetPracticeHistory();
+    refetchGetPracticeLeaderboard();
     toggle2();
   };
-  const handleComment = async () => {
-    try {
-      if (comment !== "") {
-        const response = await addLessonComment({
-          userId: user.id,
-          lessonId: id,
-          content: comment,
-        })
-          .unwrap()
-          .then(async () => {
-            const comments = await getLessonComments({
-              userId: user.id,
-              lessonId: id,
-            });
-            setComments(comments.data);
-          });
-      }
+  // const handleComment = async () => {
+  //   try {
+  //     if (comment !== "") {
+  //       const response = await addPracticeComment({
+  //         userId: user.id,
+  //         lessonId: id,
+  //         content: comment,
+  //       })
+  //         .unwrap()
+  //         .then(async () => {
+  //           const comments = await getLessonComments({
+  //             userId: user.id,
+  //             lessonId: id,
+  //           });
+  //           setComments(comments.data);
+  //         });
+  //     }
 
-      setComment("");
-      // setTitle("");
-      // setUserId("");
-      // navigate("/");
-    } catch (err) {
-      console.error("Failed to delete the comment", err);
-    }
-  };
-  const handleReplyComment = async (arg, content) => {
-    try {
-      if (content !== "") {
-        const response = await addLessonReplyComment({
-          userId: user.id,
-          lessonCommentId: arg,
-          content: content,
-        })
-          .unwrap()
-          .then(async () => {
-            const comments = await getLessonComments({
-              userId: user.id,
-              lessonId: id,
-            });
-            setComments(comments.data);
-          });
-        console.log(response);
-      }
-    } catch (err) {
-      console.error("Failed to delete the comment", err);
-    }
-  };
+  //     setComment("");
+  //     // setTitle("");
+  //     // setUserId("");
+  //     // navigate("/");
+  //   } catch (err) {
+  //     console.error("Failed to delete the comment", err);
+  //   }
+  // };
+  // const handleReplyComment = async (arg, content) => {
+  //   try {
+  //     if (content !== "") {
+  //       const response = await addLessonReplyComment({
+  //         userId: user.id,
+  //         lessonCommentId: arg,
+  //         content: content,
+  //       })
+  //         .unwrap()
+  //         .then(async () => {
+  //           const comments = await getLessonComments({
+  //             userId: user.id,
+  //             lessonId: id,
+  //           });
+  //           setComments(comments.data);
+  //         });
+  //       console.log(response);
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to delete the comment", err);
+  //   }
+  // };
 
-  const onLikeCommentClicked = async (commentId) => {
-    try {
-      await commentAction({
-        userId: user.id,
-        commentId: commentId,
-        actionId: 0,
-      })
-        .unwrap()
-        .then(async () => {
-          const comments = await getLessonComments({
-            userId: user.id,
-            lessonId: id,
-          });
-          setComments(comments.data);
-        });
-    } catch (err) {
-      console.error("Failed to like the comment", err);
-    }
-  };
-  const onDisLikeCommentClicked = async (commentId) => {
-    try {
-      await commentAction({
-        userId: user.id,
-        commentId: commentId,
-        actionId: 1,
-      })
-        .unwrap()
-        .then(async () => {
-          const comments = await getLessonComments({
-            userId: user.id,
-            lessonId: id,
-          });
-          setComments(comments.data);
-        });
-    } catch (err) {
-      console.error("Failed to dislike the comment", err);
-    }
-  };
-  const onLikeReplyCommentClicked = async (commentId) => {
-    try {
-      await replyCommentAction({
-        userId: user.id,
-        commentId: commentId,
-        actionId: 0,
-      })
-        .unwrap()
-        .then(async () => {
-          const comments = await getLessonComments({
-            userId: user.id,
-            lessonId: id,
-          });
-          setComments(comments.data);
-        });
-    } catch (err) {
-      console.error("Failed to like the reply comment", err);
-    }
-  };
-  const onDisLikeReplyCommentClicked = async (commentId) => {
-    try {
-      await replyCommentAction({
-        userId: user.id,
-        commentId: commentId,
-        actionId: 1,
-      })
-        .unwrap()
-        .then(async () => {
-          const comments = await getLessonComments({
-            userId: user.id,
-            lessonId: id,
-          });
-          setComments(comments.data);
-        });
-    } catch (err) {
-      console.error("Failed to dislike the reply comment", err);
-    }
-  };
-  const onDeleteCommentClicked = async (commentId) => {
-    try {
-      await deleteComment({ userId: user.id, commentId: commentId })
-        .unwrap()
-        .then(async () => {
-          const comments = await getLessonComments({
-            userId: user.id,
-            lessonId: id,
-          });
-          setComments(comments.data);
-        });
-    } catch (err) {
-      console.error("Failed to delete the comment", err);
-    }
-  };
-  const onDeleteReplyCommentClicked = async (commentId) => {
-    try {
-      await deleteReplyComment({ userId: user.id, replyCommentId: commentId })
-        .unwrap()
-        .then(async () => {
-          const comments = await getLessonComments({
-            userId: user.id,
-            lessonId: id,
-          });
-          setComments(comments.data);
-        });
-    } catch (err) {
-      console.error("Failed to delete the reply comment", err);
-    }
-  };
+  // const onLikeCommentClicked = async (commentId) => {
+  //   try {
+  //     await commentAction({
+  //       userId: user.id,
+  //       commentId: commentId,
+  //       actionId: 0,
+  //     })
+  //       .unwrap()
+  //       .then(async () => {
+  //         const comments = await getLessonComments({
+  //           userId: user.id,
+  //           lessonId: id,
+  //         });
+  //         setComments(comments.data);
+  //       });
+  //   } catch (err) {
+  //     console.error("Failed to like the comment", err);
+  //   }
+  // };
+  // const onDisLikeCommentClicked = async (commentId) => {
+  //   try {
+  //     await commentAction({
+  //       userId: user.id,
+  //       commentId: commentId,
+  //       actionId: 1,
+  //     })
+  //       .unwrap()
+  //       .then(async () => {
+  //         const comments = await getLessonComments({
+  //           userId: user.id,
+  //           lessonId: id,
+  //         });
+  //         setComments(comments.data);
+  //       });
+  //   } catch (err) {
+  //     console.error("Failed to dislike the comment", err);
+  //   }
+  // };
+  // const onLikeReplyCommentClicked = async (commentId) => {
+  //   try {
+  //     await replyCommentAction({
+  //       userId: user.id,
+  //       commentId: commentId,
+  //       actionId: 0,
+  //     })
+  //       .unwrap()
+  //       .then(async () => {
+  //         const comments = await getLessonComments({
+  //           userId: user.id,
+  //           lessonId: id,
+  //         });
+  //         setComments(comments.data);
+  //       });
+  //   } catch (err) {
+  //     console.error("Failed to like the reply comment", err);
+  //   }
+  // };
+  // const onDisLikeReplyCommentClicked = async (commentId) => {
+  //   try {
+  //     await replyCommentAction({
+  //       userId: user.id,
+  //       commentId: commentId,
+  //       actionId: 1,
+  //     })
+  //       .unwrap()
+  //       .then(async () => {
+  //         const comments = await getLessonComments({
+  //           userId: user.id,
+  //           lessonId: id,
+  //         });
+  //         setComments(comments.data);
+  //       });
+  //   } catch (err) {
+  //     console.error("Failed to dislike the reply comment", err);
+  //   }
+  // };
+  // const onDeleteCommentClicked = async (commentId) => {
+  //   try {
+  //     await deleteComment({ userId: user.id, commentId: commentId })
+  //       .unwrap()
+  //       .then(async () => {
+  //         const comments = await getLessonComments({
+  //           userId: user.id,
+  //           lessonId: id,
+  //         });
+  //         setComments(comments.data);
+  //       });
+  //   } catch (err) {
+  //     console.error("Failed to delete the comment", err);
+  //   }
+  // };
+  // const onDeleteReplyCommentClicked = async (commentId) => {
+  //   try {
+  //     await deleteReplyComment({ userId: user.id, replyCommentId: commentId })
+  //       .unwrap()
+  //       .then(async () => {
+  //         const comments = await getLessonComments({
+  //           userId: user.id,
+  //           lessonId: id,
+  //         });
+  //         setComments(comments.data);
+  //       });
+  //   } catch (err) {
+  //     console.error("Failed to delete the reply comment", err);
+  //   }
+  // };
   return (
     <>
-      {isLoadingGetLessonDetails ||
+      {isLoadingGetPracticeDetails ||
       isLoadingGetCodeLanguages ||
-      isLoadingGetLessonHistory ||
+      isLoadingGetPracticeHistory ||
       isLoadingGetLeaderBoard ? (
         <div>
           <li className="flex items-center">
@@ -544,10 +538,10 @@ const CodeEditor = () => {
             Processing...
           </li>
         </div>
-      ) : lesson !== null ? (
+      ) : practice !== null ? (
         <section>
           {/* Breadcrumb Start */}
-          <ModalComponent
+          {/* <ModalComponent
             isShowing={isShowing3}
             arg={arg3}
             hide={toggle3}
@@ -555,7 +549,7 @@ const CodeEditor = () => {
             title="Confirmation"
             content="comment"
             type="delete"
-          />
+          /> */}
           <ModalComponent
             isShowing={isShowing4}
             arg={arg4}
@@ -565,7 +559,7 @@ const CodeEditor = () => {
             content="Are you sure you want to refresh code?"
             type="confirm"
           />
-          <ModalComponent
+          {/* <ModalComponent
             isShowing={isShowing5}
             arg={arg5}
             hide={toggle5}
@@ -573,55 +567,11 @@ const CodeEditor = () => {
             title="Confirmation"
             content="reply comment"
             type="delete"
-          />
-          <nav
-            className="flex h-[5vh] py-2 px-4 text-gray-700 bg-gray-50  border-2 border-gray-300 dark:bg-gray-800 dark:border-gray-700"
-            aria-label="Breadcrumb"
-          >
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-              {/* <li className="inline-flex items-center">
-                <Link
-                  to="/"
-                  className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-sky-500 dark:text-gray-400 dark:hover:text-white"
-                >
-                  home 
-                </Link>
-              </li> */}
-              <li>
-                <div className="flex items-center">
-                  {/* <svg
-                    className="w-6 h-6 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"></path>
-                  </svg> */}
-                  <Link
-                    to="/course"
-                    className="ml-1 text-sm font-medium text-gray-700 hover:text-sky-500 md:ml-2 dark:text-gray-400 dark:hover:text-white"
-                  >
-                    Course
-                  </Link>
-                </div>
-              </li>
-              <li aria-current="page">
-                <div className="flex items-center">
-                  <svg
-                    className="w-6 h-6 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"></path>
-                  </svg>
-                  <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
-                    {lesson.lessonName}
-                  </span>
-                </div>
-              </li>
-            </ol>
-          </nav>
+          /> */}
+          <div className="h-[5vh] py-2 px-4 bg-gray-50  border-y-2 border-gray-200">
+            <Breadcrumbs />
+          </div>
+
           {/* Breadcrumb End  */}
           <Split
             className="split"
@@ -637,15 +587,15 @@ const CodeEditor = () => {
               className="flex-col"
               aria-label="Tabs with icons"
               ref={props.tabsRef}
-              onActiveTabChange={async (tab) => {
-                if (tab === 3) {
-                  const comments = await getLessonComments({
-                    userId: user.id,
-                    lessonId: id,
-                  });
-                  setComments(comments.data);
-                }
-              }}
+              // onActiveTabChange={async (tab) => {
+              //   if (tab === 3) {
+              //     const comments = await getLessonComments({
+              //       userId: user.id,
+              //       lessonId: id,
+              //     });
+              //     setComments(comments.data);
+              //   }
+              // }}
             >
               <Tabs.Item active icon={BookOpenIcon} title="Lesson">
                 {
@@ -653,7 +603,7 @@ const CodeEditor = () => {
                     className="block p-0 max-h-[70vh] w-full overflow-auto "
                     id="content"
                     dangerouslySetInnerHTML={{
-                      __html: lesson.content,
+                      __html: practice.content,
                     }}
                   />
                 }
@@ -713,7 +663,7 @@ const CodeEditor = () => {
                     </Table.Head>
                     <Table.Body className="divide-y">
                       {histories !== null
-                        ? histories.lessonHistories.map((history, i) => {
+                        ? histories.practiceHistories.map((history, i) => {
                             return (
                               <Table.Row className="bg-white text-blue-500 text-base">
                                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
@@ -746,16 +696,16 @@ const CodeEditor = () => {
                   </Table>
                 </div>
               </Tabs.Item>
-              <Tabs.Item icon={ChatBubbleBottomCenterTextIcon} title="Comment">
+              {/* <Tabs.Item icon={ChatBubbleBottomCenterTextIcon} title="Comment">
                 <section class="bg-white dark:bg-gray-900  lg:py-4 p-0 max-h-[70vh] w-full overflow-auto ">
                   <div class="max-w-2xl px-4">
                     <div class="flex justify-between items-center mb-6">
-                      {/* <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
+                      <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                         Discussion (20)
-                      </h2> */}
+                      </h2>
                     </div>
                     {
-                      // isLoadingGetLessonComments ||
+                      isLoadingGetLessonComments ||
                       isLoadingDeleteLessonComment ||
                       isLoadingAddLessonReplyComment ||
                       isLoadingAddLessonComment ? (
@@ -1083,7 +1033,7 @@ const CodeEditor = () => {
                       : null}
                   </div>
                 </section>
-              </Tabs.Item>
+              </Tabs.Item> */}
             </Tabs.Group>
             {/* Tabs End */}
 
@@ -1203,4 +1153,4 @@ const CodeEditor = () => {
   );
 };
 
-export default CodeEditor;
+export default CodeEditor2;

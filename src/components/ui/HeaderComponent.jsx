@@ -9,7 +9,7 @@ import Cookies from "universal-cookie";
 import { Button } from "flowbite-react";
 import { useSendLogoutMutation } from "../../redux/authApiSlice";
 
-// import { FingerPrintIcon } from "@heroicons/react/solid";
+import { FireIcon } from "@heroicons/react/24/solid";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -19,9 +19,9 @@ const Header = () => {
   //   textDecoration: "underline",
   // };
   let normalStyle =
-    "nav-link hover:text-[#2e72e7] text-gray-800 px-3 py-2 rounded-md text-base font-medium ";
+    "nav-link hover:text-[#2e72e7] text-gray-800 px-3 py-2 rounded-md text-lg font-medium ";
   let activeClassName =
-    "nav-link hover:normal-case border-b-2 border-[#2e72e7] text-[#2e72e7] px-3 py-2 text-base font-medium";
+    "nav-link hover:normal-case border-b-[3px] border-[#2e72e7] text-[#2e72e7] px-3 py-2 text-lg font-medium";
 
   const [isOpen, setIsOpen] = useState(false);
   const user = useSelector(selectCurrentUser);
@@ -59,19 +59,19 @@ const Header = () => {
     <div>
       <nav>
         <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8">
-          <div className=" flex items-center justify-between h-16">
+          <div className=" flex items-center justify-between h-16 ">
             {/* Left elements start */}
             <div className="flex items-center">
               <Link to="/">
                 <div className="flex">
-                  {/* <FingerPrintIcon className="mt-1 h-9 w-9 text-[#5089eb]"></FingerPrintIcon> */}
-                  <h1 className=" hover:text-[#2e72e7]  text-gray-800 px-3 py-2 rounded-md text-xl font-medium">
-                    Learn <i className="font-normal text-[#2e72e7]">Everyday</i>
+                  <FireIcon className="mt-1 h-9 w-9 text-[#5089eb]"></FireIcon>
+                  <h1 className=" hover:text-[#2e72e7]  text-gray-800 px-3 py-2 rounded-md text-2xl font-semibold">
+                    Code <i className="font-bold text-[#2e72e7]">Camp</i>
                   </h1>
                 </div>
               </Link>
-              <div className="hidden  md:block">
-                <div className="ml-10 flex items-baseline space-x-4">
+              <div className=" hidden md:block">
+                <div className="ml-6 flex items-baseline space-x-4">
                   <NavLink
                     exact
                     to="/course"
@@ -89,21 +89,21 @@ const Header = () => {
                   >
                     Practice
                   </NavLink>
-                  <NavLink
+                  {/* <NavLink
                     to="/contest"
                     className={({ isActive }) =>
                       isActive ? activeClassName : normalStyle
                     }
                   >
                     Contest
-                  </NavLink>
+                  </NavLink> */}
                   <NavLink
-                    to="/discuss"
+                    to="/discussion"
                     className={({ isActive }) =>
                       isActive ? activeClassName : normalStyle
                     }
                   >
-                    Discuss
+                    Discussion
                   </NavLink>
                   {user?.role === "Author" ? (
                     <NavLink
@@ -166,7 +166,6 @@ const Header = () => {
             </div>
             {/* Reponsive navbar end*/}
             {/* Right elements start */}
-
             {user ? (
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <button
@@ -226,6 +225,19 @@ const Header = () => {
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
+                          <Link
+                            to="/practicemanagement"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Practice Management
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
                           <Button
                             onClick={() => {
                               handleLogout();
@@ -233,7 +245,7 @@ const Header = () => {
                             pill
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
+                              "block ml-4 text-sm text-gray-700"
                             )}
                           >
                             Log out

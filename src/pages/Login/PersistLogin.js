@@ -40,7 +40,6 @@ const PersistLogin = () => {
             console.log(response);
             dispatch(setUser(response.data));
           }
-
           setTrueSuccess(true);
         } catch (err) {
           console.error(err);

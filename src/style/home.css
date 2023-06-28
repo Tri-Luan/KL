@@ -3,7 +3,16 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  height: 250px;
+  height: 200px;
+  position: relative;
+}
+
+.practiceCarousel {
+  background-image: url(../assets/images/img2.jpg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+  height: 200px;
   position: relative;
 }
 
@@ -58,7 +67,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  height: 550px;
+  height: 450px;
   position: relative;
 }
 
@@ -71,7 +80,7 @@
 
 .udeCarousel .carousel__content h1 {
   color: #fff;
-  font-size: 35px;
+  font-size: 30px;
   font-weight: bold;
 }
 
@@ -81,14 +90,14 @@
   font-weight: normal;
 }
 
-
 .banner .line {
-  background: linear-gradient(to right, #6e1a52, #ec5252);
+  background: linear-gradient(to right, #045de9, #08bcee);
   padding: 5px;
 }
 
 .banner .banner__content {
   background-color: #29303b;
+  height: 300px;
 }
 
 .banner .banner__content .banner__item {
@@ -96,10 +105,11 @@
   color: #fff;
   font-size: 24px;
   font-weight: normal;
-  padding: 20px;
+  padding: 40px;
 }
 
 .banner .banner__content .banner_title {
+  padding: 60px;
   text-align: center;
 }
 
@@ -118,19 +128,20 @@
 }
 
 .btnRed {
+  margin-top: 10px;
   color: #fff;
   font-size: 15px;
   font-weight: 700;
-  background-color: #ec5252;
-  padding: 10px 20px;
-  border-radius: 2px;
-  border: 1px solid #ec5252;
+  background-color: #0294bd;
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: 1px solid #0294bd;
   transition: all 0.5s;
 }
 
 .btnRed:hover {
-  background-color: #992337;
-  border-color: #992337;
+  background-color: #045de9;
+  border-color: #045de9;
   color: #fff;
 }
 
@@ -139,7 +150,7 @@
 }
 
 .intro {
-  background: linear-gradient(to right, #6e1a52, #ec5252);
+  background: linear-gradient(to right, #045de9, #08bcee);
 }
 
 .intro .intro__content {
@@ -153,7 +164,7 @@
   color: #fff;
   font-size: 40px;
   font-weight: bold;
-  margin-right: 10px;
+  margin: auto;
 }
 
 .intro .intro__item .item__text {
@@ -220,19 +231,19 @@
 
 .services__item i {
   background-color: white;
-  color: #992d52;
+  color: #056997;
   width: 100px;
   height: 100px;
   border-radius: 50px;
-  border: 1px solid #992d52;
+  border: 1px solid #056997;
   font-size: 2.5rem;
   padding: 3px;
   line-height: 100px;
   transition: all 0.5s;
 }
 .services__item:hover i {
-  color: #ec5252;
+  color: #0796d8;
 }
 .services__item h3:hover {
-  color: #0088c6;
+  color: #0796d8;
 }

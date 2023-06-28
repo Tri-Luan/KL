@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Unauthorized from "./components/ui/Unauthorized";
-import CodeEditor from "./pages/CodeEditor";
+import CodeEditor1 from "./pages/CodeEditor/editor1";
 import Editor from "./pages/CodeEditor/editor";
 import Course from "./pages/Course";
 import CreateLesson from "./pages/Course/Chapter/Lesson/create";
@@ -17,7 +17,15 @@ import Login from "./pages/Login";
 import PersistLogin from "./pages/Login/PersistLogin";
 import RequireAuth from "./pages/Login/RequireAuth";
 import Layout from "./pages/Main/index";
+import Practice from "./pages/Practice";
+import CreatePractice from "./pages/Practice/create";
+import PracticeManagement from "./pages/Practice/manage";
+import UpdatePractice from "./pages/Practice/update";
 import Register from "./pages/Register";
+import CodeEditor2 from "./pages/CodeEditor/editor2";
+import Discussion from "./pages/Discussion";
+import CreateDiscussion from "./pages/Discussion/create";
+import DiscussionDetail from "./pages/Discussion/detail";
 
 const ROLES = {
   Student: "Student",
@@ -41,11 +49,27 @@ function App() {
             <Route index element={<Course />} />
             <Route element={<RequireAuth />}>
               <Route path=":id" element={<CourseDetail />} />
+              {/* <Route path="detail/:name" element={<CodeEditor />} /> */}
             </Route>
           </Route>
+          <Route path="practice">
+            <Route index element={<Practice />} />
+            <Route path="detail/:name" element={<CodeEditor2 />} />
+          </Route>
 
+          <Route path="discussion">
+            <Route index element={<Discussion />} />
+            <Route path="create" element={<CreateDiscussion />} />
+            <Route path=":name" element={<DiscussionDetail />} />
+          </Route>
+          <Route path="lesson/detail" element={<CodeEditor1 />} />
           <Route element={<RequireAuth />}>
             {/* <Route path="/home" element={<Home />} /> */}
+            <Route path="practicemanagement">
+              <Route index element={<PracticeManagement />} />
+              <Route path="create" element={<CreatePractice />} />
+              <Route path="update/:id" element={<UpdatePractice />} />
+            </Route>
             <Route path="/coursemanagement">
               <Route index element={<CourseManagement />} />
               <Route path="create" element={<CreateCourse />} />
@@ -71,10 +95,6 @@ function App() {
 
         {/* catch all route */}
         <Route path="*" element={<DefaultHome />}></Route>
-      </Route>
-      <Route element={<PersistLogin />}>
-        <Route path="codeeditor/:id" element={<CodeEditor />} />
-        <Route path="editor" element={<Editor />} />
       </Route>
     </Routes>
   );

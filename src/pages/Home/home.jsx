@@ -9,8 +9,8 @@ const Home = () => {
     <div>
       <section className="udeCarousel">
         <div className="carousel__content">
-          <h1>Luyện tập theo lịch của bạn</h1>
-          <p>Luyện tập bất kỳ chủ đề, bất cứ lúc nào.</p>
+          <h1>Learning according to your schedule</h1>
+          <p>Practice any subject, any time</p>
           <button
             class="btnRed mt-3 ml-20"
             // onClick={() => {

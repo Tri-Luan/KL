@@ -1,129 +1,382 @@
-import { Avatar, Button, Progress, Spinner, Tabs } from "flowbite-react";
-import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import ModalComponent from "../../components/ui/ModalComponent";
-import useModal from "../../hooks/useModal";
-import { selectCurrentUser } from "../../redux/authSlice";
-import { exportComponentAsPNG } from "react-component-export-image";
-import certificate from "../../assets/images/certificate.png";
-import {
-  useAddCourseCommentMutation,
-  useAddCourseReplyCommentMutation,
-  useCommentCourseActionMutation,
-  useDeleteCourseCommentMutation,
-  useDeleteCourseReplyCommentMutation,
-  useGetCourseCommentsMutation,
-  useGetCourseDetailQuery,
-  useRegisterCourseMutation,
-  useReplycommentCourseActionMutation,
-} from "../../redux/courseApiSlice";
+//Import CSS
+import "../../style/IDE.css";
 
-const CourseDetail = () => {
-  const navigate = useNavigate();
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import { Link, useLocation, useParams } from "react-router-dom";
+import Split from "react-split";
+import { Listbox, Transition, Switch, Tab } from "@headlessui/react";
+import {
+  CheckIcon,
+  ChevronUpDownIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  LockClosedIcon,
+} from "@heroicons/react/24/solid";
+import {
+  ArrowPathIcon,
+  ArrowDownTrayIcon,
+  SaveAsIcon,
+  ChevronDoubleRightIcon,
+  BookOpenIcon,
+  AcademicCapIcon,
+  ChatBubbleBottomCenterTextIcon,
+  ClockIcon,
+} from "@heroicons/react/24/outline";
+import ReactCodeMirror from "@uiw/react-codemirror";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { javascript } from "@codemirror/lang-javascript";
+import {
+  useAddLessonCommentMutation,
+  useAddLessonReplyCommentMutation,
+  useCommentLessonActionMutation,
+  useDeleteLessonCommentMutation,
+  useDeleteLessonReplyCommentMutation,
+  useGetCodeLanguagesQuery,
+  useGetLessonCommentsMutation,
+  useGetLessonDetailsQuery,
+  useGetLessonHistoryQuery,
+  useGetLessonLeaderboardQuery,
+  useReplycommentLessonActionMutation,
+  useRunCodeLessonMutation,
+  useSubmitCodeLessonMutation,
+} from "../../redux/courseApiSlice";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../../redux/authSlice";
+import { Spinner, Table, Tabs } from "flowbite-react";
+import useModal from "../../hooks/useModal";
+import ModalComponent from "../../components/ui/ModalComponent";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
+const CodeEditor1 = () => {
+  // const window = new JSDOM("").window;
+  // const DOMPurify = createDOMPurify(window);
   const tabsRef = useRef(null);
   const props = { tabsRef };
-  const { id } = useParams();
+  const location = useLocation();
+  const id = location.state.id;
   const user = useSelector(selectCurrentUser);
-  const [comment, setComment] = useState("");
-  const [comments, setComments] = useState(null);
-  const certificateWrapper = useRef(null);
-  const [Name, setName] = useState("");
-  const currentDate = new Date().toLocaleString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
+
+  const {
+    data: languages,
+    isLoading: isLoadingGetCodeLanguages,
+    isSuccess: isSuccessGetCodeLanguages,
+    isError: isErrorGetCodeLanguages,
+    error: errorGetCodeLanguages,
+  } = useGetCodeLanguagesQuery();
+  const {
+    data: lesson,
+    isLoading: isLoadingGetLessonDetails,
+    isSuccess: isSuccessGetLessonDetails,
+    isError: isErrorGetLessonDetails,
+    error: errorGetLessonDetails,
+  } = useGetLessonDetailsQuery({ lessonId: id, userId: user.id });
+  const {
+    data: histories,
+    isLoading: isLoadingGetLessonHistory,
+    isSuccess: isSuccessGetLessonHistory,
+    isError: isErrorGetLessonHistory,
+    error: errorGetLessonHistory,
+    refetch: refetchGetLessonHistory,
+  } = useGetLessonHistoryQuery({ lessonId: id, userId: user.id });
+  const {
+    data: leaderBoards,
+    isLoading: isLoadingGetLeaderBoard,
+    isSuccess: isSuccessGetLeaderBoard,
+    isError: isErrorGetLeaderBoard,
+    error: errorGetLeaderBoard,
+    refetch: refetchGetLessonLeaderboard,
+  } = useGetLessonLeaderboardQuery({
+    lessonId: id,
+    pageSize: 4,
+    pageNumber: 1,
   });
+
+  const [getLessonComments] = useGetLessonCommentsMutation();
+
+  const [runCodeLesson, { isLoading: isLoadingRunCode }] =
+    useRunCodeLessonMutation();
+  const [submitCodeLesson, { isLoading: isLoadingSubmitCode }] =
+    useSubmitCodeLessonMutation();
+
+  const [addLessonComment, { isLoading: isLoadingAddLessonComment }] =
+    useAddLessonCommentMutation();
+
+  const [addLessonReplyComment, { isLoading: isLoadingAddLessonReplyComment }] =
+    useAddLessonReplyCommentMutation();
+  const [commentAction] = useCommentLessonActionMutation();
+  const [replyCommentAction] = useReplycommentLessonActionMutation();
+  const [deleteComment, { isLoading: isLoadingDeleteLessonComment }] =
+    useDeleteLessonCommentMutation();
+  const [deleteReplyComment, { isLoading: isLoadingDeleteLessonReplyComment }] =
+    useDeleteLessonReplyCommentMutation();
+
+  const [comments, setComments] = useState(null);
+  const [code, setCode] = useState("");
+  const [results, setResults] = useState(null);
+  const [isError, setIsError] = useState(false);
+  const [disableSubmitButton, setDisableSubmitButton] = useState(true);
+  const [error, setError] = useState({
+    errorType: String,
+    errorMessage: String,
+  });
+  const [comment, setComment] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState({});
   const {
     arg: arg1,
     isShowing: isShowing1,
     toggle: toggle1,
     setArg: setArg1,
   } = useModal();
-  const {
-    arg: arg2,
-    isShowing: isShowing2,
-    toggle: toggle2,
-    setArg: setArg2,
-  } = useModal();
+  const { arg: arg2, isShowing: isShowing2, toggle: toggle2 } = useModal();
   const {
     arg: arg3,
     isShowing: isShowing3,
     toggle: toggle3,
     setArg: setArg3,
   } = useModal();
+  const { arg: arg4, isShowing: isShowing4, toggle: toggle4 } = useModal();
   const {
-    arg: arg4,
-    isShowing: isShowing4,
-    toggle: toggle4,
-    setArg: setArg4,
+    arg: arg5,
+    isShowing: isShowing5,
+    toggle: toggle5,
+    setArg: setArg5,
   } = useModal();
-  const {
-    data: course,
-    isLoading: isLoadingGetCourse,
-    isSuccess: isSuccessGetCourse,
-    isError: isErrorGetCourse,
-    error: errorGetCourse,
-    refetch: refetchGetCourse,
-  } = useGetCourseDetailQuery({ userId: user.id, courseId: id });
-  console.log(course);
-  // const {
-  //   data: comments,
-  //   isLoading: isLoadingGetCourseComments,
-  //   isSuccess: isSuccessGetCourseComments,
-  //   isError: isErrorGetCourseComments,
-  //   error: errorGetCourseComments,
-  //   refetch: refetchGetCourseComments,
-  // } = useGetCourseCommentsQuery({ userId: user.id, courseId: id });
-  const [getCourseComments] = useGetCourseCommentsMutation();
-  const [registerCourse] = useRegisterCourseMutation();
-  const [addCourseComment, { isLoading: isLoadingAddCourseComment }] =
-    useAddCourseCommentMutation();
-  const [addCourseReplyComment, { isLoading: isLoadingAddCourseReplyComment }] =
-    useAddCourseReplyCommentMutation();
-  const [commentAction] = useCommentCourseActionMutation();
-  const [replyCommentAction] = useReplycommentCourseActionMutation();
-  const [deleteComment, { isLoading: isLoadingDeleteCourseComment }] =
-    useDeleteCourseCommentMutation();
-  const [deleteReplyComment, { isLoading: isLoadingDeleteCourseReplyComment }] =
-    useDeleteCourseReplyCommentMutation();
   useEffect(() => {
-    if (isSuccessGetCourse) {
-      document.getElementById("objective").innerHTML = course.objective;
-    }
-  }, [isSuccessGetCourse]);
-  // const renderTheme()=>{
-  //   return ()
-  // }
-  const handleRegisterCourse = async () => {
-    const response = await registerCourse({
-      userId: user.id,
-      courseId: id,
-    })
-      .unwrap()
-      .then(() => {
-        refetchGetCourse();
+    if (!isLoadingGetLessonDetails && isSuccessGetLessonDetails) {
+      setSelectedLanguage({
+        codeLanguageId: lesson.codeSamples[0].codeLanguageId,
+        codeLanguageName: lesson.codeSamples[0].codeLanguageName,
+        codeLanguageVersion: lesson.codeSamples[0].codeLanguageVersion,
       });
-    return response;
+      setCode(lesson.codeSamples[0].codeSample);
+    }
+  }, [isSuccessGetLessonDetails, isLoadingGetLessonDetails]);
+
+  const renderConditionIcon = (cond) => {
+    if (cond === true) {
+      return <CheckCircleIcon className="text-green-600 inline h-5 w-5" />;
+    } else if (cond === false) {
+      return <ExclamationCircleIcon className="text-red-600 inline h-5 w-5" />;
+    }
+  };
+  const SelectLanguage = () => {
+    return (
+      <div className="mx-5 mt-[7px] w-40">
+        <Listbox
+          value={selectedLanguage}
+          onChange={(value) => setSelectedLanguage(value)}
+        >
+          <div className="relative mt-1">
+            <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+              <span className="block truncate">
+                {selectedLanguage.codeLanguageName +
+                  " (" +
+                  selectedLanguage.codeLanguageVersion +
+                  ")"}
+              </span>
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <ChevronUpDownIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </span>
+            </Listbox.Button>
+
+            <Transition
+              as={Fragment}
+              leave="transition ease-in duration-100"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                {languages.codeLanguages.map((codeLanguage, i) => {
+                  return lesson.codeSamples.findIndex(
+                    (codeSample) =>
+                      codeSample.codeLanguageId === codeLanguage.codeLanguageId
+                  ) >= 0 ? (
+                    <Listbox.Option
+                      key={i}
+                      className={({ active }) =>
+                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                          active
+                            ? "bg-amber-100 text-amber-900"
+                            : "text-gray-900"
+                        }`
+                      }
+                      value={codeLanguage}
+                    >
+                      {({ selected }) => (
+                        <>
+                          <span
+                            className={`block truncate ${
+                              selected ? "font-medium" : "font-normal"
+                            }`}
+                          >
+                            {codeLanguage.codeLanguageName +
+                              " (" +
+                              codeLanguage.codeLanguageVersion +
+                              ")"}
+                          </span>
+                          {selected ? (
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                              <CheckIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Listbox.Option>
+                  ) : null;
+                })}
+                {/* {this.state.languages.map((language, languageIdx) => (
+                  
+                ))} */}
+              </Listbox.Options>
+            </Transition>
+          </div>
+        </Listbox>
+      </div>
+    );
+  };
+  const renderTestCase = () => {
+    return (
+      <>
+        <h3 className="text-2xl text-white font-bold mb-1 text-center">
+          Test Cases
+        </h3>
+        <div className="w-full overflow-y-auto h-60 ml-6 mt-4  inline-flex sm:px-0">
+          <Tab.Group vertical>
+            <Tab.List className="flex w-50 max-w-md flex-col space-x-0 space-y-4 rounded-xl bg-slate-800 p-1">
+              {lesson.testCases.map((testCase, Idx) => (
+                <Tab
+                  key={testCase}
+                  className={({ selected }) =>
+                    classNames(
+                      "w-full flex ml-0 rounded-lg px-2.5 py-2.5 text-sm font-medium leading-5 text-white",
+                      selected
+                        ? "bg-slate-700 "
+                        : "text-blue-100 hover:bg-white/[0.12] hover:text-white"
+                    )
+                  }
+                >
+                  Test Case {Idx + 1}
+                  {testCase.isHidden === true ? (
+                    <LockClosedIcon
+                      className="ml-2 h-5 w-5"
+                      aria-hidden="true"
+                    />
+                  ) : results !== null ? (
+                    results.testCases.map((result, i) =>
+                      result.testCaseId === testCase.testCaseId
+                        ? renderConditionIcon(result.isPassed)
+                        : null
+                    )
+                  ) : null}
+                </Tab>
+              ))}
+            </Tab.List>
+            <Tab.Panels className="">
+              {lesson.testCases.map((testCase, Idx) =>
+                !testCase.isHidden ? (
+                  <Tab.Panel
+                    key={Idx}
+                    className={classNames(
+                      "rounded-xl bg-slate-700 h-[200px] w-[600px] text-white  p-3"
+                    )}
+                  >
+                    <p>
+                      <span className="text-blue-400">Input:</span>
+                      {testCase.input}
+                    </p>
+                    <p>
+                      <span className="text-blue-400">
+                        Actual output:&nbsp;
+                      </span>
+                      {results !== null
+                        ? results.testCases.map((result, i) =>
+                            result.testCaseId === testCase.testCaseId
+                              ? result.actualOutput
+                              : null
+                          )
+                        : null}
+                    </p>
+                    <p>
+                      <span className="text-blue-400">Expected output:</span>{" "}
+                      {testCase.expectedOutput}
+                    </p>
+                  </Tab.Panel>
+                ) : (
+                  <Tab.Panel
+                    key={Idx}
+                    className={classNames(
+                      "rounded-xl bg-slate-700 h-[200px] w-[600px] text-white  p-3"
+                    )}
+                  >
+                    <p>
+                      <span className="text-blue-400">Hidden test case</span>
+                    </p>
+                  </Tab.Panel>
+                )
+              )}
+            </Tab.Panels>
+          </Tab.Group>
+        </div>
+      </>
+    );
+  };
+
+  const runCode = async () => {
+    const response = await runCodeLesson({
+      lessonId: lesson.lessonId,
+      lessonCode: code,
+      codeLanguageId: selectedLanguage.codeLanguageId,
+    }).unwrap();
+    if (response.errorType === null && response.errorMessage === null) {
+      setResults(response);
+      setDisableSubmitButton(false);
+    } else if (response.errorType !== null && response.errorMessage !== null) {
+      setError({
+        errorType: response.errorType,
+        errorMessage: response.errorMessage,
+      });
+      setIsError(true);
+    }
+  };
+  const submitCode = async () => {
+    const response = await submitCodeLesson({
+      lessonId: lesson.lessonId,
+      lessonCode: code,
+      codeLanguageId: selectedLanguage.codeLanguageId,
+      userId: user.id,
+    }).unwrap();
+    console.log(response);
+    refetchGetLessonHistory();
+    refetchGetLessonLeaderboard();
+    toggle2();
   };
   const handleComment = async () => {
     try {
       if (comment !== "") {
-        const response = await addCourseComment({
+        const response = await addLessonComment({
           userId: user.id,
-          courseId: id,
+          lessonId: id,
           content: comment,
         })
           .unwrap()
           .then(async () => {
-            const comments = await getCourseComments({
+            const comments = await getLessonComments({
               userId: user.id,
-              courseId: id,
+              lessonId: id,
             });
             setComments(comments.data);
           });
-        console.log(response);
       }
+
       setComment("");
       // setTitle("");
       // setUserId("");
@@ -135,16 +388,16 @@ const CourseDetail = () => {
   const handleReplyComment = async (arg, content) => {
     try {
       if (content !== "") {
-        const response = await addCourseReplyComment({
+        const response = await addLessonReplyComment({
           userId: user.id,
-          courseCommentId: arg,
+          lessonCommentId: arg,
           content: content,
         })
           .unwrap()
           .then(async () => {
-            const comments = await getCourseComments({
+            const comments = await getLessonComments({
               userId: user.id,
-              courseId: id,
+              lessonId: id,
             });
             setComments(comments.data);
           });
@@ -164,9 +417,9 @@ const CourseDetail = () => {
       })
         .unwrap()
         .then(async () => {
-          const comments = await getCourseComments({
+          const comments = await getLessonComments({
             userId: user.id,
-            courseId: id,
+            lessonId: id,
           });
           setComments(comments.data);
         });
@@ -183,9 +436,9 @@ const CourseDetail = () => {
       })
         .unwrap()
         .then(async () => {
-          const comments = await getCourseComments({
+          const comments = await getLessonComments({
             userId: user.id,
-            courseId: id,
+            lessonId: id,
           });
           setComments(comments.data);
         });
@@ -202,9 +455,9 @@ const CourseDetail = () => {
       })
         .unwrap()
         .then(async () => {
-          const comments = await getCourseComments({
+          const comments = await getLessonComments({
             userId: user.id,
-            courseId: id,
+            lessonId: id,
           });
           setComments(comments.data);
         });
@@ -221,9 +474,9 @@ const CourseDetail = () => {
       })
         .unwrap()
         .then(async () => {
-          const comments = await getCourseComments({
+          const comments = await getLessonComments({
             userId: user.id,
-            courseId: id,
+            lessonId: id,
           });
           setComments(comments.data);
         });
@@ -236,9 +489,9 @@ const CourseDetail = () => {
       await deleteComment({ userId: user.id, commentId: commentId })
         .unwrap()
         .then(async () => {
-          const comments = await getCourseComments({
+          const comments = await getLessonComments({
             userId: user.id,
-            courseId: id,
+            lessonId: id,
           });
           setComments(comments.data);
         });
@@ -251,9 +504,9 @@ const CourseDetail = () => {
       await deleteReplyComment({ userId: user.id, replyCommentId: commentId })
         .unwrap()
         .then(async () => {
-          const comments = await getCourseComments({
+          const comments = await getLessonComments({
             userId: user.id,
-            courseId: id,
+            lessonId: id,
           });
           setComments(comments.data);
         });
@@ -263,7 +516,10 @@ const CourseDetail = () => {
   };
   return (
     <>
-      {isLoadingGetCourse ? (
+      {isLoadingGetLessonDetails ||
+      isLoadingGetCodeLanguages ||
+      isLoadingGetLessonHistory ||
+      isLoadingGetLeaderBoard ? (
         <div>
           <li className="flex items-center">
             <div role="status">
@@ -288,233 +544,226 @@ const CourseDetail = () => {
             Processing...
           </li>
         </div>
-      ) : isSuccessGetCourse ? (
-        <div>
-          <section
-            className={`relative  `}
-            style={{
-              backgroundImage: `url(data:image/gif;base64,${course.courseTheme}`,
-            }}
+      ) : lesson !== null ? (
+        <section>
+          {/* Breadcrumb Start */}
+          <ModalComponent
+            isShowing={isShowing3}
+            arg={arg3}
+            hide={toggle3}
+            func={onDeleteCommentClicked}
+            title="Confirmation"
+            content="comment"
+            type="delete"
+          />
+          <ModalComponent
+            isShowing={isShowing4}
+            arg={arg4}
+            hide={toggle4}
+            func={() => setCode("")}
+            title="Confirmation"
+            content="Are you sure you want to refresh code?"
+            type="confirm"
+          />
+          <ModalComponent
+            isShowing={isShowing5}
+            arg={arg5}
+            hide={toggle5}
+            func={onDeleteReplyCommentClicked}
+            title="Confirmation"
+            content="reply comment"
+            type="delete"
+          />
+          <nav
+            className="flex h-[5vh] py-2 px-40 bg-gray-50  border-2 border-gray-300 dark:bg-gray-800 dark:border-gray-700"
+            aria-label="Breadcrumb"
           >
-            <ModalComponent
-              isShowing={isShowing3}
-              arg={arg3}
-              hide={toggle3}
-              func={onDeleteCommentClicked}
-              title="Confirmation"
-              content="comment"
-              type="delete"
-            />
-            <ModalComponent
-              isShowing={isShowing4}
-              arg={arg4}
-              hide={toggle4}
-              func={onDeleteReplyCommentClicked}
-              title="Confirmation"
-              content="reply comment"
-              type="delete"
-            />
-            <div className=" w-3/5 px-14 py-10">
-              <h1 className="text-white font-bold text-3xl">
-                {course.courseName}
-              </h1>
-              <p className="text-white line-clamp-3">{course.description}</p>
-              <div className="mt-2.5 mb-5 flex items-center">
-                <svg
-                  className="h-5 w-5 text-yellow-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
+            <ol className="inline-flex items-center space-x-1 md:space-x-3">
+              {/* <li className="inline-flex items-center">
+                <Link
+                  to="/"
+                  className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-sky-500 dark:text-gray-400 dark:hover:text-white"
                 >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg
-                  className="h-5 w-5 text-yellow-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg
-                  className="h-5 w-5 text-yellow-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg
-                  className="h-5 w-5 text-yellow-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg
-                  className="h-5 w-5 text-yellow-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <span className="mr-2 rounded  px-2.5 py-0.5 text-md font-semibold text-yellow-300 dark:text-yellow-300">
-                  {course.voteScore}
-                </span>
-                <span className="mr-2 rounded  px-2.5 py-0.5 text-md font-normal text-white dark:text-yellow-300">
-                  {course.numberOfVotes} ratings
-                </span>
-              </div>
-              <div className="flex justify-start">
-                <Avatar
-                  img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                  rounded={true}
-                  className="mt-2.5 mb-5 ml-2 "
-                >
-                  <div className="space-y-1 font-medium dark:text-white">
-                    <div className="text-sm text-white dark:text-white">
-                      {course.authorName}
-                    </div>
-                  </div>
-                </Avatar>
-              </div>
-              {course.isRegistered ? (
-                <Progress
-                  class="w-1/2"
-                  color="blue"
-                  labelProgress
-                  labelText
-                  progress={course.completedPercent}
-                  progressLabelPosition="inside"
-                  size="lg"
-                  textLabel="Progress"
-                  textLabelPosition="outside"
-                />
-              ) : (
-                /* <div class="w-20 h-20 text-center justify-center items-center  border-4 rounded-full  dark:bg-gray-700">
-                <span
-                  class="w-20 h-20 text-base font-medium text-blue-100"
-                  // style="width: 45%"
-                >
-                  {" "}
-                  45%
-                </span>
-              </div> */
-                <>
-                  <button
-                    class="btnRed mt-3 "
-                    onClick={() => {
-                      handleRegisterCourse();
-                    }}
+                  home 
+                </Link>
+              </li> */}
+              <li>
+                <div className="flex items-center">
+                  {/* <svg
+                    className="w-6 h-6 text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    Enroll for Free!
-                  </button>
-                  <div className="mt-7 font-medium dark:text-white">
-                    <div className="text-md text-white dark:text-white">
-                      <span className="font-bold text-xl">
-                        {" "}
-                        {course.numberOfStudents}{" "}
-                      </span>
-                      already enrolled
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </section>
-          <div class="container mx-auto my-5">
+                    <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"></path>
+                  </svg> */}
+                  <Link
+                    to="/course"
+                    className="ml-1 text-sm font-medium text-gray-700 hover:text-sky-500 md:ml-2 dark:text-gray-400 dark:hover:text-white"
+                  >
+                    Course
+                  </Link>
+                </div>
+              </li>
+              <li aria-current="page">
+                <div className="flex items-center">
+                  <svg
+                    className="w-6 h-6 text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"></path>
+                  </svg>
+                  <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+                    {lesson.lessonName}
+                  </span>
+                </div>
+              </li>
+            </ol>
+          </nav>
+          {/* Breadcrumb End  */}
+          <Split
+            className="split"
+            sizes={[30, 70]}
+            minSize={100}
+            gutterSize={10}
+            snapOffset={10}
+            dragInterval={1}
+            cursor="row-resize"
+          >
+            {/* Tabs Start */}
             <Tabs.Group
-              aria-label="Tabs with underline"
-              style="underline"
+              className="flex-col"
+              aria-label="Tabs with icons"
               ref={props.tabsRef}
               onActiveTabChange={async (tab) => {
-                if (tab === 2) {
-                  const comments = await getCourseComments({
+                if (tab === 3) {
+                  const comments = await getLessonComments({
                     userId: user.id,
-                    courseId: id,
+                    lessonId: id,
                   });
                   setComments(comments.data);
                 }
               }}
             >
-              <Tabs.Item active={true} title="Objective">
-                <div id="objective"></div>
-              </Tabs.Item>
-              <Tabs.Item title="Tasks">
-                <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
-                  <ModalComponent
-                    isShowing={isShowing2}
-                    arg={arg2}
-                    type="confirm"
-                    title="Confirm"
-                    content="Do you want to join this course?"
-                    func={handleRegisterCourse}
-                    hide={toggle2}
+              <Tabs.Item active icon={BookOpenIcon} title="Lesson">
+                {
+                  <div
+                    className="block p-0 max-h-[70vh] w-full overflow-auto "
+                    id="content"
+                    dangerouslySetInnerHTML={{
+                      __html: lesson.content,
+                    }}
                   />
-                  {course.chapters.map((chapter, i) => {
-                    return (
-                      <div className="lesson mt-14">
-                        <center>
-                          <div className="title w-fit px-6 py-3 text-center rounded-full bg-indigo-500 text-white">
-                            <h3>{chapter.name}</h3>
-                          </div>
-                          <div className="flex justify-center my-6">
-                            {chapter.lessons.map((lesson, i) => {
-                              return (
-                                <button
-                                  className="mx-1.5 my-3"
-                                  onClick={() => {
-                                    if (course.isRegistered) {
-                                      navigate(`/codeeditor/${lesson.id}`, {
-                                        state: "use for course",
-                                      });
-                                      navigate(`/lesson/detail`, {
-                                        state: {
-                                          useFor: "lesson",
-                                          id: lesson.id,
-                                        },
-                                      });
-                                    } else {
-                                      toggle2();
-                                    }
-                                  }}
-                                >
-                                  <div
-                                    className={`rounded-full ${
-                                      lesson.isLearned
-                                        ? "bg-indigo-500 text-white"
-                                        : "bg-white"
-                                    } hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10`}
-                                  >
-                                    {lesson.lessonNumber}
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </center>
-                      </div>
-                    );
-                  })}
+                }
+              </Tabs.Item>
+              <Tabs.Item icon={AcademicCapIcon} title="Leaderboard">
+                <Table hoverable>
+                  <Table.Head>
+                    <Table.HeadCell>No</Table.HeadCell>
+                    <Table.HeadCell>Submit Time</Table.HeadCell>
+                    <Table.HeadCell>Language</Table.HeadCell>
+                    <Table.HeadCell>Score</Table.HeadCell>
+                    <Table.HeadCell>Submitted By</Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {leaderBoards.leaderboards !== null
+                      ? leaderBoards.leaderboards.map((leaderBoard, i) => {
+                          return (
+                            <Table.Row className="bg-white text-blue-500 text-base">
+                              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                {i + 1}
+                              </Table.Cell>
+                              <Table.Cell>
+                                {new Date(
+                                  leaderBoard.submittedDate
+                                ).toLocaleString("vi-VN", {
+                                  month: "numeric",
+                                  day: "numeric",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                  timeZoneName: "short",
+                                })}
+                              </Table.Cell>
+                              <Table.Cell>
+                                {leaderBoard.codeLanguageName}
+                              </Table.Cell>
+                              <Table.Cell>{leaderBoard.score}</Table.Cell>
+                              <Table.Cell>{leaderBoard.authorName}</Table.Cell>
+                            </Table.Row>
+                          );
+                        })
+                      : null}
+                  </Table.Body>
+                </Table>
+              </Tabs.Item>
+              <Tabs.Item icon={ClockIcon} title="Submit History">
+                <div className="max-h-[70vh] w-full overflow-y-auto ">
+                  <Table hoverable>
+                    <Table.Head>
+                      <Table.HeadCell>No</Table.HeadCell>
+                      <Table.HeadCell>Submit Time</Table.HeadCell>
+                      <Table.HeadCell>Language</Table.HeadCell>
+                      <Table.HeadCell>Test Case</Table.HeadCell>
+                      <Table.HeadCell>Score</Table.HeadCell>
+                      <Table.HeadCell>Submitted By</Table.HeadCell>
+                    </Table.Head>
+                    <Table.Body className="divide-y">
+                      {histories !== null
+                        ? histories.lessonHistories.map((history, i) => {
+                            return (
+                              <Table.Row className="bg-white text-blue-500 text-base">
+                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                  {i + 1}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {new Date(
+                                    history.submittedDate
+                                  ).toLocaleString("vi-VN", {
+                                    month: "numeric",
+                                    day: "numeric",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit",
+                                    timeZoneName: "short",
+                                  })}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {history.codeLanguageName}
+                                </Table.Cell>
+                                <Table.Cell>{history.testCase}</Table.Cell>
+                                <Table.Cell>{history.score}</Table.Cell>
+                                <Table.Cell>{history.userSubmitted}</Table.Cell>
+                              </Table.Row>
+                            );
+                          })
+                        : null}
+                    </Table.Body>
+                  </Table>
                 </div>
               </Tabs.Item>
-              <Tabs.Item title="Comments">
-                <section class="bg-white dark:bg-gray-900 py-2 lg:py-4">
+              <Tabs.Item icon={ChatBubbleBottomCenterTextIcon} title="Comment">
+                <section class="bg-white dark:bg-gray-900  lg:py-4 p-0 max-h-[70vh] w-full overflow-auto ">
                   <div class="max-w-2xl px-4">
                     <div class="flex justify-between items-center mb-6">
                       {/* <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                         Discussion (20)
                       </h2> */}
                     </div>
-                    {isLoadingDeleteCourseComment ||
-                    isLoadingAddCourseReplyComment ||
-                    isLoadingAddCourseComment ? (
-                      <div className="text-center">
-                        <Spinner aria-label="Center-aligned spinner example" />
-                      </div>
-                    ) : null}
+                    {
+                      // isLoadingGetLessonComments ||
+                      isLoadingDeleteLessonComment ||
+                      isLoadingAddLessonReplyComment ||
+                      isLoadingAddLessonComment ? (
+                        <div className="text-center">
+                          <Spinner aria-label="Center-aligned spinner example" />
+                        </div>
+                      ) : null
+                    }
                     <ModalComponent
                       isShowing={isShowing1}
                       arg={arg1}
@@ -523,7 +772,6 @@ const CourseDetail = () => {
                       func={handleReplyComment}
                       hide={toggle1}
                     />
-
                     <div class="mb-6">
                       <div class="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
                         <label for="comment" class="sr-only">
@@ -547,7 +795,7 @@ const CourseDetail = () => {
                       </button>
                     </div>
                     {comments !== null
-                      ? comments.courseComments.map((comment, i) => {
+                      ? comments.lessonComments.map((comment, i) => {
                           return (
                             <>
                               <article class="p-6 mb-6 text-base bg-white rounded-lg dark:bg-gray-900">
@@ -573,6 +821,7 @@ const CourseDetail = () => {
                                       </time>
                                     </p>
                                   </div>
+
                                   <button
                                     id={`dropdownComment${i}Button`}
                                     data-dropdown-toggle={`dropdownComment${i}`}
@@ -718,8 +967,8 @@ const CourseDetail = () => {
                                               class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                                               type="button"
                                               onClick={() => {
-                                                setArg4(replycomment.commentId);
-                                                toggle4();
+                                                setArg5(replycomment.commentId);
+                                                toggle5();
                                               }}
                                             >
                                               <svg
@@ -835,65 +1084,123 @@ const CourseDetail = () => {
                   </div>
                 </section>
               </Tabs.Item>
-              <Tabs.Item title="Certificate">
-                <div
-                  id="downloadWrapper"
-                  className="p-5"
-                  ref={certificateWrapper}
-                >
-                  <div
-                    id="certificateWrapper "
-                    className="overflow-hidden relative w-[880px] h-[620px]"
-                  >
-                    <h3 className="absolute left-[240px] top-[270px] text-6xl font-medium font-pinyon">
-                      {user.lastName + " " + user.firstName}
-                    </h3>
-                    <h3 className="absolute left-[210px] top-[370px] text-4xl font-faustina">
-                      {course.courseName}
-                    </h3>
-
-                    <h5 className="absolute text-gray-600  left-[220px] top-[445px] text-base font-faustina">
-                      Ho Chi Minh,{" "}
-                      {course.completedDate !== null
-                        ? new Date(course.completedDate).toLocaleString(
-                            "en-US",
-                            {
-                              month: "long",
-                              day: "numeric",
-                              year: "numeric",
-                            }
-                          )
-                        : currentDate}
-                    </h5>
-                    <img
-                      className="block w-[880px] h-[620px] "
-                      src={certificate}
-                      alt="Certificate"
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  className="ml-96 py-3 px-8"
-                  gradientDuoTone="cyanToBlue"
-                  disabled={!course.isCompleted}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    exportComponentAsPNG(certificateWrapper, {
-                      html2CanvasOptions: { backgroundColor: null },
-                      fileName: "certificate",
-                    });
-                  }}
-                >
-                  Download
-                </Button>
-              </Tabs.Item>
             </Tabs.Group>
-          </div>
-        </div>
+            {/* Tabs End */}
+
+            {/* Code Editor Start  */}
+            <div className="relative z-1">
+              <div className="bg-slate-800 flex h-14 selectLanguage">
+                {SelectLanguage()}
+
+                {/* SelectTheme unfinished */}
+                {/* {this.SelectTheme()} */}
+                <h3 className="text-2xl text-white font-bold mx-36 mt-2 text-center">
+                  Code Editor
+                </h3>
+                <div className="float-right ml-16 pt-[10px] space-x-2 justify-right justify-items-center">
+                  <button
+                    type="button"
+                    data-mdb-ripple="false"
+                    data-mdb-ripple-color="light"
+                    className="px-4 pt-2.5 pb-2 bg-blue-600 text-white font-medium text-xs leading-tight  uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-600 focus:shadow-lg focus:outline-none focus:ring-0  transition duration-150 ease-in-out flex align-center"
+                    onClick={() => toggle4()}
+                  >
+                    <ArrowPathIcon
+                      className="h-4 w-4 mr-2 ml-0  text-white "
+                      aria-hidden="true"
+                    />
+                    Reset
+                  </button>
+                </div>
+              </div>
+              <div className="editor">
+                <ReactCodeMirror
+                  value={code}
+                  height="500px"
+                  theme={oneDark}
+                  extensions={[javascript({ jsx: true })]}
+                  onChange={(value, viewUpdate) => {
+                    setCode(value);
+                  }}
+                />
+              </div>
+              <div className=" bg-slate-800 h-96">
+                {isError === true ? (
+                  <div className="text-white">
+                    <h3 className="text-2xl font-bold mb-3 pb-4 text-center">
+                      Console
+                    </h3>
+                    <p>
+                      <span className="font-bold mb-3 pb-4 text-red-500">
+                        {error.errorType}:
+                      </span>{" "}
+                      {error.errorMessage}
+                    </p>
+                    <button
+                      type="button"
+                      className="ml-96 my-3 px-4 pt-2.5 pb-2 bg-indigo-500 text-white font-medium text-xs leading-tight  uppercase rounded shadow-md hover:bg-indigo-600 hover:shadow-lg focus:bg-indigo-500 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-500 active:shadow-lg transition duration-150 ease-in-out flex align-center"
+                      onClick={() => {
+                        setIsError(false);
+                      }}
+                    >
+                      Clear Console
+                    </button>
+                  </div>
+                ) : (
+                  renderTestCase()
+                )}
+                {/* {renderModal()} */}
+                <div className="flex float-right px-3 py-1">
+                  <button
+                    type="button"
+                    data-mdb-ripple="true"
+                    data-mdb-ripple-color="light"
+                    className=" px-4 pt-2.5 pb-2 bg-blue-600 text-white font-medium text-xs leading-tight  uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-600 active:shadow-lg transition duration-150 ease-in-out flex align-center"
+                    onClick={() => {
+                      runCode();
+                    }}
+                  >
+                    <ChevronDoubleRightIcon
+                      className="h-4 w-4 mr-2 ml-0  text-white "
+                      aria-hidden="true"
+                    />
+                    Run
+                  </button>
+                  <button
+                    type="button"
+                    disabled={disableSubmitButton}
+                    data-mdb-ripple="true"
+                    data-mdb-ripple-color="light"
+                    className="ml-2 px-4 pt-2.5 pb-2 disabled:bg-lime-700 bg-lime-600 text-white font-medium text-xs leading-tight  uppercase rounded shadow-md hover:bg-lime-700 hover:shadow-lg focus:bg-lime-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-lime-600 active:shadow-lg transition duration-150 ease-in-out flex align-center"
+                    onClick={() => {
+                      submitCode();
+                    }}
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                  >
+                    <ArrowDownTrayIcon
+                      className="h-4 w-4 mr-2 ml-0  text-white "
+                      aria-hidden="true"
+                    />
+                    Submit
+                  </button>
+                  <ModalComponent
+                    isShowing={isShowing2}
+                    arg={arg2}
+                    hide={toggle2}
+                    type="submit"
+                    title={`Congratulations ${user.userName}`}
+                    content="You have just finished this task."
+                  />
+                </div>
+              </div>
+            </div>
+            {/* Code Editor End  */}
+          </Split>
+        </section>
       ) : null}
     </>
   );
 };
 
-export default CourseDetail;
+export default CodeEditor1;
