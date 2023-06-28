@@ -346,7 +346,7 @@ const CodeEditor2 = () => {
   };
   const submitCode = async () => {
     const response = await submitCodePractice({
-      practiceId: practice.lessonId,
+      practiceId: practice.practiceId,
       practiceCode: code,
       codeLanguageId: selectedLanguage.codeLanguageId,
       userId: user.id,
@@ -678,7 +678,8 @@ const CodeEditor2 = () => {
                       : null}
                   </Table.Body>
                 </Table>
-                {leaderBoards.leaderboards !== null ? (
+                {leaderBoards.leaderboards !== null &&
+                leaderBoards.totalPages > 1 ? (
                   <center>
                     <Pagination
                       // aria-current={currentPage}

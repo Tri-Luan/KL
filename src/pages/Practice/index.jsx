@@ -255,18 +255,20 @@ const Practice = () => {
                 })
               : null}
           </div>
-          <center>
-            <Pagination
-              // aria-current={currentPage}
-              // theme={customTheme}
-              currentPage={currentPage}
-              onPageChange={(page) => {
-                setCurrentPage(page);
-              }}
-              showIcons
-              totalPages={data.totalPages}
-            />
-          </center>
+          {data.totalPages > 1 ? (
+            <center>
+              <Pagination
+                // aria-current={currentPage}
+                // theme={customTheme}
+                currentPage={currentPage}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                }}
+                showIcons
+                totalPages={data.totalPages}
+              />
+            </center>
+          ) : null}
         </section>
       ) : null}
     </div>

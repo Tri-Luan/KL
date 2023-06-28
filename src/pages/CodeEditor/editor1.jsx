@@ -48,6 +48,7 @@ import { Spinner, Table, Tabs, Pagination, Badge } from "flowbite-react";
 import useModal from "../../hooks/useModal";
 import ModalComponent from "../../components/ui/ModalComponent";
 import userAvatar from "../../assets/images/userAvatar.png";
+import Breadcrumbs from "../../components/ui/Breadcrumbs";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -580,54 +581,10 @@ const CodeEditor1 = () => {
             content="reply comment"
             type="delete"
           />
-          <nav
-            className="flex h-[5vh] py-2 px-40 bg-gray-50  border-2 border-gray-300 dark:bg-gray-800 dark:border-gray-700"
-            aria-label="Breadcrumb"
-          >
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-              {/* <li className="inline-flex items-center">
-                <Link
-                  to="/"
-                  className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-sky-500 dark:text-gray-400 dark:hover:text-white"
-                >
-                  home 
-                </Link>
-              </li> */}
-              <li>
-                <div className="flex items-center">
-                  {/* <svg
-                    className="w-6 h-6 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"></path>
-                  </svg> */}
-                  <Link
-                    to="/course"
-                    className="ml-1 text-sm font-medium text-gray-700 hover:text-sky-500 md:ml-2 dark:text-gray-400 dark:hover:text-white"
-                  >
-                    Course
-                  </Link>
-                </div>
-              </li>
-              <li aria-current="page">
-                <div className="flex items-center">
-                  <svg
-                    className="w-6 h-6 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"></path>
-                  </svg>
-                  <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
-                    {lesson.lessonName}
-                  </span>
-                </div>
-              </li>
-            </ol>
-          </nav>
+          <div className="h-[5vh] py-2 px-4 bg-gray-50  border-y-2 border-gray-200">
+          <Breadcrumbs />
+          </div>
+         
           {/* Breadcrumb End  */}
           <Split
             className="split"
@@ -717,7 +674,8 @@ const CodeEditor1 = () => {
                       : null}
                   </Table.Body>
                 </Table>
-                {leaderBoards.leaderboards !== null ? (
+                {leaderBoards.leaderboards !== null &&
+                leaderBoards.totalPages > 1 ? (
                   <center>
                     <Pagination
                       // aria-current={currentPage}
