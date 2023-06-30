@@ -15,6 +15,7 @@ import {
   useDeleteDiscussionCommentMutation,
   useDeleteDiscussionReplyCommentMutation,
 } from "../../redux/discussionApiSlice";
+import userAvatar from "../../assets/images/userAvatar.png";
 
 const DiscussionDetail = () => {
   const location = useLocation();
@@ -215,7 +216,7 @@ const DiscussionDetail = () => {
                     <div class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
                       <img
                         class="mr-4 w-16 h-16 rounded-full"
-                        src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                        src={userAvatar}
                         alt="Jese Leos"
                       />
                       <div>
@@ -254,7 +255,7 @@ const DiscussionDetail = () => {
                 <section class="not-format">
                   <div class="flex justify-between items-center mb-6">
                     <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
-                      Discussion (20)
+                      Discussion ({discussion.totalComments})
                     </h2>
                   </div>
                   <ModalComponent
@@ -298,7 +299,7 @@ const DiscussionDetail = () => {
                                   <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
                                     <img
                                       class="mr-2 w-6 h-6 rounded-full"
-                                      src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                                      src={userAvatar}
                                       alt="Michael Gough"
                                     />
                                     {comment.authorName}
@@ -432,7 +433,7 @@ const DiscussionDetail = () => {
                                           <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
                                             <img
                                               class="mr-2 w-6 h-6 rounded-full"
-                                              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                                              src={userAvatar}
                                               alt="Jese Leos"
                                             />
                                             {replycomment.authorName}

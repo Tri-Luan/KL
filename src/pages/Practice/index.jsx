@@ -23,7 +23,7 @@ const Practice = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, isSuccess, isError, error } = useGetPracticesQuery({
     userId: user.id,
-    pageSize: 12,
+    pageSize: 8,
     pageNumber: currentPage,
   });
 
@@ -153,11 +153,8 @@ const Practice = () => {
             {data.practices !== null
               ? data.practices.map((practice, i) => {
                   return practice.length !== 0 ? (
-                    <div
-                      className="container sm:mx-5 md:mx-10 lg:mx-20 xl:mx-32 2xl:mx-48 my-8"
-                      key={i}
-                    >
-                      <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    <div className="my-8" key={i}>
+                      <div class="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                         <div class="flex justify-center px-4 pt-4">
                           <Link
                             to={`/practice/${practice.practiceName}`}
@@ -166,7 +163,7 @@ const Practice = () => {
                               id: practice.practiceId,
                             }}
                           >
-                            <h5 class="hover:text-[#2e72e7] mb-1 text-xl font-medium text-gray-900 dark:text-white">
+                            <h5 class="hover:text-[#2e72e7] mb-1 text-lg font-medium text-gray-900 dark:text-white">
                               {practice.practiceName}
                             </h5>
                           </Link>

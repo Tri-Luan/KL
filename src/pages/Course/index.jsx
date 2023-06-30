@@ -161,7 +161,7 @@ const Course = () => {
                                     {course.authorName}
                                   </span>
                                 </div>
-                                <p className="course-description mt-4 line-clamp-2 font-normal text-gray-700 dark:text-gray-400">
+                                <p className="course-description mt-1 line-clamp-2 font-normal text-gray-700 dark:text-gray-400">
                                   {course.description}
                                 </p>
                               </div>

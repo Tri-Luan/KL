@@ -411,6 +411,8 @@ const CourseManagement = () => {
                                         hide={toggle}
                                         func={handleDeleteCourse}
                                         type="delete"
+                                        title="Confirmation"
+                                        content="course"
                                       />
                                     </div>
                                   </td>
