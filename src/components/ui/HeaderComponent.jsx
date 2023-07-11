@@ -1,10 +1,8 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { selectCurrentUser, setUser } from "../../redux/authSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useGetUserMutation } from "../../redux/usersApiSlice";
+import { selectCurrentUser } from "../../redux/authSlice";
+import { useSelector } from "react-redux";
 import Cookies from "universal-cookie";
 import { Button } from "flowbite-react";
 import { useSendLogoutMutation } from "../../redux/authApiSlice";
@@ -14,32 +12,13 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 const Header = () => {
-  // Active navbar
-  // let activeStyle = {
-  //   textDecoration: "underline",
-  // };
   let normalStyle =
     "nav-link hover:text-[#2e72e7] text-gray-800 px-3 py-2 rounded-md text-lg font-medium ";
   let activeClassName =
     "nav-link hover:normal-case border-b-[3px] border-[#2e72e7] text-[#2e72e7] px-3 py-2 text-lg font-medium";
-
-  const [isOpen, setIsOpen] = useState(false);
   const user = useSelector(selectCurrentUser);
   const cookies = new Cookies();
-  const dispatch = useDispatch();
   const [sendLogout] = useSendLogoutMutation();
-
-  // useEffect(() => {
-  //   if (user !== null) {
-  //     // setPersist((prev) => !prev);
-  //     try {
-  //       const response = await getUser(user.id);
-  //     } catch (error) {
-
-  //     }D
-  //     dispatch(setUser(response));
-  //   }
-  // }, []);
   const navigate = useNavigate();
   const handleLogout = async () => {
     const body = {
@@ -48,11 +27,12 @@ const Header = () => {
     };
     const response = await sendLogout(body);
     if (response.data.isSuccessful) {
+      localStorage.setItem("persist", false);
       cookies.remove("user_id", { path: "/" });
       cookies.remove("jwt_access", { path: "/" });
       cookies.remove("jwt_refresh", { path: "/" });
-      localStorage.setItem("persist", false);
       navigate("/");
+      window.location.reload();
     }
   };
   return (
@@ -89,6 +69,8 @@ const Header = () => {
                   >
                     Practice
                   </NavLink>
+
+                  {/* Unfinished */}
                   {/* <NavLink
                     to="/contest"
                     className={({ isActive }) =>
@@ -97,6 +79,7 @@ const Header = () => {
                   >
                     Contest
                   </NavLink> */}
+
                   <NavLink
                     to="/discussion"
                     className={({ isActive }) =>
@@ -109,63 +92,20 @@ const Header = () => {
               </div>
             </div>
             {/* Left elements end */}
-            {/* Reponsive navbar start*/}
-            <div className="-mr-2 flex md:hidden">
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                type="button"
-                className="bg-gray-900 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                aria-controls="mobile-menu"
-                aria-expanded="false"
-              >
-                <span className="sr-only">Open main menu</span>
-                {!isOpen ? (
-                  <svg
-                    className="block h-6 w-6"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="block h-6 w-6"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                )}
-              </button>
-            </div>
-            {/* Reponsive navbar end*/}
             {/* Right elements start */}
             {user ? (
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <button
+                {/* Unfinished */}
+                {/* <button
                   type="button"
                   className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none "
                 >
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                </button> */}
+
                 {/* Profile dropdown */}
+
                 <Menu as="div" className="relative ml-3">
                   <div>
                     <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none ">
@@ -270,42 +210,6 @@ const Header = () => {
             {/* Right elements end */}
           </div>
         </div>
-        {/* Mobile navbar start*/}
-        <Transition
-          show={isOpen}
-          enter="transition ease-out duration-100 transform"
-          enterFrom="opacity-0 scale-95"
-          enterTo="opacity-100 scale-100"
-          leave="transition ease-in duration-75 transform"
-          leaveFrom="opacity-100 scale-100"
-          leaveTo="opacity-0 scale-95"
-        >
-          {(ref) => (
-            <div className="md:hidden" id="mobile-menu">
-              <div ref={ref} className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <Link
-                  to="/"
-                  className="hover:bg-gray-700 text-white block px-3 py-2 rounded-md text-base font-medium"
-                >
-                  Trang chủ
-                </Link>
-                <Link
-                  to="/practice"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                >
-                  Luyện tập
-                </Link>
-                <Link
-                  to="/post"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                >
-                  Đăng bài
-                </Link>
-              </div>
-            </div>
-          )}
-        </Transition>
-        {/* Mobile navbar end*/}
       </nav>
     </div>
   );

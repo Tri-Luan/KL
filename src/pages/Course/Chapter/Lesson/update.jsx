@@ -1,4 +1,5 @@
 import { BackwardIcon } from "@heroicons/react/24/outline";
+import { Spinner } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -16,7 +17,7 @@ import {
 } from "../../../../redux/courseApiSlice";
 
 const UpdateLesson = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const chapterId = location.state.chapterId;
   const { id } = useParams();
@@ -43,7 +44,10 @@ const UpdateLesson = () => {
     isError,
     error,
     refetch,
-  } = useGetLessonDetailsUpdateQuery(id);
+  } = useGetLessonDetailsUpdateQuery(id, {
+    refetchOnMountOrArgChange: true,
+  });
+  console.log(lesson);
   const {
     data,
     isLoading: isLoadingGetCodeLanguages,
@@ -77,6 +81,7 @@ const UpdateLesson = () => {
     try {
       let testCases = getDataTestCases().concat(getDataHiddenTestCases());
       let CodeSample = {
+        codeSampleId: lesson.codeSamples[0].codeSampleId,
         codeSample: codeSample,
         codeLanguageId: codeSampleLanguage,
       };
@@ -89,10 +94,20 @@ const UpdateLesson = () => {
         codeSamples: [CodeSample],
       }).unwrap();
       if (response.isSuccessful) {
-        setAlertIsShowing(true);
-        window.scrollTo(0, 0);
+        setCkEditorData("");
+        setNumberTestCases(0);
+        setNumberHiddenTestCases(0);
+        setScore(100);
+        setLessonName("");
+        setErrMessage(null);
+        setFormValid(false);
+        navigate(`/lessonmanagement/${chapterId}`, {
+          state: {
+            status: "Update lesson successfull",
+          },
+        });
       } else {
-        setErrMessage(response.data.errorMessages);
+        setErrMessage(response.errorMessages);
         window.scrollTo(0, 0);
       }
     } catch (err) {
@@ -112,7 +127,7 @@ const UpdateLesson = () => {
       if (i < lesson.totalTestCases) {
         let testCaseId = lesson.testCases[i].testCaseId;
         content.push(
-          <>
+          <div key={testCaseId}>
             <label>Test case {Number(i) + 1}</label>
             <button
               class="mt-2 inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
@@ -138,6 +153,8 @@ const UpdateLesson = () => {
               </svg>
             </button>
             <input
+              //try to create a unique key
+              key={`testCaseInput` + testCaseId + lesson.testCases[i].input}
               type="text"
               name="name"
               id={`txtTestCaseInput${i}`}
@@ -148,20 +165,26 @@ const UpdateLesson = () => {
               defaultValue={lesson.testCases[i].input}
             />
             <input
+              //try to create a unique key
+              key={
+                `testCaseOutput` +
+                testCaseId +
+                lesson.testCases[i].expectedOutput
+              }
               type="text"
               name="name"
               id={`txtTestCaseOutput${i}`}
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              class="bg-gray-50 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
               placeholder="Output"
               required
               autoComplete="off"
               defaultValue={lesson.testCases[i].expectedOutput}
             />
-          </>
+          </div>
         );
       } else {
         content.push(
-          <>
+          <div>
             <label>Test case {Number(i) + 1}</label>
             <input
               type="text"
@@ -181,7 +204,7 @@ const UpdateLesson = () => {
               required
               autoComplete="off"
             />
-          </>
+          </div>
         );
       }
     }
@@ -193,7 +216,7 @@ const UpdateLesson = () => {
       if (i < lesson.totalHiddenTestCases) {
         let testCaseId = lesson.hiddenTestCases[i].testCaseId;
         content.push(
-          <div>
+          <div key={testCaseId}>
             <label>Hidden test case {Number(i) + 1} </label>
             <button
               class="mt-2 inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
@@ -219,6 +242,12 @@ const UpdateLesson = () => {
               </svg>
             </button>
             <input
+              //try to create a unique key
+              key={
+                `hiddenTestCaseInput` +
+                testCaseId +
+                lesson.hiddenTestCases[i].input
+              }
               type="text"
               id={`txtHiddenTestCaseInput${i}`}
               class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -228,6 +257,12 @@ const UpdateLesson = () => {
               defaultValue={lesson.hiddenTestCases[i].input}
             />
             <input
+              //try to create a unique key
+              key={
+                `hiddenTestCaseOutput` +
+                testCaseId +
+                lesson.hiddenTestCases[i].expectedOutput
+              }
               type="text"
               id={`txtHiddenTestCaseOutput${i}`}
               class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -273,6 +308,8 @@ const UpdateLesson = () => {
       var input = String(document.getElementById(inputId).value.trim());
       var output = String(document.getElementById(outputId).value.trim());
       var testcase = {
+        testCaseId:
+          i < lesson.totalTestCases ? lesson.testCases[i].testCaseId : 0,
         input: input,
         expectedOutput: output,
         isHidden: false,
@@ -286,10 +323,14 @@ const UpdateLesson = () => {
     var testCases = [];
     for (var i = 0; i < totalHiddenTestCase; i++) {
       var inputId = String("txtHiddenTestCaseInput" + i);
-      var outputId = String("txtHiddenTestCaseInput" + i);
+      var outputId = String("txtHiddenTestCaseOutput" + i);
       var input = String(document.getElementById(inputId).value.trim());
       var output = String(document.getElementById(outputId).value.trim());
       var testcase = {
+        testCaseId:
+          i < lesson.totalHiddenTestCases
+            ? lesson.hiddenTestCases[i].testCaseId
+            : 0,
         input: input,
         expectedOutput: output,
         isHidden: true,
@@ -300,44 +341,23 @@ const UpdateLesson = () => {
   };
   const onDeleteTestCaseClicked = async (testCaseId) => {
     try {
-      await deleteTestCaseLesson(testCaseId)
-        .unwrap()
-        .then(async () => {
-          await refetch();
-          window.scrollTo(0, 0);
-          setAlertIsShowing(true);
-        });
+      const response = await deleteTestCaseLesson(testCaseId).unwrap();
+      if (response.isSuccessful) {
+        await refetch();
+        window.scrollTo(0, 0);
+        setAlertIsShowing(true);
+      }
     } catch (err) {
-      console.error("Failed to delete the discussion", err);
+      console.error("Failed to delete the testcase", err);
     }
   };
 
   return (
     <div>
       {isLoadingGetLesson || isLoadingGetCodeLanguages ? (
-        <div>
-          <li className="flex items-center">
-            <div role="status">
-              <svg
-                aria-hidden="true"
-                className="w-10 h-10 mr-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                viewBox="0 0 100 101"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                  fill="currentFill"
-                />
-              </svg>
-              <span className="sr-only">Loading...</span>
-            </div>
-            Processing...
-          </li>
+        <div className="text-center">
+          <Spinner aria-label="Center-aligned spinner" />
+          <span className="ml-2">Loading...</span>
         </div>
       ) : (
         <section class="bg-white ">
@@ -414,10 +434,12 @@ const UpdateLesson = () => {
                     // }}
                     onChange={(e) => setScore(e.target.value)}
                   >
-                    <option value={100} selected="">
+                    <option value={100} selected={score === 100}>
                       100
                     </option>
-                    <option value={200}>200</option>
+                    <option value={200} selected={score === 200}>
+                      200
+                    </option>
                   </select>
                 </div>
                 <div class="sm:col-span-2 w-1/3">
@@ -521,7 +543,13 @@ const UpdateLesson = () => {
                   >
                     {data.codeLanguages.map((codeLanguage, i) => {
                       return (
-                        <option value={codeLanguage.codeLanguageId}>
+                        <option
+                          value={codeLanguage.codeLanguageId}
+                          selected={
+                            lesson.codeSamples[0].codeLanguageId ===
+                            codeLanguage.codeLanguageId
+                          }
+                        >
                           {codeLanguage.codeLanguageName}&nbsp;(
                           {codeLanguage.codeLanguageVersion})
                         </option>

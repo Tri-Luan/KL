@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Unauthorized from "./components/ui/Unauthorized";
 import CodeEditor1 from "./pages/CodeEditor/editor1";
-import Editor from "./pages/CodeEditor/editor";
 import Course from "./pages/Course";
 import CreateLesson from "./pages/Course/Chapter/Lesson/create";
 import LessonManagement from "./pages/Course/Chapter/Lesson/manage";
@@ -38,9 +37,9 @@ function App() {
       <Route path="register" element={<Register />} />
       <Route path="course/detail" element={<CodeEditor1 />} />
       <Route path="practice/:name" element={<CodeEditor2 />} />
-      <Route path="/" element={<Layout />}>
-        {/* public routes */}
-        <Route element={<PersistLogin />}>
+      <Route element={<PersistLogin />}>
+        <Route path="/" element={<Layout />}>
+          {/* public routes */}
           <Route index element={<DefaultHome />} />
 
           <Route path="unauthorized" element={<Unauthorized />} />
@@ -87,16 +86,6 @@ function App() {
             </Route>
           </Route>
         </Route>
-
-        {/* <Route path="/practice" element={<PracticePage />}></Route>
-            <Route path="/post" element={<PostPage />}></Route>
-            <Route path="/history" element={<HistoryPage />}></Route>
-            <Route path="/score-board" element={<ScoreBoardPage />}></Route>
-            <Route path="/result" element={<ResultPage />}></Route>
-            
-            <Route path="/testcase-detail" element={<TestCaseDetailPage />}></Route>
-            <Route path="/editor/:exerciseID" element={<EditorPage />}></Route> */}
-
         {/* catch all route */}
         <Route path="*" element={<DefaultHome />}></Route>
       </Route>

@@ -1,11 +1,10 @@
 import { BackwardIcon } from "@heroicons/react/24/outline";
-import { FileInput, Label } from "flowbite-react";
+import { FileInput, Label, Spinner } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 
 import { Link, useParams } from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
 import AlertComponent from "../../components/ui/AlertComponent";
-import LoadingComponent from "../../components/ui/LoadingComponent";
 import useCkEditor from "../../hooks/useCkEditor";
 import {
   useGetCourseDetailUpdateQuery,
@@ -125,7 +124,10 @@ const UpdateCourse = () => {
   return (
     <div>
       {isLoadingGetCourse || isLoadingGetThemes ? (
-        <LoadingComponent />
+        <div className="text-center">
+          <Spinner aria-label="Center-aligned spinner" />
+          <span className="ml-2">Loading...</span>
+        </div>
       ) : isSuccessGetCourse && isSuccessGetThemes ? (
         <section className="bg-white ">
           <div className="py-8 px-4 mx-auto w-3/4 lg:py-16">

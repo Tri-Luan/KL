@@ -36,6 +36,7 @@ export default function Discussion() {
       {isLoading ? (
         <div className="text-center">
           <Spinner aria-label="Center-aligned spinner" />
+          <span className="ml-2">Loading...</span>
         </div>
       ) : isSuccess ? (
         <div className="bg-white py-6 sm:py-6">

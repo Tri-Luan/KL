@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import usePersist from "../../hooks/usePersist";
 import { useRefreshMutation } from "../../redux/authApiSlice";
 import { selectCurrentToken, setToken, setUser } from "../../redux/authSlice";
@@ -26,26 +26,28 @@ const PersistLogin = () => {
           refreshToken: cookies.get("jwt_refresh"),
           accessToken: cookies.get("jwt_access"),
         };
-        const userId = cookies.get("user_id");
-        console.log("verifying refresh token");
-        try {
-          const response = await refresh(body);
-          if (response.isSuccessful) {
-            dispatch(setToken(response.token));
-          } else {
-            dispatch(setToken({ accessToken: cookies.get("jwt_access") }));
+        console.log(body);
+        if (body.refreshToken || body.accessToken) {
+          const userId = cookies.get("user_id");
+          console.log("verifying refresh token");
+          try {
+            const response = await refresh(body);
+            if (response.data.isSuccessful) {
+              dispatch(setToken(response.token));
+            } else {
+              dispatch(setToken({ accessToken: cookies.get("jwt_access") }));
+            }
+            if (userId !== undefined) {
+              const user = await getUser(userId);
+              console.log(user);
+              dispatch(setUser(user.data));
+            }
+            setTrueSuccess(true);
+          } catch (err) {
+            console.error(err);
           }
-          if (userId !== undefined) {
-            const response = await getUser(userId);
-            console.log(response);
-            dispatch(setUser(response.data));
-          }
-          setTrueSuccess(true);
-        } catch (err) {
-          console.error(err);
         }
       };
-
       if (!token && persist) verifyRefreshToken();
     }
     return () => (effectRan.current = true);
@@ -58,7 +60,7 @@ const PersistLogin = () => {
     console.log("no persist");
     content = <Outlet />;
   } else if (isLoading) {
-    //persist: yes, token: no
+    //persist: yes, verifyRefreshToken: isLoading
   } else if (isError) {
     //persist: yes, token: no
     // content = (
@@ -67,14 +69,16 @@ const PersistLogin = () => {
     //     <Link to="/login">Please login again</Link>.
     //   </p>
     // );
+    console.log("error");
   } else if (isSuccess && trueSuccess) {
     //persist: yes, token: yes
+    console.log("verifyRefreshToken success");
     content = <Outlet />;
   } else if (token && isUninitialized) {
     //persist: yes, token: yes
+    console.log("success && isUninitialized");
     content = <Outlet />;
   }
-
   return content;
 };
 export default PersistLogin;

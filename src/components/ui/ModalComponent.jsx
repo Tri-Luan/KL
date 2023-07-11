@@ -1,11 +1,7 @@
-import { Dialog, Transition } from "@headlessui/react";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { Button, Checkbox, Label, Modal, TextInput } from "flowbite-react";
-import { useEffect, useRef, useState } from "react";
 import congraratulation from "../../assets/images/congratulation.gif";
 
 import React from "react";
-// import ReactDOM from "react-dom";
 
 const ModalComponent = ({
   isShowing,
@@ -18,13 +14,6 @@ const ModalComponent = ({
   content,
   setContent,
 }) => {
-  const [chapterName, setChapterName] = useState();
-  useEffect(() => {
-    if (content !== undefined) {
-      setChapterName(content);
-    }
-  }, [content]);
-
   return (
     <Modal
       show={isShowing}
@@ -114,6 +103,7 @@ const ModalComponent = ({
               className="w-full mr-auto"
               onClick={() => {
                 content = document.getElementById("chapterName").value;
+
                 func(content);
                 hide();
               }}
@@ -132,25 +122,21 @@ const ModalComponent = ({
               </label>
               <input
                 type="text"
-                key="chapterNameEdit1"
-                name="chapterNameEditId"
-                id="chapterNameEditId"
+                key={`chapterNameEditId` + arg}
+                name="chapterNameEdit"
+                id="txtchapterNameEdit"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Type chapter name"
                 required
                 autoComplete="off"
-                value={chapterName}
-                onChange={(e) => {
-                  setChapterName(e.target.value);
-                }}
+                defaultValue={content}
               />
             </div>
             <Button
               className="w-full mr-auto"
               onClick={() => {
-                // const chapterName =
-                //   document.getElementById("chapterNameEdit").value;
-                console.log(chapterName);
+                let chapterName =
+                  document.getElementById("txtchapterNameEdit").value;
                 func(arg, chapterName);
                 hide();
               }}

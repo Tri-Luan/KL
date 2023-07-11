@@ -8,13 +8,6 @@ const AlertComponent = ({ visible, content }) => {
       rounded={true}
       withBorderAccent={true}
       onDismiss={() => visible(false)}
-      //   additionalContent={
-      //     <React.Fragment>
-      //       <div className="mt-2 mb-4 text-sm text-green-700 dark:text-green-800"></div>
-      //     </React.Fragment>
-      //   }
-      //   icon={
-      //   }
     >
       <div className="flex">
         <svg

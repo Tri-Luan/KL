@@ -183,7 +183,8 @@ const DiscussionDetail = () => {
     <>
       {isLoading ? (
         <div className="text-center">
-          <Spinner aria-label="Center-aligned spinner example" />
+          <Spinner aria-label="Center-aligned spinner" />
+          <span className="ml-2">Loading...</span>
         </div>
       ) : isSuccess ? (
         <div>
