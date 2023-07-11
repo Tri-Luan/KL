@@ -87,8 +87,7 @@ const Practice = () => {
           <div className="ml-8 my-5">
             <Breadcrumbs />
           </div>
-          <img src={img2} className="w-full max-w-6xl h-56 mb-3" alt="" />
-
+          <img src={img2} className="w-full max-w-7xl h-56 mb-3" alt="" />
           <form className="mt-6 ml-5 flex">
             <div class="flex">
               <div class="relative w-96 mr-20">

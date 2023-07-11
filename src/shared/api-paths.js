@@ -28,6 +28,7 @@ export const ApiPaths = {
     },
     lesson: {
       root: "/lessons",
+      testcase: "/testcase",
       management: "/management",
       detail: "/details",
       hidden: "/hidden",
@@ -47,6 +48,7 @@ export const ApiPaths = {
     detail: "/details",
     levels: "/levels",
     management: { root: "/management", detail: "/details", hidden: "/hidden" },
+    testcase: "/testcase",
     run: "/run",
     submit: "/submit",
     histories: "/histories",

@@ -1,4 +1,8 @@
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import {
+  BackwardIcon,
+  PhotoIcon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -61,10 +65,9 @@ const CreateLesson = () => {
         testCases: testCases,
         codeSamples: [CodeSample],
       }).unwrap();
-
       if (response.isSuccessful) {
-        setCkEditorData();
-        setCodeSampleLanguage("");
+        setCkEditorData("");
+        setCodeSampleLanguage(1);
         setCodeSample("");
         setNumberTestCases(0);
         setNumberHiddenTestCases(0);
@@ -82,12 +85,15 @@ const CreateLesson = () => {
       console.error(err);
       if (!err?.originalStatus) {
         setErrMessage("Server not response");
+        window.scrollTo(0, 0);
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
+        window.scrollTo(0, 0);
       }
     }
   };
-  //render
+
+  //Render TestCase
   const renderTestCases = () => {
     var content = [];
     for (var i = 0; i < numberTestCases; i++) {
@@ -107,8 +113,6 @@ const CreateLesson = () => {
             placeholder="Input"
             required
             autoComplete="off"
-            // value={lessonName}
-            // onChange={(e) => setLessonName(e.target.value)}
           />
           <input
             type="text"
@@ -118,8 +122,6 @@ const CreateLesson = () => {
             placeholder="Output"
             required
             autoComplete="off"
-            // value={lessonName}
-            // onChange={(e) => setLessonName(e.target.value)}
           />
         </>
       );
@@ -219,9 +221,10 @@ const CreateLesson = () => {
         <section class="bg-white ">
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
-              to={`/coursemanagement/chaptermanagement/lessonmanagement/${id}`}
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+              to={`/lessonmanagement/${id}`}
+              className="flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
             >
+              <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
               Back to lesson management
             </Link>
             <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -273,11 +276,6 @@ const CreateLesson = () => {
                     id="score"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     required
-                    // onChange={(e) => {
-                    //   if (e.target.value === "Basic") setLevel(1);
-                    //   else if (e.target.value === "General") setLevel(2);
-                    //   else setLevel(3);
-                    // }}
                     onChange={(e) => setScore(e.target.value)}
                   >
                     <option value={100} selected={score === 100}>
@@ -349,7 +347,12 @@ const CreateLesson = () => {
                   >
                     {data.codeLanguages.map((codeLanguage, i) => {
                       return (
-                        <option value={codeLanguage.codeLanguageId}>
+                        <option
+                          value={codeLanguage.codeLanguageId}
+                          selected={
+                            codeSampleLanguage === codeLanguage.codeLanguageId
+                          }
+                        >
                           {codeLanguage.codeLanguageName}&nbsp;(
                           {codeLanguage.codeLanguageVersion})
                         </option>

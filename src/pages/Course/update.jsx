@@ -1,3 +1,4 @@
+import { BackwardIcon } from "@heroicons/react/24/outline";
 import { FileInput, Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 
@@ -130,8 +131,9 @@ const UpdateCourse = () => {
           <div className="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
               to="/coursemanagement"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+              className="flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
             >
+              <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
               Back to course management
             </Link>
 

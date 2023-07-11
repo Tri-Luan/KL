@@ -18,8 +18,8 @@ import {
 import userAvatar from "../../assets/images/userAvatar.png";
 
 const DiscussionDetail = () => {
-  const location = useLocation();
-  const id = location.state.id;
+  const { id } = useParams();
+  console.log(id);
   const user = useSelector(selectCurrentUser);
   const [comment, setComment] = useState("");
   const {
@@ -316,32 +316,36 @@ const DiscussionDetail = () => {
                                     </time>
                                   </p>
                                 </div>
-                                <button
-                                  id={`dropdownComment${i}Button`}
-                                  data-dropdown-toggle={`dropdownComment${i}`}
-                                  class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                                  type="button"
-                                  onClick={() => {
-                                    setArg2(comment.commentId);
-                                    toggle2();
-                                  }}
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="w-5 h-5 text-red-700"
+                                {comment.authorId === user.id ? (
+                                  <button
+                                    id={`dropdownComment${i}Button`}
+                                    data-dropdown-toggle={`dropdownComment${i}`}
+                                    class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                                    type="button"
+                                    onClick={() => {
+                                      setArg2(comment.commentId);
+                                      toggle2();
+                                    }}
                                   >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                                    />
-                                  </svg>
-                                  <span class="sr-only">Comment settings</span>
-                                </button>
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={1.5}
+                                      stroke="currentColor"
+                                      className="w-5 h-5 text-red-700"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                      />
+                                    </svg>
+                                    <span class="sr-only">
+                                      Comment settings
+                                    </span>
+                                  </button>
+                                ) : null}
                               </footer>
                               <p class="text-gray-900 ">{comment.content}</p>
                               <div class="flex items-center mt-4 space-x-4">
@@ -450,34 +454,36 @@ const DiscussionDetail = () => {
                                             </time>
                                           </p>
                                         </div>
-                                        <button
-                                          id={`dropdownComment${i}Button`}
-                                          data-dropdown-toggle={`dropdownComment${i}`}
-                                          class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                                          type="button"
-                                          onClick={() => {
-                                            setArg3(replycomment.commentId);
-                                            toggle3();
-                                          }}
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={1.5}
-                                            stroke="currentColor"
-                                            className="w-5 h-5 text-red-700"
+                                        {replycomment.authorId === user.id ? (
+                                          <button
+                                            id={`dropdownComment${i}Button`}
+                                            data-dropdown-toggle={`dropdownComment${i}`}
+                                            class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                                            type="button"
+                                            onClick={() => {
+                                              setArg3(replycomment.commentId);
+                                              toggle3();
+                                            }}
                                           >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                                            />
-                                          </svg>
-                                          <span class="sr-only">
-                                            Comment settings
-                                          </span>
-                                        </button>
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              fill="none"
+                                              viewBox="0 0 24 24"
+                                              strokeWidth={1.5}
+                                              stroke="currentColor"
+                                              className="w-5 h-5 text-red-700"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                              />
+                                            </svg>
+                                            <span class="sr-only">
+                                              Comment settings
+                                            </span>
+                                          </button>
+                                        ) : null}
                                       </footer>
                                       <p class="text-gray-900">
                                         {replycomment.content}
@@ -538,27 +544,6 @@ const DiscussionDetail = () => {
                                           <div class="absolute inline-flex items-center justify-center w-6 h-6 text-md font-bold text-red-500 border-2 border-white rounded-full -right-1 ">
                                             {replycomment.numberOfDislike}
                                           </div>
-                                        </button>
-                                        <button
-                                          type="button"
-                                          class="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400"
-                                        >
-                                          <svg
-                                            aria-hidden="true"
-                                            class="mr-1 w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              stroke-width="2"
-                                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                                            ></path>
-                                          </svg>
-                                          Reply
                                         </button>
                                       </div>
                                     </article>

@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import AlertComponent from "../../../components/ui/AlertComponent";
 import ModalComponent from "../../../components/ui/ModalComponent";
 import useModal from "../../../hooks/useModal";
+import { BackwardIcon } from "@heroicons/react/24/outline";
 import {
   useAddChapterMutation,
   useDeleteChapterMutation,
@@ -53,51 +54,11 @@ const ChapterManagement = () => {
     setArg: setArg3,
     setContent: setContent3,
   } = useModal();
-  const [success, setSuccess] = useState(false);
+  const [alertUpdateIsShowing, setAlertUpdateIsShowing] = useState(false);
+  const [alertDeleteIsShowing, setAlertDeleteIsShowing] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
   const [alertIsShowing, setAlertIsShowing] = useState(false);
-  const handleDeleteChapter = async (chapterId) => {
-    try {
-      const response = await deleteChapter(chapterId)
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
-      } else {
-        setErrMessage(response.data.errorMessages);
-      }
-    } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
-      } else if (err.originalStatus === 401) {
-        setErrMessage("Unauthorized");
-      }
-    }
-  };
-  const handleSetHideChapter = async (chapterId) => {
-    try {
-      const response = await setHideChapter(chapterId)
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
-      } else {
-        setErrMessage(response.data.errorMessages);
-      }
-    } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
-      } else if (err.originalStatus === 401) {
-        setErrMessage("Unauthorized");
-      }
-    }
-  };
+
   const handleAddChapter = async (chapterName) => {
     const response = await addChapter({ courseId: id, chapterName })
       .unwrap()
@@ -115,16 +76,45 @@ const ChapterManagement = () => {
       const response = await updateChapter({
         chapterId: chapterId,
         chapterName: chapterName,
-      })
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
+      }).unwrap();
+      if (response.isSuccessful) {
+        setAlertUpdateIsShowing(true);
+        refetch();
       } else {
-        setErrMessage(response.data.errorMessages);
+        setErrMessage(response.errorMessages);
+      }
+    } catch (err) {
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
+      } else if (err.originalStatus === 401) {
+        setErrMessage("Unauthorized");
+      }
+    }
+  };
+  const handleDeleteChapter = async (chapterId) => {
+    try {
+      const response = await deleteChapter(chapterId).unwrap();
+      if (response.isSuccessful) {
+        setAlertDeleteIsShowing(true);
+        refetch();
+      } else {
+        setErrMessage(response.errorMessages);
+      }
+    } catch (err) {
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
+      } else if (err.originalStatus === 401) {
+        setErrMessage("Unauthorized");
+      }
+    }
+  };
+  const handleSetHideChapter = async (chapterId) => {
+    try {
+      const response = await setHideChapter(chapterId).unwrap();
+      if (response.isSuccessful) {
+        refetch();
+      } else {
+        setErrMessage(response.errorMessages);
       }
     } catch (err) {
       if (!err?.originalStatus) {
@@ -166,14 +156,33 @@ const ChapterManagement = () => {
           <h2 className="text-3xl font-bold mb-6 pb-4 text-center">
             Chapter Manage
           </h2>
-          {alertIsShowing ? (
-            <AlertComponent
-              content={"Create new chapter successed"}
-              visible={setAlertIsShowing}
-            />
-          ) : null}
           <section class="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">
             <div class="px-4 mx-auto max-w-screen-2xl lg:px-12">
+              <Link
+                to={`/coursemanagement`}
+                className="ml-4 mb-4 flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
+                Back to course management
+              </Link>
+              {alertIsShowing ? (
+                <AlertComponent
+                  content={"Create new chapter success"}
+                  visible={setAlertIsShowing}
+                />
+              ) : null}
+              {alertUpdateIsShowing ? (
+                <AlertComponent
+                  content={"Update chapter success"}
+                  visible={setAlertUpdateIsShowing}
+                />
+              ) : null}
+              {alertDeleteIsShowing ? (
+                <AlertComponent
+                  content={"Delete chapter success"}
+                  visible={setAlertDeleteIsShowing}
+                />
+              ) : null}
               <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
                 <div class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                   <div class="flex items-center flex-1 space-x-4">
@@ -343,7 +352,7 @@ const ChapterManagement = () => {
                                 </th>
                                 <td class="px-4 py-2">
                                   <Link
-                                    to={`/coursemanagement/chaptermanagement/lessonmanagement/${chapter.chapterId}`}
+                                    to={`/lessonmanagement/${chapter.chapterId}`}
                                     className="font-medium text-blue-600 dark:text-blue-500 hover:text-blue-700"
                                   >
                                     Manage
@@ -435,7 +444,8 @@ const ChapterManagement = () => {
                                     <ModalComponent
                                       isShowing={isShowing3}
                                       arg={arg3}
-                                      title="chapter"
+                                      title="Confirmation"
+                                      content="chapter"
                                       hide={toggle3}
                                       func={handleDeleteChapter}
                                       type="delete"

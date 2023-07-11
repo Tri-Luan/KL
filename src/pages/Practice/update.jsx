@@ -1,21 +1,31 @@
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import {
+  BackwardIcon,
+  PhotoIcon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
 import AlertComponent from "../../components/ui/AlertComponent";
+import ModalComponent from "../../components/ui/ModalComponent";
 import useCkEditor from "../../hooks/useCkEditor";
+import useModal from "../../hooks/useModal";
 import { selectCurrentUser } from "../../redux/authSlice";
 import {
-  useGetPracticeDetailsQuery,
+  useGetPracticeManagementDetailsQuery,
   useGetPracticeLevelsQuery,
   useUpdatePracticeMutation,
+  useDeleteTestCasePracticeMutation,
 } from "../../redux/practiceApiSlice";
 
 const UpdatePractice = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { id } = useParams();
+  const user = useSelector(selectCurrentUser);
+  const authorId = user.id;
+  const { arg, isShowing, toggle, setArg } = useModal();
   const { CkEditorData, setCkEditorData } = useCkEditor();
   const [formValid, setFormValid] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
@@ -23,28 +33,29 @@ const UpdatePractice = () => {
   const [score, setScore] = useState(100);
   const [numberTestCases, setNumberTestCases] = useState(0);
   const [numberHiddenTestCases, setNumberHiddenTestCases] = useState(0);
-  const [codeSample, setCodeSample] = useState("");
-  const [codeSampleLanguage, setCodeSampleLanguage] = useState(1);
-
+  const [practiceLevelId, setPracticeLevelId] = useState(1);
   const [alertIsShowing, setAlertIsShowing] = useState(false);
-  const [updatePractice, { isLoading }] = useUpdatePracticeMutation();
+  const [updatePractice, { isLoading: isLoadingUpdatePractice }] =
+    useUpdatePracticeMutation();
+  const [deleteTestCasePractice, { isLoading: isLoadingDeletePractice }] =
+    useDeleteTestCasePracticeMutation();
   const {
     data: practice,
     isLoading: isLoadingGetPractice,
     isSuccess,
-    isError,
-    error,
     refetch,
-  } = useGetPracticeDetailsQuery(id);
+  } = useGetPracticeManagementDetailsQuery(id, {
+    refetchOnMountOrArgChange: true,
+  });
   const {
     data,
-    isLoading: isLoadingGetCodeLanguages,
-    isSuccess: isSuccessGetCodeLanguages,
-    isError: isErrorGetCodeLanguages,
-    error: errorGetCodeLanguages,
+    isLoading: isLoadingGetPracticeLevels,
+    isSuccess: isSuccessGetPracticeLevels,
+    isError: isErrorGetPracticeLevels,
+    error: errorGetPracticeLevels,
   } = useGetPracticeLevelsQuery();
   useEffect(() => {
-    if (isSuccess) {
+    if (!isLoadingGetPractice) {
       console.log(practice);
       setCkEditorData(practice.content);
       setPracticeName(practice.practiceName);
@@ -53,13 +64,13 @@ const UpdatePractice = () => {
       setNumberHiddenTestCases(practice.totalHiddenTestCases);
       // setLevel(practice);
     }
-  }, [isSuccess]);
+  }, [isLoadingGetPractice, practice, setCkEditorData]);
 
   useEffect(() => {
-    if (practiceName !== "" && codeSample !== "" && CkEditorData !== "") {
+    if (practiceName !== "" && CkEditorData !== "" && numberTestCases !== 0) {
       setFormValid(true);
     }
-  }, [practiceName, codeSample, CkEditorData]);
+  }, [practiceName, CkEditorData, numberTestCases]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,32 +79,38 @@ const UpdatePractice = () => {
     }
     try {
       let testCases = getDataTestCases().concat(getDataHiddenTestCases());
-      let CodeSample = {
-        codeSample: codeSample,
-        codeLanguageId: codeSampleLanguage,
-      };
       const response = await updatePractice({
+        practiceId: practice.practiceId,
         practiceName: practiceName,
-        content: CkEditorData,
         score: score,
-        lessonId: id,
+        practiceLevelId: practiceLevelId,
+        content: CkEditorData,
         testCases: testCases,
-        codeSamples: [CodeSample],
       }).unwrap();
-      if (response.data.isSuccessful) {
-        setAlertIsShowing(true);
-        window.scrollTo(0, 0);
+      if (response.isSuccessful) {
+        setCkEditorData("");
+        setPracticeLevelId(1);
+        setNumberTestCases(0);
+        setNumberHiddenTestCases(0);
+        setScore(100);
+        setPracticeName("");
+        setErrMessage(null);
+        setFormValid(false);
+        navigate(`/practicemanagement`, {
+          state: {
+            status: "Update practice successfull",
+          },
+        });
       } else {
-        setErrMessage(response.data.errorMessages);
+        setErrMessage(response.errorMessages);
         window.scrollTo(0, 0);
       }
     } catch (err) {
+      console.error(err);
       if (!err?.originalStatus) {
         setErrMessage("Server not response");
-        window.scrollTo(0, 0);
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
-        window.scrollTo(0, 0);
       }
     }
   };
@@ -101,65 +118,167 @@ const UpdatePractice = () => {
   const renderTestCases = () => {
     var content = [];
     for (var i = 0; i < numberTestCases; i++) {
-      content.push(
-        <>
-          <label
-            for="name"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Test case {Number(i) + 1}
-          </label>
-          <input
-            type="text"
-            name="name"
-            id={`txtTestCaseInput${i}`}
-            class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Input"
-            required
-            autoComplete="off"
-            // value={lessonName}
-            // onChange={(e) => setLessonName(e.target.value)}
-          />
-          <input
-            type="text"
-            name="name"
-            id={`txtTestCaseOutput${i}`}
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Output"
-            required
-            autoComplete="off"
-            // value={lessonName}
-            // onChange={(e) => setLessonName(e.target.value)}
-          />
-        </>
-      );
+      if (i < practice.totalTestCases) {
+        let testCaseId = practice.testCases[i].testCaseId;
+        content.push(
+          <div key={testCaseId}>
+            <label>Test case {Number(i) + 1}</label>
+            <button
+              class="mt-2 inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              type="button"
+              onClick={() => {
+                setArg(testCaseId);
+                toggle();
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-red-700"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                />
+              </svg>
+            </button>
+            <input
+              //try to create a unique key
+              key={testCaseId + practice.testCases[i].input}
+              type="text"
+              name="name"
+              id={`txtTestCaseInput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Input"
+              required
+              autoComplete="off"
+              defaultValue={practice.testCases[i].input}
+            />
+            <input
+              //try to create a unique key
+              key={testCaseId + practice.testCases[i].expectedOutput}
+              type="text"
+              name="name"
+              id={`txtTestCaseOutput${i}`}
+              class="bg-gray-50 border w-2/3 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Output"
+              required
+              autoComplete="off"
+              defaultValue={practice.testCases[i].expectedOutput}
+            />
+          </div>
+        );
+      } else {
+        content.push(
+          <>
+            <label>Test case {Number(i) + 1}</label>
+            <input
+              type="text"
+              name="name"
+              id={`txtTestCaseInput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Input"
+              required
+              autoComplete="off"
+            />
+            <input
+              type="text"
+              name="name"
+              id={`txtTestCaseOutput${i}`}
+              class="bg-gray-50 border w-2/3 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Output"
+              required
+              autoComplete="off"
+            />
+          </>
+        );
+      }
     }
     return content;
   };
   const renderHiddenTestCase = () => {
     var content = [];
+    console.log(practice.hiddenTestCases);
     for (var i = 0; i < numberHiddenTestCases; i++) {
-      content.push(
-        <div>
-          <label>Hidden test case {Number(i) + 1} </label>
-          <input
-            type="text"
-            id={`txtHiddenTestCaseInput${i}`}
-            class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Input"
-            required
-            autoComplete="off"
-          />
-          <input
-            type="text"
-            id={`txtHiddenTestCaseOutput${i}`}
-            class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Output"
-            required
-            autoComplete="off"
-          />
-        </div>
-      );
+      if (i < practice.totalHiddenTestCases) {
+        let testCaseId = practice.hiddenTestCases[i].testCaseId;
+        content.push(
+          <div>
+            <label>Hidden test case {Number(i) + 1} </label>
+            <button
+              class="mt-2 inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              type="button"
+              onClick={() => {
+                setArg(testCaseId);
+                toggle();
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-red-700"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                />
+              </svg>
+            </button>
+            <input
+              //try to create a unique key
+              key={testCaseId + practice.hiddenTestCases[i].input}
+              type="text"
+              id={`txtHiddenTestCaseInput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Input"
+              required
+              autoComplete="off"
+              defaultValue={practice.hiddenTestCases[i].input}
+            />
+            <input
+              //try to create a unique key
+              key={testCaseId + practice.hiddenTestCases[i].expectedOutput}
+              type="text"
+              id={`txtHiddenTestCaseOutput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Output"
+              required
+              autoComplete="off"
+              defaultValue={practice.hiddenTestCases[i].expectedOutput}
+            />
+          </div>
+        );
+      } else {
+        content.push(
+          <div>
+            <label>Hidden test case {Number(i) + 1} </label>
+            <input
+              type="text"
+              id={`txtHiddenTestCaseInput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Input"
+              required
+              autoComplete="off"
+            />
+            <input
+              type="text"
+              id={`txtHiddenTestCaseOutput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Output"
+              required
+              autoComplete="off"
+            />
+          </div>
+        );
+      }
     }
     return content;
   };
@@ -172,6 +291,8 @@ const UpdatePractice = () => {
       var input = String(document.getElementById(inputId).value.trim());
       var output = String(document.getElementById(outputId).value.trim());
       var testcase = {
+        testCaseId:
+          i < practice.totalTestCases ? practice.testCases[i].testCaseId : 0,
         input: input,
         expectedOutput: output,
         isHidden: false,
@@ -185,10 +306,14 @@ const UpdatePractice = () => {
     var testCases = [];
     for (var i = 0; i < totalHiddenTestCase; i++) {
       var inputId = String("txtHiddenTestCaseInput" + i);
-      var outputId = String("txtHiddenTestCaseInput" + i);
+      var outputId = String("txtHiddenTestCaseOutput" + i);
       var input = String(document.getElementById(inputId).value.trim());
       var output = String(document.getElementById(outputId).value.trim());
       var testcase = {
+        testCaseId:
+          i < practice.totalHiddenTestCases
+            ? practice.hiddenTestCases[i].testCaseId
+            : 0,
         input: input,
         expectedOutput: output,
         isHidden: true,
@@ -197,10 +322,23 @@ const UpdatePractice = () => {
     }
     return testCases;
   };
+  const onDeleteTestCaseClicked = async (testCaseId) => {
+    try {
+      await deleteTestCasePractice(testCaseId)
+        .unwrap()
+        .then(async () => {
+          await refetch();
+          window.scrollTo(0, 0);
+          setAlertIsShowing(true);
+        });
+    } catch (err) {
+      console.error("Failed to delete the discussion", err);
+    }
+  };
 
   return (
     <div>
-      {isLoading || isLoadingGetCodeLanguages ? (
+      {isLoadingGetPractice || isLoadingGetPracticeLevels ? (
         <div>
           <li className="flex items-center">
             <div role="status">
@@ -227,11 +365,21 @@ const UpdatePractice = () => {
         </div>
       ) : (
         <section class="bg-white ">
+          <ModalComponent
+            isShowing={isShowing}
+            arg={arg}
+            hide={toggle}
+            func={onDeleteTestCaseClicked}
+            title="Confirmation"
+            content="test case"
+            type="delete"
+          />
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
               to={`/practicemanagement`}
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+              className="flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
             >
+              <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
               Back to management
             </Link>
 
@@ -240,7 +388,7 @@ const UpdatePractice = () => {
             </h2>
             {alertIsShowing ? (
               <AlertComponent
-                content={"Create new lesson success"}
+                content={"Delete test case success"}
                 visible={setAlertIsShowing}
               />
             ) : null}
@@ -273,7 +421,7 @@ const UpdatePractice = () => {
                     onChange={(e) => setPracticeName(e.target.value)}
                   />
                 </div>
-                <div class="sm:col-span-2 w-1/3">
+                <div>
                   <label
                     for="score"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -284,17 +432,39 @@ const UpdatePractice = () => {
                     id="score"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     required
-                    // onChange={(e) => {
-                    //   if (e.target.value === "Basic") setLevel(1);
-                    //   else if (e.target.value === "General") setLevel(2);
-                    //   else setLevel(3);
-                    // }}
                     onChange={(e) => setScore(e.target.value)}
                   >
-                    <option value={100} selected="">
+                    <option value={100} selected={score === 100}>
                       100
                     </option>
-                    <option value={200}>200</option>
+                    <option value={200} selected={score === 200}>
+                      200
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    for="level"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Choose level
+                  </label>
+                  <select
+                    id="level"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    required
+                    onChange={(e) => setPracticeLevelId(e.target.value)}
+                  >
+                    {data.levels.map((level, i) => {
+                      return (
+                        <option
+                          value={level.id}
+                          selected={practice.practiceLevelId === level.id}
+                        >
+                          {level.name}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
                 <div class="sm:col-span-2 w-1/3">
@@ -383,29 +553,6 @@ const UpdatePractice = () => {
                   </select>
                 </div>
                 <div>{renderHiddenTestCase()}</div>
-                {/* <div class="sm:col-span-2 w-1/3">
-                  <label
-                    for="hiddentestcase"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Choose code sample language
-                  </label>
-                  <select
-                    id="hiddentestcase"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required
-                    onChange={(e) => setCodeSampleLanguage(e.target.value)}
-                  >
-                    {data.codeLanguages.map((codeLanguage, i) => {
-                      return (
-                        <option value={codeLanguage.codeLanguageId}>
-                          {codeLanguage.codeLanguageName}&nbsp;(
-                          {codeLanguage.codeLanguageVersion})
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div> */}
                 <div class="sm:col-span-2">
                   <label
                     for="content"

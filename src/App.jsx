@@ -36,7 +36,7 @@ function App() {
     <Routes>
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
-      <Route path="lesson/:name" element={<CodeEditor1 />} />
+      <Route path="course/detail" element={<CodeEditor1 />} />
       <Route path="practice/:name" element={<CodeEditor2 />} />
       <Route path="/" element={<Layout />}>
         {/* public routes */}
@@ -59,11 +59,11 @@ function App() {
           <Route path="discussion">
             <Route index element={<Discussion />} />
             <Route path="create" element={<CreateDiscussion />} />
-            <Route path=":name" element={<DiscussionDetail />} />
           </Route>
 
           <Route element={<RequireAuth />}>
             {/* <Route path="/home" element={<Home />} /> */}
+            <Route path="discussion/:id" element={<DiscussionDetail />} />
             <Route path="practice">
               <Route index element={<Practice />} />
             </Route>
@@ -72,19 +72,18 @@ function App() {
               <Route path="create" element={<CreatePractice />} />
               <Route path="update/:id" element={<UpdatePractice />} />
             </Route>
-            <Route path="/coursemanagement">
+            <Route path="coursemanagement">
               <Route index element={<CourseManagement />} />
               <Route path="create" element={<CreateCourse />} />
-
-              <Route path="chaptermanagement">
-                <Route path=":id" element={<ChapterManagement />} />
-                <Route path="lessonmanagement">
-                  <Route path=":id" element={<LessonManagement />} />
-                  <Route path="create/:id" element={<CreateLesson />} />
-                  <Route path="update/:id" element={<UpdateLesson />} />
-                </Route>
-              </Route>
               <Route path="update/:id" element={<UpdateCourse />} />
+            </Route>
+            <Route path="chaptermanagement">
+              <Route path=":id" element={<ChapterManagement />} />
+            </Route>
+            <Route path="lessonmanagement">
+              <Route path=":id" element={<LessonManagement />} />
+              <Route path="create/:id" element={<CreateLesson />} />
+              <Route path="update/:id" element={<UpdateLesson />} />
             </Route>
           </Route>
         </Route>

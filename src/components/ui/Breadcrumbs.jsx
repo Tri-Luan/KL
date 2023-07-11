@@ -13,7 +13,11 @@ const Breadcrumbs = () => {
     .map((crumb, i, array) => {
       currentLink += `/${crumb}`;
       if (i === array.length - 1)
-        return <Breadcrumb.Item>{crumb}</Breadcrumb.Item>;
+        return (
+          <Breadcrumb.Item>
+            {crumb[0].toUpperCase() + crumb.slice(1)}
+          </Breadcrumb.Item>
+        );
       else
         return (
           <Breadcrumb.Item href={currentLink}>

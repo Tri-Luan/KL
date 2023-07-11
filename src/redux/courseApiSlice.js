@@ -239,6 +239,18 @@ export const courseApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    deleteTestCaseLesson: builder.mutation({
+      query: (id) => ({
+        url: `${
+          ApiPaths.course.root +
+          ApiPaths.course.lesson.root +
+          ApiPaths.course.lesson.testcase +
+          "/" +
+          id
+        }`,
+        method: "DELETE",
+      }),
+    }),
     setHideLesson: builder.mutation({
       query: (id) => ({
         url: `${
@@ -433,6 +445,7 @@ export const {
   useGetLessonHistoryQuery,
   useUpdateLessonMutation,
   useDeleteLessonMutation,
+  useDeleteTestCaseLessonMutation,
   useSetHideLessonMutation,
   useGetLessonLeaderboardQuery,
 

@@ -71,6 +71,14 @@ export const practiceApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    deleteTestCasePractice: builder.mutation({
+      query: (id) => ({
+        url: `${
+          ApiPaths.practice.root + ApiPaths.practice.testcase + "/" + id
+        }`,
+        method: "DELETE",
+      }),
+    }),
     setHidePractice: builder.mutation({
       query: (id) => ({
         url: `${
@@ -126,6 +134,7 @@ export const {
   useAddPracticeMutation,
   useUpdatePracticeMutation,
   useDeletePracticeMutation,
+  useDeleteTestCasePracticeMutation,
   useSetHidePracticeMutation,
   useGetPracticeHistoryQuery,
   useGetPracticeLeaderboardQuery,

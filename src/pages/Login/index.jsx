@@ -43,6 +43,7 @@ const Login = () => {
         cookies.set("user_id", authData.userId, { path: "/" });
         navigate(from, { replace: true });
       } else {
+        setPassword("");
         setErrMessage(authData.errorMessage);
       }
     } catch (err) {

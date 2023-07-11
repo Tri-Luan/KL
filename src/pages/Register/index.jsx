@@ -42,7 +42,6 @@ const Register = () => {
         password: password,
         rePassword: rePassword,
       }).unwrap();
-
       if (response.isSuccessful) {
         setUserName("");
         setLastName("");

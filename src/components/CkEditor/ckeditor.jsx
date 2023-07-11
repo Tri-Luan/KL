@@ -51,11 +51,11 @@ const CkEditor = ({ CkEditorData, setCkEditorData }) => {
       contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
     },
   };
-  const [CkData, setCkData] = useState(CkEditorData);
+  // const [CkData, setCkData] = useState(CkEditorData);
   return (
     <CKEditor
       editor={Editor}
-      data={CkData}
+      data={CkEditorData}
       config={configurations}
       onReady={(editor) => {
         editor.editing.view.change((writer) => {
@@ -68,7 +68,7 @@ const CkEditor = ({ CkEditorData, setCkEditorData }) => {
       }}
       onChange={(event, editor) => {
         const data = editor.getData();
-        setCkData(data);
+        setCkEditorData(data);
         console.log();
       }}
       onBlur={(event, editor) => {

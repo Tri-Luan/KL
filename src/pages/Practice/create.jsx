@@ -1,4 +1,4 @@
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { BackwardIcon, PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -203,14 +203,15 @@ const CreatePractice = () => {
       ) : (
         <section class="bg-white ">
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
-            <Breadcrumbs />
-            {/* <Link
+            
+            <Link
               to={`/practicemanagement`}
-              className="font-medium mt-4 text-indigo-600 hover:text-indigo-500"
+              className="flex w-fit font-medium mt-4 text-indigo-600 hover:text-indigo-500"
             >
+            <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
               Back to management
-            </Link> */}
-           
+            </Link>
+
             <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Create new practice
             </h2>

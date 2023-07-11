@@ -1,7 +1,9 @@
+import { BackwardIcon } from "@heroicons/react/24/outline";
 import { Button } from "flowbite-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import AlertComponent from "../../../../components/ui/AlertComponent";
 import ModalComponent from "../../../../components/ui/ModalComponent";
 import useModal from "../../../../hooks/useModal";
 import { selectCurrentUser } from "../../../../redux/authSlice";
@@ -28,24 +30,21 @@ const LessonManagement = () => {
   const [setHideLesson, { isLoading: isLoadingHideLesso }] =
     useSetHideLessonMutation();
   const { arg, isShowing, toggle, setArg } = useModal();
-  const [success, setSuccess] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
+  const [alertUpdateIsShowing, setAlertUpdateIsShowing] = useState(false);
+  const [alertDeleteIsShowing, setAlertDeleteIsShowing] = useState(false);
   const handleDeleteLesson = async (chapterId) => {
     try {
-      const response = await deleteLesson(chapterId)
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
+      const response = await deleteLesson(chapterId).unwrap();
+      if (response.isSuccessful) {
+        setAlertDeleteIsShowing(true);
+        refetch();
       } else {
-        setErrMessage(response.data.errorMessages);
+        setErrMessage(response.errorMessages);
       }
     } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
       }
@@ -53,20 +52,15 @@ const LessonManagement = () => {
   };
   const handleSetHideLesson = async (chapterId) => {
     try {
-      const response = await setHideLesson(chapterId)
-        .unwrap()
-        .then(() => {
-          refetch();
-        });
-      if (response.data.isSuccessful) {
-        setSuccess(true);
-        setErrMessage(["Register successful"]);
+      const response = await setHideLesson(chapterId).unwrap();
+      if (response.isSuccessful) {
+        refetch();
       } else {
-        setErrMessage(response.data.errorMessages);
+        setErrMessage(response.errorMessages);
       }
     } catch (err) {
-      if (err.originalStatus === 200) {
-        setErrMessage("Create successful");
+      if (!err?.originalStatus) {
+        setErrMessage("Server not response");
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
       }
@@ -106,6 +100,25 @@ const LessonManagement = () => {
           </h2>
           <section class="bg-gray-50 dark:bg-gray-900 py-7 sm:py-5">
             <div class="px-2 mx-auto max-w-screen-2xl lg:px-12">
+              <Link
+                to={`/chaptermanagement/${id}`}
+                className="ml-4 mb-4 flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
+                Back to chapter management
+              </Link>
+              {alertUpdateIsShowing ? (
+                <AlertComponent
+                  content={"Update lesson success"}
+                  visible={setAlertUpdateIsShowing}
+                />
+              ) : null}
+              {alertDeleteIsShowing ? (
+                <AlertComponent
+                  content={"Delete lesson success"}
+                  visible={setAlertDeleteIsShowing}
+                />
+              ) : null}
               <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 rounded-lg">
                 <div class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                   <div class="flex items-center flex-1 space-x-4">
@@ -175,9 +188,7 @@ const LessonManagement = () => {
                     </div>
                   </div>
                   <div class="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-                    <Link
-                      to={`/coursemanagement/chaptermanagement/lessonmanagement/create/${id}`}
-                    >
+                    <Link to={`/lessonmanagement/create/${id}`}>
                       <Button gradientDuoTone="cyanToBlue">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -288,7 +299,8 @@ const LessonManagement = () => {
                                 <td>
                                   <div class="flex items-center px-5">
                                     <Link
-                                      to={`/coursemanagement/chaptermanagement/lessonmanagement/update/${lesson.lessonId}`}
+                                      to={`/lessonmanagement/update/${lesson.lessonId}`}
+                                      state={{ chapterId: id }}
                                     >
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -330,7 +342,8 @@ const LessonManagement = () => {
                                       arg={arg}
                                       hide={toggle}
                                       func={handleDeleteLesson}
-                                      title="lesson"
+                                      title="Confirmation"
+                                      content="lesson"
                                       type="delete"
                                     />
                                   </div>

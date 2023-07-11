@@ -1,13 +1,15 @@
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-
+import { BackwardIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import CkEditor from "../../../../components/CkEditor/ckeditor";
 import AlertComponent from "../../../../components/ui/AlertComponent";
+import ModalComponent from "../../../../components/ui/ModalComponent";
 import useCkEditor from "../../../../hooks/useCkEditor";
+import useModal from "../../../../hooks/useModal";
 import { selectCurrentUser } from "../../../../redux/authSlice";
 import {
+  useDeleteTestCaseLessonMutation,
   useGetCodeLanguagesQuery,
   useGetLessonDetailsUpdateQuery,
   useUpdateLessonMutation,
@@ -15,7 +17,10 @@ import {
 
 const UpdateLesson = () => {
   // const navigate = useNavigate();
+  const location = useLocation();
+  const chapterId = location.state.chapterId;
   const { id } = useParams();
+  const { arg, isShowing, toggle, setArg } = useModal();
   const { CkEditorData, setCkEditorData } = useCkEditor();
   const [formValid, setFormValid] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
@@ -27,10 +32,13 @@ const UpdateLesson = () => {
   const [codeSampleLanguage, setCodeSampleLanguage] = useState(1);
 
   const [alertIsShowing, setAlertIsShowing] = useState(false);
-  const [updateLesson, { isLoading }] = useUpdateLessonMutation();
+  const [updateLesson, { isLoading: isLoadingUpdateLesson }] =
+    useUpdateLessonMutation();
+  const [deleteTestCaseLesson, { isLoading: isLoadingDeleteTestCaseLesson }] =
+    useDeleteTestCaseLessonMutation();
   const {
     data: lesson,
-    isLoading: isLoadingGetCourse,
+    isLoading: isLoadingGetLesson,
     isSuccess,
     isError,
     error,
@@ -45,16 +53,15 @@ const UpdateLesson = () => {
   } = useGetCodeLanguagesQuery();
   useEffect(() => {
     if (isSuccess) {
-      console.log(lesson);
       setCkEditorData(lesson.content);
       setLessonName(lesson.lessonName);
       setScore(lesson.score);
-      // numberTestCases(lesson.numberTestCases);
-      // numberHiddenTestCases(lesson.description);
+      setNumberTestCases(lesson.totalTestCases);
+      setNumberHiddenTestCases(lesson.totalHiddenTestCases);
       setCodeSample(lesson.codeSamples[0].codeSample);
       setCodeSampleLanguage(lesson.codeSamples[0].codeLanguageId);
     }
-  }, [isSuccess]);
+  }, [isSuccess, lesson, setCkEditorData]);
 
   useEffect(() => {
     if (lessonName !== "" && codeSample !== "" && CkEditorData !== "") {
@@ -81,7 +88,7 @@ const UpdateLesson = () => {
         testCases: testCases,
         codeSamples: [CodeSample],
       }).unwrap();
-      if (response.data.isSuccessful) {
+      if (response.isSuccessful) {
         setAlertIsShowing(true);
         window.scrollTo(0, 0);
       } else {
@@ -102,65 +109,158 @@ const UpdateLesson = () => {
   const renderTestCases = () => {
     var content = [];
     for (var i = 0; i < numberTestCases; i++) {
-      content.push(
-        <>
-          <label
-            for="name"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Test case {Number(i) + 1}
-          </label>
-          <input
-            type="text"
-            name="name"
-            id={`txtTestCaseInput${i}`}
-            class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Input"
-            required
-            autoComplete="off"
-            // value={lessonName}
-            // onChange={(e) => setLessonName(e.target.value)}
-          />
-          <input
-            type="text"
-            name="name"
-            id={`txtTestCaseOutput${i}`}
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Output"
-            required
-            autoComplete="off"
-            // value={lessonName}
-            // onChange={(e) => setLessonName(e.target.value)}
-          />
-        </>
-      );
+      if (i < lesson.totalTestCases) {
+        let testCaseId = lesson.testCases[i].testCaseId;
+        content.push(
+          <>
+            <label>Test case {Number(i) + 1}</label>
+            <button
+              class="mt-2 inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              type="button"
+              onClick={() => {
+                setArg(testCaseId);
+                toggle();
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-red-700"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                />
+              </svg>
+            </button>
+            <input
+              type="text"
+              name="name"
+              id={`txtTestCaseInput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Input"
+              required
+              autoComplete="off"
+              defaultValue={lesson.testCases[i].input}
+            />
+            <input
+              type="text"
+              name="name"
+              id={`txtTestCaseOutput${i}`}
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Output"
+              required
+              autoComplete="off"
+              defaultValue={lesson.testCases[i].expectedOutput}
+            />
+          </>
+        );
+      } else {
+        content.push(
+          <>
+            <label>Test case {Number(i) + 1}</label>
+            <input
+              type="text"
+              name="name"
+              id={`txtTestCaseInput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Input"
+              required
+              autoComplete="off"
+            />
+            <input
+              type="text"
+              name="name"
+              id={`txtTestCaseOutput${i}`}
+              class="bg-gray-50 border w-2/3 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Output"
+              required
+              autoComplete="off"
+            />
+          </>
+        );
+      }
     }
     return content;
   };
   const renderHiddenTestCase = () => {
     var content = [];
     for (var i = 0; i < numberHiddenTestCases; i++) {
-      content.push(
-        <div>
-          <label>Hidden test case {Number(i) + 1} </label>
-          <input
-            type="text"
-            id={`txtHiddenTestCaseInput${i}`}
-            class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Input"
-            required
-            autoComplete="off"
-          />
-          <input
-            type="text"
-            id={`txtHiddenTestCaseOutput${i}`}
-            class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Output"
-            required
-            autoComplete="off"
-          />
-        </div>
-      );
+      if (i < lesson.totalHiddenTestCases) {
+        let testCaseId = lesson.hiddenTestCases[i].testCaseId;
+        content.push(
+          <div>
+            <label>Hidden test case {Number(i) + 1} </label>
+            <button
+              class="mt-2 inline-flex items-center p-2 text-sm font-medium text-center text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              type="button"
+              onClick={() => {
+                setArg(testCaseId);
+                toggle();
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-red-700"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                />
+              </svg>
+            </button>
+            <input
+              type="text"
+              id={`txtHiddenTestCaseInput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Input"
+              required
+              autoComplete="off"
+              defaultValue={lesson.hiddenTestCases[i].input}
+            />
+            <input
+              type="text"
+              id={`txtHiddenTestCaseOutput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Output"
+              required
+              autoComplete="off"
+              defaultValue={lesson.hiddenTestCases[i].expectedOutput}
+            />
+          </div>
+        );
+      } else {
+        content.push(
+          <div>
+            <label>Hidden test case {Number(i) + 1} </label>
+            <input
+              type="text"
+              id={`txtHiddenTestCaseInput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Input"
+              required
+              autoComplete="off"
+            />
+            <input
+              type="text"
+              id={`txtHiddenTestCaseOutput${i}`}
+              class="bg-gray-50 mb-2 w-2/3 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              placeholder="Output"
+              required
+              autoComplete="off"
+            />
+          </div>
+        );
+      }
     }
     return content;
   };
@@ -198,10 +298,23 @@ const UpdateLesson = () => {
     }
     return testCases;
   };
+  const onDeleteTestCaseClicked = async (testCaseId) => {
+    try {
+      await deleteTestCaseLesson(testCaseId)
+        .unwrap()
+        .then(async () => {
+          await refetch();
+          window.scrollTo(0, 0);
+          setAlertIsShowing(true);
+        });
+    } catch (err) {
+      console.error("Failed to delete the discussion", err);
+    }
+  };
 
   return (
     <div>
-      {isLoading || isLoadingGetCodeLanguages ? (
+      {isLoadingGetLesson || isLoadingGetCodeLanguages ? (
         <div>
           <li className="flex items-center">
             <div role="status">
@@ -228,11 +341,21 @@ const UpdateLesson = () => {
         </div>
       ) : (
         <section class="bg-white ">
+          <ModalComponent
+            isShowing={isShowing}
+            arg={arg}
+            hide={toggle}
+            func={onDeleteTestCaseClicked}
+            title="Confirmation"
+            content="test case"
+            type="delete"
+          />
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
-              to={`/coursemanagement/chaptermanagement/lessonmanagement/${id}`}
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+              to={`/lessonmanagement/${chapterId}`}
+              className="flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
             >
+              <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
               Back to lesson management
             </Link>
             <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -240,7 +363,7 @@ const UpdateLesson = () => {
             </h2>
             {alertIsShowing ? (
               <AlertComponent
-                content={"Create new lesson success"}
+                content={"Delete test case success"}
                 visible={setAlertIsShowing}
               />
             ) : null}
@@ -310,14 +433,24 @@ const UpdateLesson = () => {
                     required
                     onChange={(e) => setNumberTestCases(e.target.value)}
                   >
-                    <option value={0} selected="">
+                    <option value={0} selected={lesson.totalTestCases === 0}>
                       0
                     </option>
-                    <option value={1}>1</option>
-                    <option value={2}>2</option>
-                    <option value={3}>3</option>
-                    <option value={4}>4</option>
-                    <option value={5}>5</option>
+                    <option value={1} selected={lesson.totalTestCases === 1}>
+                      1
+                    </option>
+                    <option value={2} selected={lesson.totalTestCases === 2}>
+                      2
+                    </option>
+                    <option value={3} selected={lesson.totalTestCases === 3}>
+                      3
+                    </option>
+                    <option value={4} selected={lesson.totalTestCases === 4}>
+                      4
+                    </option>
+                    <option value={5} selected={lesson.totalTestCases === 5}>
+                      5
+                    </option>
                   </select>
                 </div>
                 <div>{renderTestCases()}</div>
@@ -334,14 +467,42 @@ const UpdateLesson = () => {
                     required
                     onChange={(e) => setNumberHiddenTestCases(e.target.value)}
                   >
-                    <option value={0} selected="">
+                    <option
+                      value={0}
+                      selected={lesson.totalHiddenTestCases === 0}
+                    >
                       0
                     </option>
-                    <option value={1}>1</option>
-                    <option value={2}>2</option>
-                    <option value={3}>3</option>
-                    <option value={4}>4</option>
-                    <option value={5}>5</option>
+                    <option
+                      value={1}
+                      selected={lesson.totalHiddenTestCases === 1}
+                    >
+                      1
+                    </option>
+                    <option
+                      value={2}
+                      selected={lesson.totalHiddenTestCases === 2}
+                    >
+                      2
+                    </option>
+                    <option
+                      value={3}
+                      selected={lesson.totalHiddenTestCases === 3}
+                    >
+                      3
+                    </option>
+                    <option
+                      value={4}
+                      selected={lesson.totalHiddenTestCases === 4}
+                    >
+                      4
+                    </option>
+                    <option
+                      value={5}
+                      selected={lesson.totalHiddenTestCases === 5}
+                    >
+                      5
+                    </option>
                   </select>
                 </div>
                 <div>{renderHiddenTestCase()}</div>
