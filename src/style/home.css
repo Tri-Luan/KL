@@ -64,13 +64,6 @@
   position: relative;
 }
 
-.udeCarousel .carousel__content {
-  position: absolute;
-  width: 50%;
-  top: 10%;
-  left: 5%;
-}
-
 .udeCarousel .carousel__content h1 {
   color: #fff;
   font-size: 30px;
@@ -125,10 +118,10 @@
   color: #fff;
   font-size: 15px;
   font-weight: 700;
-  background-color: #0294bd;
+  background-color: #4169e1;
   padding: 12px 20px;
   border-radius: 6px;
-  border: 1px solid #0294bd;
+  border: 1px solid #4169e1;
   transition: all 0.5s;
 }
 
@@ -144,13 +137,6 @@
 
 .intro {
   background: linear-gradient(to right, #045de9, #08bcee);
-}
-
-.intro .intro__content {
-  display: flex;
-  width: 80%;
-  margin: auto;
-  padding-top: 8px;
 }
 
 .intro .intro__item .item__icon {
@@ -208,7 +194,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .services__item h3 {
@@ -224,19 +211,19 @@
 
 .services__item i {
   background-color: white;
-  color: #056997;
+  color: #4e77f0;
   width: 100px;
   height: 100px;
   border-radius: 50px;
-  border: 1px solid #056997;
+  border: 1px solid #4e77f0;
   font-size: 2.5rem;
   padding: 3px;
   line-height: 100px;
   transition: all 0.5s;
 }
 .services__item:hover i {
-  color: #0796d8;
+  color: #045de9;
 }
 .services__item h3:hover {
-  color: #0796d8;
+  color: #045de9;
 }

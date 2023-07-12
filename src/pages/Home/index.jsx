@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 const DefaultHome = () => {
   const navigate = useNavigate();
   return (
-    <div>
-      <section className="udeCarousel">
-        <div className="carousel__content">
+    <div className="">
+      <section className="udeCarousel ">
+        <div className="carousel__content p-10 mx-auto w-full max-w-7xl ">
           <h1>Learning according to your schedule</h1>
           <p>Practice any subject, any time</p>
           <button
@@ -21,7 +21,7 @@ const DefaultHome = () => {
       {/* Intro start */}
       <section className="intro">
         <div className="intro__content">
-          <div className="flex flex-row mx-auto gap-28">
+          <div className="flex flex-row pl-8 py-1 mx-auto w-full max-w-7xl justify-between">
             <div className="">
               <div className="intro__item flex flex-row">
                 <div className="item__icon">
@@ -62,8 +62,8 @@ const DefaultHome = () => {
       {/* <!-- SERVICE START --> */}
       <section id="services">
         <h1>Roadmap to become a programmer</h1>
-        <div className="services__content">
-          <div className="services__item">
+        <div className="services__content  mx-auto w-full max-w-7xl">
+          <div className="services__item ">
             <i className="fa fa-adjust" />
             <h3>Learn to code</h3>
             <p>
