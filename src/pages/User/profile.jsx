@@ -1,5 +1,3 @@
-import { Link, Navigate } from "react-router-dom";
-
 import { useEffect, useState } from "react";
 import AlertComponent from "../../components/ui/AlertComponent";
 import { Spinner } from "flowbite-react";
@@ -27,8 +25,7 @@ const Profile = () => {
   const [alertIsShowing, setAlertIsShowing] = useState(false);
   const [updateUser, { isLoading: isLoadingUpdateUser }] =
     useUpdateUserMutation();
-  const [getUser, { isLoading: isLoadingGetUser, isSuccess }] =
-    useGetUserMutation();
+  const [getUser, { isLoading: isLoadingGetUser }] = useGetUserMutation();
   useEffect(() => {
     if (userData) {
       setUserName(userData.userName);
@@ -337,11 +334,10 @@ const Profile = () => {
             </button>
             {alertIsShowing ? (
               <AlertComponent
-                content={"Register new account success"}
+                content={"Update your information success"}
                 visible={setAlertIsShowing}
               />
             ) : null}
-
             <form className="mt-8 space-y-6">
               <img
                 className="mx-auto h-20 w-20 rounded-full border-none"
