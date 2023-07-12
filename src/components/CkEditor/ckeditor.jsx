@@ -69,7 +69,6 @@ const CkEditor = ({ CkEditorData, setCkEditorData }) => {
       onChange={(event, editor) => {
         const data = editor.getData();
         setCkEditorData(data);
-        console.log();
       }}
       onBlur={(event, editor) => {
         const data = editor.getData();

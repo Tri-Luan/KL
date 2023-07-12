@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { selectCurrentUser } from "../../redux/authSlice";
@@ -27,7 +27,7 @@ const Header = () => {
     };
     const response = await sendLogout(body);
     if (response.data.isSuccessful) {
-      localStorage.setItem("persist", false);
+      sessionStorage.setItem("persist", false);
       cookies.remove("user_id", { path: "/" });
       cookies.remove("jwt_access", { path: "/" });
       cookies.remove("jwt_refresh", { path: "/" });
@@ -111,8 +111,12 @@ const Header = () => {
                     <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none ">
                       <span className="sr-only">Open user menu</span>
                       <img
-                        className="h-8 w-8 rounded-full border-none"
-                        src={userAvatar}
+                        className="h-10 w-10 rounded-full border-none"
+                        src={
+                          user.avatar === null
+                            ? userAvatar
+                            : "data:image/jpeg;base64," + user.avatar
+                        }
                         alt=""
                       />
                     </Menu.Button>
@@ -130,7 +134,7 @@ const Header = () => {
                       <Menu.Item>
                         {({ active }) => (
                           <Link
-                            to="/coursemanagement"
+                            to="/profile"
                             className={classNames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"

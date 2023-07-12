@@ -1,11 +1,18 @@
 import { Badge, Spinner } from "flowbite-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useGetCoursesQuery } from "../../redux/courseApiSlice";
 
 const Course = () => {
-  const { data, isLoading, isSuccess, isError, error } = useGetCoursesQuery();
-  console.log(data);
-
+  const [keyword, setKeyword] = useState("");
+  const { data, isLoading, isSuccess, isError, error } = useGetCoursesQuery(
+    {
+      keyword: keyword,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
   return (
     <div>
       {isLoading ? (
@@ -16,23 +23,32 @@ const Course = () => {
       ) : isSuccess ? (
         <section>
           <section className="courseCarousel">
-            <div className="carousel__content container mx-auto w-full max-w-7xl">
+            <div className="pl-3 pt-6 mx-auto w-full max-w-7xl carousel__content">
               <h3>
                 Learning programming online. Let's start with your first course!
               </h3>
-              <form className="mt-6 ">
+              <form className="mt-6">
                 <div class="flex">
-                  <div class="relative w-2/4">
+                  <div class="relative w-2/4 ">
                     <input
                       type="search"
-                      id="search-dropdown"
+                      id="searchkeyword"
                       class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-r-lg border-l-gray-50 border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-l-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                       placeholder="Search course by course name"
-                      required
+                      defaultValue={keyword}
                     />
                     <button
-                      type="submit"
-                      class="absolute top-0 right-0 p-2.5 text-sm font-medium text-white bg-blue-700 rounded-r-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      class="absolute top-0 right-0 p-2.5 text-sm font-medium text-white bg-blue-700 rounded-r-lg border border-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setKeyword(
+                          String(
+                            document
+                              .getElementById("searchkeyword")
+                              .value.trim()
+                          )
+                        );
+                      }}
                     >
                       <svg
                         aria-hidden="true"
@@ -49,7 +65,6 @@ const Course = () => {
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         ></path>
                       </svg>
-                      <span class="sr-only">Search</span>
                     </button>
                   </div>
                 </div>

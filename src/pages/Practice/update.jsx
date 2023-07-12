@@ -57,7 +57,6 @@ const UpdatePractice = () => {
   } = useGetPracticeLevelsQuery();
   useEffect(() => {
     if (!isLoadingGetPractice) {
-      console.log(practice);
       setCkEditorData(practice.content);
       setPracticeName(practice.practiceName);
       setScore(practice.score);
@@ -205,7 +204,6 @@ const UpdatePractice = () => {
   };
   const renderHiddenTestCase = () => {
     var content = [];
-    console.log(practice.hiddenTestCases);
     for (var i = 0; i < numberHiddenTestCases; i++) {
       if (i < practice.totalHiddenTestCases) {
         let testCaseId = practice.hiddenTestCases[i].testCaseId;

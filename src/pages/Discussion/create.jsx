@@ -1,4 +1,8 @@
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import {
+  BackwardIcon,
+  PhotoIcon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
 
 import { FileInput, Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
@@ -19,6 +23,7 @@ const CreateDiscussion = () => {
   const [errMessage, setErrMessage] = useState(null);
   const [discussionName, setDiscussionName] = useState("");
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
   const [alertIsShowing, setAlertIsShowing] = useState(false);
   const [addDiscussion, { isLoading }] = useAddDiscussionMutation();
 
@@ -38,11 +43,13 @@ const CreateDiscussion = () => {
         description: description,
         discussionName: discussionName,
         content: CkEditorData,
+        image: image,
       }).unwrap();
       if (response.isSuccessful) {
-        setCkEditorData();
+        setCkEditorData("");
         setDiscussionName("");
         setDescription("");
+        setImage("");
         setErrMessage(null);
         setFormValid(false);
         setAlertIsShowing(true);
@@ -60,14 +67,23 @@ const CreateDiscussion = () => {
       }
     }
   };
+  const convertToBase64 = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      let base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
+      setImage(base64String);
+    };
+  };
   return (
     <div>
       <section class="bg-white ">
         <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
           <Link
             to="/discussion"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
           >
+            <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
             Back to discussion
           </Link>
           <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -75,7 +91,7 @@ const CreateDiscussion = () => {
           </h2>
           {alertIsShowing ? (
             <AlertComponent
-              content={"Create new course success"}
+              content={"Create new discussion success"}
               visible={setAlertIsShowing}
             />
           ) : null}
@@ -96,6 +112,7 @@ const CreateDiscussion = () => {
                 >
                   Discussion name
                 </label>
+
                 <input
                   type="text"
                   name="name"
@@ -106,6 +123,26 @@ const CreateDiscussion = () => {
                   autoComplete="off"
                   value={discussionName}
                   onChange={(e) => setDiscussionName(e.target.value)}
+                />
+              </div>
+              <div id="fileUpload">
+                <div className="mb-2 block">
+                  <Label htmlFor="file" value="Discussion image" />
+                </div>
+                <FileInput
+                  id="file"
+                  helperText="Discussion image is used to represent the discussion (.png)"
+                  required
+                  onChange={(e) => {
+                    convertToBase64(e.target.files[0]);
+                  }}
+                />
+              </div>
+              <div className={`mt-5`}>
+                <img
+                  class="rounded-t-lg h-40 min-w-full"
+                  src={"data:image/jpeg;base64," + image}
+                  alt=""
                 />
               </div>
               <div class="sm:col-span-2">

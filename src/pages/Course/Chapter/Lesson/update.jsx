@@ -19,6 +19,7 @@ import {
 const UpdateLesson = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const courseId = location.state?.courseId;
   const chapterId = location.state.chapterId;
   const { id } = useParams();
   const { arg, isShowing, toggle, setArg } = useModal();
@@ -47,7 +48,6 @@ const UpdateLesson = () => {
   } = useGetLessonDetailsUpdateQuery(id, {
     refetchOnMountOrArgChange: true,
   });
-  console.log(lesson);
   const {
     data,
     isLoading: isLoadingGetCodeLanguages,
@@ -104,6 +104,7 @@ const UpdateLesson = () => {
         navigate(`/lessonmanagement/${chapterId}`, {
           state: {
             status: "Update lesson successfull",
+            courseId: courseId,
           },
         });
       } else {
@@ -373,6 +374,7 @@ const UpdateLesson = () => {
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
               to={`/lessonmanagement/${chapterId}`}
+              state={{ courseId: courseId }}
               className="flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
             >
               <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />

@@ -26,7 +26,6 @@ const PersistLogin = () => {
           refreshToken: cookies.get("jwt_refresh"),
           accessToken: cookies.get("jwt_access"),
         };
-        console.log(body);
         if (body.refreshToken || body.accessToken) {
           const userId = cookies.get("user_id");
           console.log("verifying refresh token");
@@ -39,7 +38,6 @@ const PersistLogin = () => {
             }
             if (userId !== undefined) {
               const user = await getUser(userId);
-              console.log(user);
               dispatch(setUser(user.data));
             }
             setTrueSuccess(true);
@@ -72,11 +70,9 @@ const PersistLogin = () => {
     console.log("error");
   } else if (isSuccess && trueSuccess) {
     //persist: yes, token: yes
-    console.log("verifyRefreshToken success");
     content = <Outlet />;
   } else if (token && isUninitialized) {
     //persist: yes, token: yes
-    console.log("success && isUninitialized");
     content = <Outlet />;
   }
   return content;

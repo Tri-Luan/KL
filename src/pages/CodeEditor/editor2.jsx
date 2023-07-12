@@ -51,8 +51,6 @@ const CodeEditor2 = () => {
   const tabsRef = useRef(null);
   const props = { tabsRef };
   const location = useLocation();
-
-  console.log(location.state);
   const user = useSelector(selectCurrentUser);
   // const { id } = useParams();
   const id = location.state.id;
@@ -72,7 +70,6 @@ const CodeEditor2 = () => {
     isError: isErrorGetPracticeDetails,
     error: errorGetPracticeDetails,
   } = useGetPracticeDetailsQuery({ practiceId: id, userId: user.id });
-  console.log(practice);
   const {
     data: histories,
     isLoading: isLoadingGetPracticeHistory,
@@ -81,7 +78,6 @@ const CodeEditor2 = () => {
     error: errorGetPracticeHistory,
     refetch: refetchGetPracticeHistory,
   } = useGetPracticeHistoryQuery({ practiceId: id, userId: user.id });
-  console.log(histories);
   const {
     data: leaderBoards,
     isLoading: isLoadingGetLeaderBoard,
@@ -94,7 +90,6 @@ const CodeEditor2 = () => {
     pageSize: 5,
     pageNumber: currentPage,
   });
-  console.log(leaderBoards);
   const [runCodePractice, { isLoading: isLoadingRunCode }] =
     useRunCodePracticeMutation();
   const [submitCodePractice, { isLoading: isLoadingSubmitCode }] =
@@ -351,7 +346,6 @@ const CodeEditor2 = () => {
       codeLanguageId: selectedLanguage.codeLanguageId,
       userId: user.id,
     }).unwrap();
-    console.log(response);
     refetchGetPracticeHistory();
     refetchGetPracticeLeaderboard();
     toggle2();

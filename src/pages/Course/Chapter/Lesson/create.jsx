@@ -18,7 +18,8 @@ import {
 } from "../../../../redux/courseApiSlice";
 
 const CreateLesson = () => {
-  // const navigate = useNavigate();
+  const location = useLocation();
+  const courseId = location.state?.courseId;
   const user = useSelector(selectCurrentUser);
   const authorId = user.id;
   const { id } = useParams();
@@ -178,7 +179,7 @@ const CreateLesson = () => {
     var testCases = [];
     for (var i = 0; i < totalHiddenTestCase; i++) {
       var inputId = String("txtHiddenTestCaseInput" + i);
-      var outputId = String("txtHiddenTestCaseInput" + i);
+      var outputId = String("txtHiddenTestCaseOutput" + i);
       var input = String(document.getElementById(inputId).value.trim());
       var output = String(document.getElementById(outputId).value.trim());
       var testcase = {
@@ -203,6 +204,7 @@ const CreateLesson = () => {
           <div class="py-8 px-4 mx-auto w-3/4 lg:py-16">
             <Link
               to={`/lessonmanagement/${id}`}
+              state={{ courseId: courseId }}
               className="flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
             >
               <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />

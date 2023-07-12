@@ -25,6 +25,7 @@ import CodeEditor2 from "./pages/CodeEditor/editor2";
 import Discussion from "./pages/Discussion";
 import CreateDiscussion from "./pages/Discussion/create";
 import DiscussionDetail from "./pages/Discussion/detail";
+import Profile from "./pages/User/profile";
 
 const ROLES = {
   Student: "Student",
@@ -35,9 +36,9 @@ function App() {
     <Routes>
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
-      <Route path="course/detail" element={<CodeEditor1 />} />
-      <Route path="practice/:name" element={<CodeEditor2 />} />
       <Route element={<PersistLogin />}>
+        <Route path="course/detail" element={<CodeEditor1 />} />
+        <Route path="practice/:name" element={<CodeEditor2 />} />
         <Route path="/" element={<Layout />}>
           {/* public routes */}
           <Route index element={<DefaultHome />} />
@@ -62,6 +63,7 @@ function App() {
 
           <Route element={<RequireAuth />}>
             {/* <Route path="/home" element={<Home />} /> */}
+            <Route path="profile" element={<Profile />} />
             <Route path="discussion/:id" element={<DiscussionDetail />} />
             <Route path="practice">
               <Route index element={<Practice />} />

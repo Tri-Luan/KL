@@ -58,7 +58,7 @@ const CreatePractice = () => {
       }).unwrap();
 
       if (response.isSuccessful) {
-        setCkEditorData();
+        setCkEditorData("");
         setPracticeLevelId(1);
         setNumberTestCases(0);
         setNumberHiddenTestCases(0);
@@ -193,7 +193,7 @@ const CreatePractice = () => {
               className="flex w-fit font-medium mt-4 text-indigo-600 hover:text-indigo-500"
             >
               <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
-              Back to management
+              Back to practice management
             </Link>
 
             <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -201,7 +201,7 @@ const CreatePractice = () => {
             </h2>
             {alertIsShowing ? (
               <AlertComponent
-                content={"Create new lesson successed"}
+                content={"Create new practice success"}
                 visible={setAlertIsShowing}
               />
             ) : null}

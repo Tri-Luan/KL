@@ -36,7 +36,7 @@ const Login = () => {
         dispatch(setToken(authData.token));
         const response = await getUser(authData.userId);
         dispatch(setUser(response.data));
-        localStorage.setItem("persist", true);
+        sessionStorage.setItem("persist", true);
         cookies.set("jwt_refresh", authData.token.refreshToken, { path: "/" });
         cookies.set("jwt_access", authData.token.accessToken, { path: "/" });
         cookies.set("user_id", authData.userId, { path: "/" });

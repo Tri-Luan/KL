@@ -16,13 +16,6 @@
   position: relative;
 }
 
-.courseCarousel .carousel__content {
-  position: absolute;
-  width: 80%;
-  top: 10%;
-  left: 10%;
-}
-
 .courseCarousel .carousel__content h3 {
   color: #fff;
   font-size: 25px;

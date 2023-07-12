@@ -67,7 +67,6 @@ const CourseDetail = () => {
     error: errorGetCourse,
     refetch: refetchGetCourse,
   } = useGetCourseDetailQuery({ userId: user.id, courseId: id });
-  console.log(course);
   // const {
   //   data: comments,
   //   isLoading: isLoadingGetCourseComments,
@@ -123,7 +122,6 @@ const CourseDetail = () => {
             });
             setComments(comments.data);
           });
-        console.log(response);
       }
       setComment("");
       // setTitle("");
@@ -149,7 +147,6 @@ const CourseDetail = () => {
             });
             setComments(comments.data);
           });
-        console.log(response);
       }
     } catch (err) {
       console.error("Failed to delete the comment", err);
@@ -429,7 +426,6 @@ const CourseDetail = () => {
                     courseId: id,
                   });
                   setComments(comments.data);
-                  console.log(comments);
                 }
               }}
             >

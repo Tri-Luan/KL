@@ -16,45 +16,24 @@ import { useState } from "react";
 import Breadcrumbs from "../../components/ui/Breadcrumbs";
 const Practice = () => {
   const user = useSelector(selectCurrentUser);
-  const [practiceLevelId, setPracticeLevelId] = useState(1);
+  const navigate = useNavigate();
   const { data: levels, isLoading: isLoadingGetLevels } =
     useGetPracticeLevelsQuery();
-  const navigate = useNavigate();
+  const [practiceLevelId, setPracticeLevelId] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const { data, isLoading, isSuccess, isError, error } = useGetPracticesQuery({
-    userId: user.id,
-    pageSize: 8,
-    pageNumber: currentPage,
-  });
-
-  console.log(data);
-  // const customTheme: CustomFlowbiteTheme["pagination"] = {
-  //   base: "",
-  //   layout: {
-  //     table: {
-  //       base: "text-sm text-gray-700 dark:text-gray-400",
-  //       span: "font-semibold text-gray-900 dark:text-white",
-  //     },
-  //   },
-  //   pages: {
-  //     base: "xs:mt-0 mt-2 inline-flex items-center -space-x-px",
-  //     showIcon: "inline-flex",
-  //     previous: {
-  //       base: "ml-0 rounded-l-lg border border-gray-300 bg-white py-2 px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white",
-  //       icon: "h-5 w-5",
-  //     },
-  //     next: {
-  //       base: "rounded-r-lg border border-gray-300 bg-white py-2 px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white",
-  //       icon: "h-5 w-5",
-  //     },
-  //     selector: {
-  //       base: "w-12 border border-gray-300 bg-white py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white",
-  //       active:
-  //         "bg-cyan-50 text-cyan-600 hover:bg-cyan-100 hover:text-cyan-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white",
-  //       disabled: "opacity-50 cursor-normal",
-  //     },
-  //   },
-  // };
+  const [keyword, setKeyword] = useState("");
+  const { data, isLoading, isSuccess, isError, error } = useGetPracticesQuery(
+    {
+      userId: user.id,
+      pageSize: 8,
+      pageNumber: currentPage,
+      keyword: keyword,
+      practiceLevelId: practiceLevelId,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
   return (
     <div>
       {isLoading || isLoadingGetLevels ? (
@@ -73,14 +52,23 @@ const Practice = () => {
               <div class="relative w-96 mr-20">
                 <input
                   type="search"
-                  id="search-dropdown"
+                  id="searchkeyword"
                   class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-r-lg border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-l-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
                   placeholder="Search practice by practice name"
                   required
+                  defaultValue={keyword}
                 />
                 <button
                   type="submit"
-                  class="absolute top-0 right-0 p-2.5 text-sm font-medium text-white bg-blue-600 rounded-r-lg border border-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  class="absolute top-0 right-0 p-2.5 text-sm font-medium text-white bg-blue-600 rounded-r-lg border border-blue-600 hover:bg-blue-700 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setKeyword(
+                      String(
+                        document.getElementById("searchkeyword").value.trim()
+                      )
+                    );
+                  }}
                 >
                   <svg
                     aria-hidden="true"
@@ -101,7 +89,6 @@ const Practice = () => {
                 </button>
               </div>
             </div>
-
             <select
               id="level"
               class="bg-gray-50 mr-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500  w-40 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -113,8 +100,7 @@ const Practice = () => {
                 return <option value={level.id}>{level.name}</option>;
               })}
             </select>
-
-            <div class="flex">
+            {/* <div class="flex">
               <select
                 id="level"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500  w-40 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -126,7 +112,7 @@ const Practice = () => {
                   return <option value={level.id}>{level.name}</option>;
                 })}
               </select>
-            </div>
+            </div> */}
           </form>
           <div class="grid lg:grid-cols-4 lg:gap-5 gap-5 xl:gap-x-7">
             {data.practices !== null

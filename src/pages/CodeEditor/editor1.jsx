@@ -78,7 +78,6 @@ const CodeEditor1 = () => {
     isError: isErrorGetLessonDetails,
     error: errorGetLessonDetails,
   } = useGetLessonDetailsQuery({ lessonId: id, userId: user.id });
-  console.log(lesson);
   const {
     data: histories,
     isLoading: isLoadingGetLessonHistory,
@@ -361,7 +360,6 @@ const CodeEditor1 = () => {
       codeLanguageId: selectedLanguage.codeLanguageId,
       userId: user.id,
     }).unwrap();
-    console.log(response);
     refetchGetLessonHistory();
     refetchGetLessonLeaderboard();
     toggle2();
@@ -408,7 +406,6 @@ const CodeEditor1 = () => {
             });
             setComments(comments.data);
           });
-        console.log(response);
       }
     } catch (err) {
       console.error("Failed to delete the comment", err);

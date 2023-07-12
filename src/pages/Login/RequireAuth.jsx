@@ -1,9 +1,11 @@
 import { useSelector } from "react-redux";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
-import { selectCurrentUser } from "../../redux/authSlice";
+import Cookies from "universal-cookie";
+
 
 const RequireAuth = ({ allowedRoles }) => {
-  const user = useSelector(selectCurrentUser);
+  const cookies = new Cookies();
+  const userId = cookies.get("user_id");
   const location = useLocation();
 
   return (
@@ -11,7 +13,7 @@ const RequireAuth = ({ allowedRoles }) => {
     //     ?<Outlet/>
     // <Navigate to="/unauthorized" state={{ from: location }} replace />
     //     :
-    user ? (
+    userId ? (
       <Outlet />
     ) : (
       <Navigate to="/login" state={{ from: location }} replace />

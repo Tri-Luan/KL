@@ -4,8 +4,15 @@ import { ApiPaths } from "../shared/api-paths";
 export const courseApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCourses: builder.query({
-      query: () => `${ApiPaths.course.root}`,
-      keepUnusedDataFor: 5,
+      query: (arg) => {
+        const { keyword } = arg;
+        return {
+          url: `${ApiPaths.course.root}`,
+          params: {
+            keyword,
+          },
+        };
+      },
     }),
     getCourseDetail: builder.query({
       query: (arg) => {
@@ -15,7 +22,6 @@ export const courseApiSlice = apiSlice.injectEndpoints({
           params: { userId, courseId },
         };
       },
-      keepUnusedDataFor: 5,
     }),
     getCourseDetailUpdate: builder.query({
       query: (arg) =>
@@ -33,7 +39,6 @@ export const courseApiSlice = apiSlice.injectEndpoints({
           params: { userId },
         };
       },
-      keepUnusedDataFor: 5,
     }),
     addCourse: builder.mutation({
       query: (body) => ({
@@ -145,7 +150,6 @@ export const courseApiSlice = apiSlice.injectEndpoints({
           params: { courseId },
         };
       },
-      keepUnusedDataFor: 5,
     }),
     addChapter: builder.mutation({
       query: (body) => ({
@@ -195,7 +199,6 @@ export const courseApiSlice = apiSlice.injectEndpoints({
           params: { chapterId },
         };
       },
-      keepUnusedDataFor: 5,
     }),
     getLessonDetails: builder.query({
       query: (arg) => {
@@ -392,12 +395,10 @@ export const courseApiSlice = apiSlice.injectEndpoints({
         };
       },
     }),
-
     getThemes: builder.query({
       query: () => `${ApiPaths.course.root + ApiPaths.course.themes}`,
       keepUnusedDataFor: 5,
     }),
-
     getCodeLanguages: builder.query({
       query: () => `${ApiPaths.course.root + ApiPaths.course.codeLanguages}`,
       keepUnusedDataFor: 5,

@@ -1,4 +1,8 @@
-import { BackwardIcon, PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import {
+  BackwardIcon,
+  PhotoIcon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
 
 import { FileInput, Label, Spinner } from "flowbite-react";
 import React, { useEffect, useState } from "react";
@@ -73,8 +77,6 @@ const CreateCourse = () => {
     reader.onload = () => {
       let base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
       setCourseAvatar(base64String);
-      console.log("result1: ", base64String);
-      console.log("result: ", reader.result);
     };
   };
 
@@ -96,7 +98,7 @@ const CreateCourse = () => {
         time: time,
       }).unwrap();
       if (response.isSuccessful) {
-        setCkEditorData();
+        setCkEditorData("");
         setTime(0);
         setDescription("");
         setLevel(1);
@@ -115,8 +117,10 @@ const CreateCourse = () => {
       console.error(err);
       if (!err?.originalStatus) {
         setErrMessage("Server not response");
+        window.scrollTo(0, 0);
       } else if (err.originalStatus === 401) {
         setErrMessage("Unauthorized");
+        window.scrollTo(0, 0);
       }
     }
   };
@@ -133,7 +137,8 @@ const CreateCourse = () => {
             <Link
               to="/coursemanagement"
               className="flex w-fit font-medium text-indigo-600 hover:text-indigo-500"
-            ><BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
+            >
+              <BackwardIcon className="h-6 w-6 mr-2 " aria-hidden="true" />
               Back to course management
             </Link>
             <h2 className="mt-12 mb-6 text-center text-3xl font-bold tracking-tight text-gray-900">
