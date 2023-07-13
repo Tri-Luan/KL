@@ -68,25 +68,31 @@ export default function Discussion() {
             <div class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
               <div class="relative"></div>
               <div class="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-                <Link to={`/discussion/create`}>
-                  <Button gradientDuoTone="cyanToBlue">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 4.5v15m7.5-7.5h-15"
-                      />
-                    </svg>
-                    Create new discussion
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link to={`/discussion/create`}>
+                    <Button gradientDuoTone="cyanToBlue">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 4.5v15m7.5-7.5h-15"
+                        />
+                      </svg>
+                      Create new discussion
+                    </Button>
+                  </Link>
+                ) : (
+                  <span className="text-red-500">
+                    Login to create new discussion
+                  </span>
+                )}
               </div>
             </div>
             <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-1">
@@ -96,10 +102,7 @@ export default function Discussion() {
                       key={post.discussionId}
                       className="flex gap-x-4 text-xs items-start"
                     >
-                      <Link
-                        to={`/discussion/${post.discussionId}`}
-                        
-                      >
+                      <Link to={`/discussion/${post.discussionId}`}>
                         <img
                           className="w-[320px] h-[256px] rounded-3xl"
                           src={"data:image/jpeg;base64," + post.discussionImage}
@@ -122,10 +125,7 @@ export default function Discussion() {
                           )}
                         </time>
                         <h5 className="hover:text-[#2e72e7]  text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                          <Link
-                            to={`/discussion/${post.discussionId}`}
-                            
-                          >
+                          <Link to={`/discussion/${post.discussionId}`}>
                             {post.discussionName}
                           </Link>
                         </h5>
