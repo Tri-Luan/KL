@@ -95,9 +95,18 @@ const Practice = () => {
               required
               onChange={(e) => setPracticeLevelId(e.target.value)}
             >
-              <option value={0}>Level</option>
+              <option value={0} selected={practiceLevelId === 0}>
+                Level
+              </option>
               {levels.levels.map((level, i) => {
-                return <option value={level.id}>{level.name}</option>;
+                return (
+                  <option
+                    value={level.id}
+                    selected={practiceLevelId === level.id}
+                  >
+                    {level.name}
+                  </option>
+                );
               })}
             </select>
           </form>

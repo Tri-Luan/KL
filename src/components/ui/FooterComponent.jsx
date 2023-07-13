@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <div className="relative">
-      <div className="relative top-full py-2 h-11 text-gray-800 text-center">
+    <div className="">
+      <div className=" py-2 h-11 text-gray-800 text-center">
         <footer class="bg-white rounded-lg shadow dark:bg-gray-900 m-4">
           <hr className="h-px mb-3 mt-28 bg-blue-200 border-0 " />
           <div class="w-full max-w-screen-xl mx-auto p-4 md:py-8">

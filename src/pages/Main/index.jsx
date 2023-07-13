@@ -7,11 +7,13 @@ import Footer from "../../components/ui/FooterComponent";
 class Layout extends Component {
   render() {
     return (
-      <main className="App">
+      <div class="flex flex-col  h-screen justify-between">
         <Header />
-        <Outlet />
+        <div className="mb-auto">
+          <Outlet />
+        </div>
         <Footer />
-      </main>
+      </div>
     );
   }
 }
