@@ -13,7 +13,6 @@ import {
 } from "../../redux/courseApiSlice";
 
 const UpdateCourse = () => {
-  // const navigate = useNavigate();
   const { id } = useParams();
   const [formValid, setFormValid] = useState(false);
   const [errMessage, setErrMessage] = useState(null);

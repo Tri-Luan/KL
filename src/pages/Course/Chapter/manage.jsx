@@ -1,4 +1,4 @@
-import { Button, Modal, Spinner } from "flowbite-react";
+import { Button, Spinner } from "flowbite-react";
 import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import AlertComponent from "../../../components/ui/AlertComponent";
@@ -19,11 +19,8 @@ const ChapterManagement = () => {
     data,
     isLoading: isLoadingGetChapters,
     isSuccess,
-    isError,
-    error,
     refetch,
   } = useGetChaptersByCourseIdQuery({ courseId: id });
-  console.log(data);
   const [deleteChapter, { isLoading: isLoading1 }] = useDeleteChapterMutation();
   const [addChapter, { isLoading: isLoading2 }] = useAddChapterMutation();
   const [setHideChapter, { isLoading: isLoading3 }] =
@@ -58,9 +55,6 @@ const ChapterManagement = () => {
   const [alertDeleteIsShowing, setAlertDeleteIsShowing] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
   const [alertIsShowing, setAlertIsShowing] = useState(false);
-  const [toggleEdit, setToggleEdit] = useState(false);
-  const [chapterIdEdit, setChapterIdEdit] = useState("");
-  const [chapterNameEdit, setChapterNameEdit] = useState("");
   const handleAddChapter = async (chapterName) => {
     const response = await addChapter({ courseId: id, chapterName })
       .unwrap()

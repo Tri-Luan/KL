@@ -1,7 +1,7 @@
-import { Avatar, Button, Progress, Spinner, Tabs } from "flowbite-react";
+import { Avatar, Button, Spinner, Tabs } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ModalComponent from "../../components/ui/ModalComponent";
 import useModal from "../../hooks/useModal";
 import { selectCurrentUser } from "../../redux/authSlice";
@@ -29,7 +29,6 @@ const CourseDetail = () => {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState(null);
   const certificateWrapper = useRef(null);
-  const [Name, setName] = useState("");
   const currentDate = new Date().toLocaleString("en-US", {
     month: "long",
     day: "numeric",
@@ -66,15 +65,12 @@ const CourseDetail = () => {
     isError: isErrorGetCourse,
     error: errorGetCourse,
     refetch: refetchGetCourse,
-  } = useGetCourseDetailQuery({ userId: user.id, courseId: id });
-  // const {
-  //   data: comments,
-  //   isLoading: isLoadingGetCourseComments,
-  //   isSuccess: isSuccessGetCourseComments,
-  //   isError: isErrorGetCourseComments,
-  //   error: errorGetCourseComments,
-  //   refetch: refetchGetCourseComments,
-  // } = useGetCourseCommentsQuery({ userId: user.id, courseId: id });
+  } = useGetCourseDetailQuery(
+    { userId: user.id, courseId: id },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
   const [getCourseComments] = useGetCourseCommentsMutation();
   const [registerCourse] = useRegisterCourseMutation();
   const [addCourseComment, { isLoading: isLoadingAddCourseComment }] =
@@ -92,9 +88,6 @@ const CourseDetail = () => {
       document.getElementById("objective").innerHTML = course.objective;
     }
   }, [isSuccessGetCourse]);
-  // const renderTheme()=>{
-  //   return ()
-  // }
   const handleRegisterCourse = async () => {
     const response = await registerCourse({
       userId: user.id,
@@ -124,9 +117,6 @@ const CourseDetail = () => {
           });
       }
       setComment("");
-      // setTitle("");
-      // setUserId("");
-      // navigate("/");
     } catch (err) {
       console.error("Failed to delete the comment", err);
     }
@@ -375,7 +365,7 @@ const CourseDetail = () => {
                     ) : (
                       <div
                         className={`bg-green-500 text-white h-6 text-md font-medium  text-center p-0.5 leading-none rounded-full`}
-                        style={{ width: `${course.completedPercent}` }}
+                        style={{ width: `${course.completedPercent}%` }}
                       >
                         {course.completedPercent}%
                       </div>
@@ -383,15 +373,6 @@ const CourseDetail = () => {
                   </div>
                 </>
               ) : (
-                /* <div class="w-20 h-20 text-center justify-center items-center  border-4 rounded-full  dark:bg-gray-700">
-                <span
-                  class="w-20 h-20 text-base font-medium text-blue-100"
-                  // style="width: 45%"
-                >
-                  {" "}
-                  45%
-                </span>
-              </div> */
                 <>
                   <button
                     class="btnRed mt-3 "
@@ -429,10 +410,7 @@ const CourseDetail = () => {
                 }
               }}
             >
-              <Tabs.Item active={true} title="Objective">
-                <div id="objective"></div>
-              </Tabs.Item>
-              <Tabs.Item title="Tasks">
+              <Tabs.Item active={true} title="Tasks">
                 <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
                   <ModalComponent
                     isShowing={isShowing2}
@@ -443,58 +421,61 @@ const CourseDetail = () => {
                     func={handleRegisterCourse}
                     hide={toggle2}
                   />
-                  {course.chapters.map((chapter, i) => {
-                    return (
-                      <div className="lesson mt-14">
-                        <center>
-                          <div className="title w-fit px-6 py-3 text-center rounded-full bg-indigo-500 text-white">
-                            <h3>{chapter.name}</h3>
+                  {course.chapters !== null
+                    ? course.chapters.map((chapter, i) => {
+                        return (
+                          <div className="lesson mt-14">
+                            <center>
+                              <div className="title w-fit px-6 py-3 text-center rounded-full bg-indigo-500 text-white">
+                                <h3>{chapter.name}</h3>
+                              </div>
+                              <div className="flex justify-center my-6">
+                                {chapter.lessons.map((lesson, i) => {
+                                  return (
+                                    <button
+                                      className="mx-1.5 my-3"
+                                      onClick={() => {
+                                        if (course.isRegistered) {
+                                          navigate(`/course/detail`, {
+                                            state: {
+                                              useFor: "course",
+                                              id: lesson.id,
+                                              courseId: id,
+                                            },
+                                          });
+                                        } else {
+                                          toggle2();
+                                        }
+                                      }}
+                                    >
+                                      <div
+                                        className={`rounded-full ${
+                                          lesson.isLearned
+                                            ? "bg-indigo-500 text-white"
+                                            : "bg-white"
+                                        } hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10`}
+                                      >
+                                        {lesson.lessonNumber}
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </center>
                           </div>
-                          <div className="flex justify-center my-6">
-                            {chapter.lessons.map((lesson, i) => {
-                              return (
-                                <button
-                                  className="mx-1.5 my-3"
-                                  onClick={() => {
-                                    if (course.isRegistered) {
-                                      navigate(`/course/detail`, {
-                                        state: {
-                                          useFor: "course",
-                                          id: lesson.id,
-                                        },
-                                      });
-                                    } else {
-                                      toggle2();
-                                    }
-                                  }}
-                                >
-                                  <div
-                                    className={`rounded-full ${
-                                      lesson.isLearned
-                                        ? "bg-indigo-500 text-white"
-                                        : "bg-white"
-                                    } hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 text-indigo-500 font-medium pt-1.5 w-10 h-10`}
-                                  >
-                                    {lesson.lessonNumber}
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </center>
-                      </div>
-                    );
-                  })}
+                        );
+                      })
+                    : null}
                 </div>
               </Tabs.Item>
+              <Tabs.Item title="Objective">
+                <div id="objective"></div>
+              </Tabs.Item>
+
               <Tabs.Item title="Comments">
                 <section class="bg-white dark:bg-gray-900 py-2 lg:py-4">
                   <div class="max-w-2xl px-4">
-                    <div class="flex justify-between items-center mb-6">
-                      {/* <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
-                        Discussion (20)
-                      </h2> */}
-                    </div>
+                    <div class="flex justify-between items-center mb-6"></div>
                     {isLoadingDeleteCourseComment ||
                     isLoadingAddCourseReplyComment ||
                     isLoadingAddCourseComment ? (

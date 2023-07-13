@@ -1,16 +1,13 @@
 import {
   BackwardIcon,
-  PhotoIcon,
-  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Spinner } from "flowbite-react";
 
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import {  useSelector } from "react-redux";
+import { Link} from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
 import AlertComponent from "../../components/ui/AlertComponent";
-import Breadcrumbs from "../../components/ui/Breadcrumbs";
 import useCkEditor from "../../hooks/useCkEditor";
 import { selectCurrentUser } from "../../redux/authSlice";
 import {
@@ -19,7 +16,6 @@ import {
 } from "../../redux/practiceApiSlice";
 
 const CreatePractice = () => {
-  // const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const authorId = user.id;
 
@@ -165,7 +161,7 @@ const CreatePractice = () => {
     var testCases = [];
     for (var i = 0; i < totalHiddenTestCase; i++) {
       var inputId = String("txtHiddenTestCaseInput" + i);
-      var outputId = String("txtHiddenTestCaseInput" + i);
+      var outputId = String("txtHiddenTestCaseOutput" + i);
       var input = String(document.getElementById(inputId).value.trim());
       var output = String(document.getElementById(outputId).value.trim());
       var testcase = {

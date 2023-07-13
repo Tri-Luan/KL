@@ -1,16 +1,12 @@
 import { Button, Pagination, Spinner } from "flowbite-react";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation} from "react-router-dom";
 import AlertComponent from "../../components/ui/AlertComponent";
 import ModalComponent from "../../components/ui/ModalComponent";
 import useModal from "../../hooks/useModal";
 import { selectCurrentUser } from "../../redux/authSlice";
-import {
-  useDeleteLessonMutation,
-  useGetLessonsByChapterIdQuery,
-  useSetHideLessonMutation,
-} from "../../redux/courseApiSlice";
+
 import {
   useDeletePracticeMutation,
   useGetPracticesManagementQuery,
@@ -25,8 +21,6 @@ const PracticeManagement = () => {
     data,
     isLoading: isLoadingGetLessons,
     isSuccess,
-    isError,
-    error,
     refetch,
   } = useGetPracticesManagementQuery({
     userId: user.id,

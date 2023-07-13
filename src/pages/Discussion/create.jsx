@@ -1,13 +1,11 @@
 import {
   BackwardIcon,
-  PhotoIcon,
-  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
 import { FileInput, Label } from "flowbite-react";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {  useSelector } from "react-redux";
+import { Link} from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
 import AlertComponent from "../../components/ui/AlertComponent";
 import useCkEditor from "../../hooks/useCkEditor";
@@ -15,7 +13,6 @@ import { selectCurrentUser } from "../../redux/authSlice";
 import { useAddDiscussionMutation } from "../../redux/discussionApiSlice";
 
 const CreateDiscussion = () => {
-  // const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const authorId = user.id;
   const { CkEditorData, setCkEditorData } = useCkEditor();

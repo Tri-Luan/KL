@@ -1,7 +1,7 @@
-import { Breadcrumb, Spinner } from "flowbite-react";
+import { Spinner } from "flowbite-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Breadcrumbs from "../../components/ui/Breadcrumbs";
 import ModalComponent from "../../components/ui/ModalComponent";
 import useModal from "../../hooks/useModal";

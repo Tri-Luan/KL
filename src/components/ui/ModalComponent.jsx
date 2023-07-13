@@ -13,6 +13,7 @@ const ModalComponent = ({
   buttonContent,
   content,
   setContent,
+  results,
 }) => {
   return (
     <Modal
@@ -193,7 +194,14 @@ const ModalComponent = ({
             <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
               {content}
             </h3>
-
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Pass:{" "}
+              <span className="text-green-500">{results?.pass} test cases</span>
+            </h3>
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Score:{" "}
+              <span className="text-blue-600">{results?.score} points</span>{" "}
+            </h3>
             <div className="flex justify-center gap-4">
               <Button
                 color="blue"
@@ -202,7 +210,7 @@ const ModalComponent = ({
                   hide();
                 }}
               >
-                Try next task
+                {buttonContent}
               </Button>
               <Button color="gray" onClick={hide}>
                 Stay on this page

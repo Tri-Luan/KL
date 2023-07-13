@@ -2,9 +2,9 @@
 import "../../style/IDE.css";
 
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Split from "react-split";
-import { Listbox, Transition, Switch, Tab } from "@headlessui/react";
+import { Listbox, Transition, Tab } from "@headlessui/react";
 import {
   CheckIcon,
   ChevronUpDownIcon,
@@ -15,7 +15,6 @@ import {
 import {
   ArrowPathIcon,
   ArrowDownTrayIcon,
-  SaveAsIcon,
   ChevronDoubleRightIcon,
   BookOpenIcon,
   AcademicCapIcon,
@@ -55,13 +54,12 @@ function classNames(...classes) {
 }
 
 const CodeEditor1 = () => {
-  // const window = new JSDOM("").window;
-  // const DOMPurify = createDOMPurify(window);
-
+  const navigate = useNavigate();
   const tabsRef = useRef(null);
   const props = { tabsRef };
   const location = useLocation();
   const id = location.state.id;
+  const courseId = location.state.courseId;
   const user = useSelector(selectCurrentUser);
   const [currentPage, setCurrentPage] = useState(1);
   const {
@@ -136,7 +134,14 @@ const CodeEditor1 = () => {
     toggle: toggle1,
     setArg: setArg1,
   } = useModal();
-  const { arg: arg2, isShowing: isShowing2, toggle: toggle2 } = useModal();
+  const {
+    arg: arg2,
+    isShowing: isShowing2,
+    toggle: toggle2,
+    setArg: setArg2,
+    results: results2,
+    setResults: setResults2,
+  } = useModal();
   const {
     arg: arg3,
     isShowing: isShowing3,
@@ -239,9 +244,6 @@ const CodeEditor1 = () => {
                     </Listbox.Option>
                   ) : null;
                 })}
-                {/* {this.state.languages.map((language, languageIdx) => (
-                  
-                ))} */}
               </Listbox.Options>
             </Transition>
           </div>
@@ -362,7 +364,11 @@ const CodeEditor1 = () => {
     }).unwrap();
     refetchGetLessonHistory();
     refetchGetLessonLeaderboard();
+    setResults2(response);
     toggle2();
+  };
+  const handleNavigate = () => {
+    navigate(`/course/${courseId}`);
   };
   const handleComment = async () => {
     try {
@@ -383,9 +389,6 @@ const CodeEditor1 = () => {
       }
 
       setComment("");
-      // setTitle("");
-      // setUserId("");
-      // navigate("/");
     } catch (err) {
       console.error("Failed to delete the comment", err);
     }
@@ -655,8 +658,6 @@ const CodeEditor1 = () => {
                 leaderBoards.totalPages > 1 ? (
                   <center>
                     <Pagination
-                      // aria-current={currentPage}
-                      // theme={customTheme}
                       currentPage={currentPage}
                       onPageChange={(page) => {
                         setCurrentPage(page);
@@ -716,21 +717,15 @@ const CodeEditor1 = () => {
               <Tabs.Item icon={ChatBubbleBottomCenterTextIcon} title="Comment">
                 <section class="bg-white dark:bg-gray-900  lg:py-4 p-0 max-h-[70vh] w-full overflow-auto ">
                   <div class="max-w-2xl px-4">
-                    <div class="flex justify-between items-center mb-6">
-                      {/* <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
-                        Discussion (20)
-                      </h2> */}
-                    </div>
-                    {
-                      // isLoadingGetLessonComments ||
-                      isLoadingDeleteLessonComment ||
-                      isLoadingAddLessonReplyComment ||
-                      isLoadingAddLessonComment ? (
-                        <div className="text-center">
-                          <Spinner aria-label="Center-aligned spinner example" />
-                        </div>
-                      ) : null
-                    }
+                    <div class="flex justify-between items-center mb-6"></div>
+                    {isLoadingDeleteLessonReplyComment ||
+                    isLoadingDeleteLessonComment ||
+                    isLoadingAddLessonReplyComment ||
+                    isLoadingAddLessonComment ? (
+                      <div className="text-center">
+                        <Spinner aria-label="Center-aligned spinner example" />
+                      </div>
+                    ) : null}
                     <ModalComponent
                       isShowing={isShowing1}
                       arg={arg1}
@@ -1024,7 +1019,6 @@ const CodeEditor1 = () => {
                                                 {replycomment.numberOfDislike}
                                               </div>
                                             </button>
-                                           
                                           </div>
                                         </article>
                                       );
@@ -1045,9 +1039,6 @@ const CodeEditor1 = () => {
             <div className="relative z-1">
               <div className="bg-slate-800 flex h-14 selectLanguage">
                 {SelectLanguage()}
-
-                {/* SelectTheme unfinished */}
-                {/* {this.SelectTheme()} */}
                 <h3 className="text-2xl text-white font-bold mx-36 mt-2 text-center">
                   Code Editor
                 </h3>
@@ -1080,7 +1071,7 @@ const CodeEditor1 = () => {
               </div>
               <div className=" bg-slate-800 h-96">
                 {isError === true ? (
-                  <div className="text-white">
+                  <div className="text-white w-full overflow-y-auto h-72">
                     <h3 className="text-2xl font-bold mb-3 pb-4 text-center">
                       Console
                     </h3>
@@ -1103,7 +1094,6 @@ const CodeEditor1 = () => {
                 ) : (
                   renderTestCase()
                 )}
-                {/* {renderModal()} */}
                 <div className="flex float-right px-3 py-1">
                   <button
                     type="button"
@@ -1145,6 +1135,9 @@ const CodeEditor1 = () => {
                     type="submit"
                     title={`Congratulations ${user.userName}`}
                     content="You have just finished this task."
+                    buttonContent="Back to course"
+                    results={results2}
+                    func={handleNavigate}
                   />
                 </div>
               </div>

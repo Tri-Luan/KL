@@ -1,14 +1,12 @@
 import { BackwardIcon } from "@heroicons/react/24/outline";
 import { Spinner } from "flowbite-react";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import CkEditor from "../../../../components/CkEditor/ckeditor";
 import AlertComponent from "../../../../components/ui/AlertComponent";
 import ModalComponent from "../../../../components/ui/ModalComponent";
 import useCkEditor from "../../../../hooks/useCkEditor";
 import useModal from "../../../../hooks/useModal";
-import { selectCurrentUser } from "../../../../redux/authSlice";
 import {
   useDeleteTestCaseLessonMutation,
   useGetCodeLanguagesQuery,
@@ -42,8 +40,6 @@ const UpdateLesson = () => {
     data: lesson,
     isLoading: isLoadingGetLesson,
     isSuccess,
-    isError,
-    error,
     refetch,
   } = useGetLessonDetailsUpdateQuery(id, {
     refetchOnMountOrArgChange: true,

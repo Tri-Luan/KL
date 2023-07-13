@@ -42,25 +42,19 @@ function App() {
         <Route path="/" element={<Layout />}>
           {/* public routes */}
           <Route index element={<DefaultHome />} />
-
           <Route path="unauthorized" element={<Unauthorized />} />
           <Route path="home" element={<Home />} />
-          {/* protect routes */}
-          {/* allowedRoles={[ROLES.Student]}  */}
-
           <Route path="course">
             <Route index element={<Course />} />
             <Route element={<RequireAuth />}>
               <Route path=":id" element={<CourseDetail />} />
-              {/* <Route path="detail/:name" element={<CodeEditor />} /> */}
             </Route>
           </Route>
-
           <Route path="discussion">
             <Route index element={<Discussion />} />
             <Route path="create" element={<CreateDiscussion />} />
           </Route>
-
+          {/* protect routes */}
           <Route element={<RequireAuth />}>
             {/* <Route path="/home" element={<Home />} /> */}
             <Route path="profile" element={<Profile />} />

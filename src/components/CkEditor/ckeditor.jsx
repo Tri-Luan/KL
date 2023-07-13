@@ -51,7 +51,6 @@ const CkEditor = ({ CkEditorData, setCkEditorData }) => {
       contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
     },
   };
-  // const [CkData, setCkData] = useState(CkEditorData);
   return (
     <CKEditor
       editor={Editor}

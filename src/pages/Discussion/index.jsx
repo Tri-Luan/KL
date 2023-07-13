@@ -16,8 +16,12 @@ export default function Discussion() {
   const user = useSelector(selectCurrentUser);
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, isSuccess, isError, error, refetch } =
-    useGetDiscussionsQuery({ pageSize: 3, pageNumber: currentPage });
-  console.log(data);
+    useGetDiscussionsQuery(
+      { pageSize: 3, pageNumber: currentPage },
+      {
+        refetchOnMountOrArgChange: true,
+      }
+    );
   const [deleteDiscussion, { isLoading: isLoadingDeleteCourseReplyComment }] =
     useDeleteDiscussionMutation();
   const { arg, isShowing, toggle, setArg } = useModal();
@@ -94,7 +98,7 @@ export default function Discussion() {
                     >
                       <Link
                         to={`/discussion/${post.discussionId}`}
-                        // state={{ id: post.discussionId }}
+                        
                       >
                         <img
                           className="w-[320px] h-[256px] rounded-3xl"
@@ -120,7 +124,7 @@ export default function Discussion() {
                         <h5 className="hover:text-[#2e72e7]  text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
                           <Link
                             to={`/discussion/${post.discussionId}`}
-                            // state={{ id: post.discussionId }}
+                            
                           >
                             {post.discussionName}
                           </Link>
@@ -182,7 +186,6 @@ export default function Discussion() {
               {data.totalPages > 1 ? (
                 <div className="mx-auto">
                   <Pagination
-                    // aria-current={currentPage}
                     currentPage={currentPage}
                     onPageChange={(page) => {
                       setCurrentPage(page);

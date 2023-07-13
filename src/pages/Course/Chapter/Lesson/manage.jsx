@@ -22,13 +22,16 @@ const LessonManagement = () => {
     data,
     isLoading: isLoadingGetLessons,
     isSuccess,
-    isError,
-    error,
     refetch,
-  } = useGetLessonsByChapterIdQuery({ chapterId: id });
+  } = useGetLessonsByChapterIdQuery(
+    { chapterId: id },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
   const [deleteLesson, { isLoading: isLoadingDeleteLesson }] =
     useDeleteLessonMutation();
-  const [setHideLesson, { isLoading: isLoadingHideLesso }] =
+  const [setHideLesson, { isLoading: isLoadingHideLesson }] =
     useSetHideLessonMutation();
   const { arg, isShowing, toggle, setArg } = useModal();
   const [errMessage, setErrMessage] = useState(null);

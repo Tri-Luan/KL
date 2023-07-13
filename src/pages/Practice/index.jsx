@@ -1,4 +1,4 @@
-import { Badge, Card, Dropdown, Pagination, Spinner } from "flowbite-react";
+import { Badge, Pagination, Spinner } from "flowbite-react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { selectCurrentUser } from "../../redux/authSlice";
@@ -19,7 +19,7 @@ const Practice = () => {
   const navigate = useNavigate();
   const { data: levels, isLoading: isLoadingGetLevels } =
     useGetPracticeLevelsQuery();
-  const [practiceLevelId, setPracticeLevelId] = useState(1);
+  const [practiceLevelId, setPracticeLevelId] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [keyword, setKeyword] = useState("");
   const { data, isLoading, isSuccess, isError, error } = useGetPracticesQuery(
@@ -28,7 +28,7 @@ const Practice = () => {
       pageSize: 8,
       pageNumber: currentPage,
       keyword: keyword,
-      practiceLevelId: practiceLevelId,
+      levelId: practiceLevelId,
     },
     {
       refetchOnMountOrArgChange: true,
@@ -100,19 +100,6 @@ const Practice = () => {
                 return <option value={level.id}>{level.name}</option>;
               })}
             </select>
-            {/* <div class="flex">
-              <select
-                id="level"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500  w-40 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                required
-                onChange={(e) => setPracticeLevelId(e.target.value)}
-              >
-                <option value={0}>Status</option>
-                {levels.levels.map((level, i) => {
-                  return <option value={level.id}>{level.name}</option>;
-                })}
-              </select>
-            </div> */}
           </form>
           <div class="grid lg:grid-cols-4 lg:gap-5 gap-5 xl:gap-x-7">
             {data.practices !== null
@@ -220,8 +207,6 @@ const Practice = () => {
           {data.totalPages > 1 ? (
             <center>
               <Pagination
-                // aria-current={currentPage}
-                // theme={customTheme}
                 currentPage={currentPage}
                 onPageChange={(page) => {
                   setCurrentPage(page);

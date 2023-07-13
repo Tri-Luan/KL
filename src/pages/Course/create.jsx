@@ -1,13 +1,9 @@
-import {
-  BackwardIcon,
-  PhotoIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
+import { BackwardIcon } from "@heroicons/react/24/outline";
 
 import { FileInput, Label, Spinner } from "flowbite-react";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
 import AlertComponent from "../../components/ui/AlertComponent";
 import useCkEditor from "../../hooks/useCkEditor";
@@ -18,7 +14,6 @@ import {
 } from "../../redux/courseApiSlice";
 
 const CreateCourse = () => {
-  // const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const authorId = user.id;
   const { CkEditorData, setCkEditorData } = useCkEditor();
@@ -31,27 +26,9 @@ const CreateCourse = () => {
   const [reward, setReward] = useState("");
   const [theme, setTheme] = useState("");
   const [time, setTime] = useState(0);
-  const [success, setSuccess] = useState(false);
   const [alertIsShowing, setAlertIsShowing] = useState(false);
-  const {
-    data,
-    isLoading: isLoadingGetThemes,
-    isSuccess,
-    isError,
-    error,
-  } = useGetThemesQuery();
+  const { data, isLoading: isLoadingGetThemes } = useGetThemesQuery();
   const [addCourse, { isLoading }] = useAddCourseMutation();
-  // useEffect(() => {
-  //   if (results && results.data) {
-  //     // dispatch(setUser(results.data));
-  //     // navigate(from, { replace: true });
-  //     if (results.data.isSuccessful) {
-  //       setErrMessage(["Register successful"]);
-  //     } else {
-  //       setErrMessage(results.data.errorMessages);
-  //     }
-  //   }
-  // }, [results]);
 
   useEffect(() => {
     if (!isLoadingGetThemes) {

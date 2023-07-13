@@ -5,7 +5,7 @@ import { useGetCoursesQuery } from "../../redux/courseApiSlice";
 
 const Course = () => {
   const [keyword, setKeyword] = useState("");
-  const { data, isLoading, isSuccess, isError, error } = useGetCoursesQuery(
+  const { data, isLoading, isSuccess } = useGetCoursesQuery(
     {
       keyword: keyword,
     },
@@ -181,30 +181,6 @@ const Course = () => {
         </section>
       ) : null}
     </div>
-
-    // <div class="popover-course arrow-left" style="left: calc(100% + 20px); right: unset;">
-    // <a href="/learning/object-oriented-programming-in-cpp" title="Object Oriented-Programming in C++"> <h3 class="popover-course__title">Object Oriented-Programming in C++</h3></a>
-    // <div class="popover-course__sum">
-    // <div class="author">
-    // <img src="/CodeCamp/CodeCamp/Upload/Avatar/a76638850ecc4722b76d255e9cdd462f.jpg" alt="TuanLQ7">
-    // <a href="/profile/3488" class="user-name" title="TuanLQ7">TuanLQ7</a>
-    // </div>
-    // <span class="rate-wrap">
-    // <span class="star-rating"><span style="width:88.0%"></span></span>
-    // <span class="avg-rate">4.4</span>
-    // <span class="total-rate">(219)</span>
-    // </span>
-    // </div>
-    // <ul class="popover-course__detail-infor">
-    // <li><p><i class="cl-icon-dribbble"></i> Online </p></li>
-    // <li><p><i class="cl-icon-users-alt"></i> 51854 students</p></li>
-    // <li><p><i class="cl-icon-star" avg-rate="4.4"></i> Great reviews from students</p></li>
-    // <li><p><i class="cl-icon-clock"></i> Time to complete: <strong>40 hours</strong></p></li>
-    // <li><p><i class="cl-icon-award"></i> Certificate of Course Completion</p></li>
-    // </ul>
-    // </div>
-    // </div>
-    // </article>
   );
 };
 

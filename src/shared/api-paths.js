@@ -1,6 +1,4 @@
 export const baseUrl = "http://209.97.172.240/api/v1.0";
-
-// export const serverUrl = 'http://128.199.172.148:4000/jobe/index.php/restapi/';
 export const ApiPaths = {
   auth: {
     root: "/authentications",

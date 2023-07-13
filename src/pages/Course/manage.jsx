@@ -20,7 +20,12 @@ const CourseManagement = () => {
     isError,
     error,
     refetch,
-  } = useGetCoursesByUserIdQuery({ userId: user.id });
+  } = useGetCoursesByUserIdQuery(
+    { userId: user.id },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
   const [deleteCourse, { isLoading: isLoadingDeleteCourse }] =
     useDeleteCourseMutation();
   const [setHideCourse, { isLoading: isLoadingHideCourse }] =

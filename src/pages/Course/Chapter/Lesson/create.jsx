@@ -1,13 +1,9 @@
-import {
-  BackwardIcon,
-  PhotoIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
+import { BackwardIcon } from "@heroicons/react/24/outline";
 import { Spinner } from "flowbite-react";
 
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link, useLocation, useParams } from "react-router-dom";
 import CkEditor from "../../../../components/CkEditor/ckeditor";
 import AlertComponent from "../../../../components/ui/AlertComponent";
 import useCkEditor from "../../../../hooks/useCkEditor";
@@ -34,13 +30,8 @@ const CreateLesson = () => {
   const [codeSampleLanguage, setCodeSampleLanguage] = useState(1);
   const [alertIsShowing, setAlertIsShowing] = useState(false);
   const [addLesson, { isLoading }] = useAddLessonMutation();
-  const {
-    data,
-    isLoading: isLoadingGetCodeLanguages,
-    isSuccess,
-    isError,
-    error,
-  } = useGetCodeLanguagesQuery();
+  const { data, isLoading: isLoadingGetCodeLanguages } =
+    useGetCodeLanguagesQuery();
   useEffect(() => {
     if (lessonName !== "" && codeSample !== "" && CkEditorData !== "") {
       setFormValid(true);
@@ -215,7 +206,7 @@ const CreateLesson = () => {
             </h2>
             {alertIsShowing ? (
               <AlertComponent
-                content={"Create new lesson successed"}
+                content={"Create new lesson success"}
                 visible={setAlertIsShowing}
               />
             ) : null}

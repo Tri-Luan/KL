@@ -1,13 +1,9 @@
-import {
-  BackwardIcon,
-  PhotoIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
+import { BackwardIcon } from "@heroicons/react/24/outline";
 import { Spinner } from "flowbite-react";
 
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import CkEditor from "../../components/CkEditor/ckeditor";
 import AlertComponent from "../../components/ui/AlertComponent";
 import ModalComponent from "../../components/ui/ModalComponent";
@@ -62,7 +58,7 @@ const UpdatePractice = () => {
       setScore(practice.score);
       setNumberTestCases(practice.totalTestCases);
       setNumberHiddenTestCases(practice.totalHiddenTestCases);
-      // setLevel(practice);
+      setPracticeLevelId(practice.practiceLevelId);
     }
   }, [isLoadingGetPractice, practice, setCkEditorData]);
 

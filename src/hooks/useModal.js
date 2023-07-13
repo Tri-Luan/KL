@@ -4,6 +4,7 @@ const useModal = () => {
   const [isShowing, setIsShowing] = useState(false);
   const [arg, setArg] = useState();
   const [content, setContent] = useState();
+  const [results, setResults] = useState();
   function toggle() {
     setIsShowing(!isShowing);
   }
@@ -11,9 +12,11 @@ const useModal = () => {
     arg,
     isShowing,
     content,
+    results,
     toggle,
     setArg,
     setContent,
+    setResults,
   };
 };
 
